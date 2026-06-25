@@ -1,0 +1,24 @@
+<h1>login</h1>
+
+<form  method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit">Enter the Arena</button>
+</form>
+
+<a href="/accounts/google/login/?process=login">
+    Login with Google
+</a>
+
+<br>
+
+<a href="/accounts/discord/login/">
+Login with Discord
+</a>
+
+<br>
+
+<a href="/accounts/password/reset/">
+Forgot Password
+</a>
