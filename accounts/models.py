@@ -1,8 +1,13 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 # Create your models here.
 class user_profile(models.Model):
- 
+    user=models.OneToOneField(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE
+    )
     full_name=models.CharField(max_length=100)
     age=models.CharField()
     gamer_tag=models.CharField(max_length=100,unique=True)
