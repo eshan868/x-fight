@@ -25,6 +25,9 @@ class Tournament(models.Model):
         max_length=20,
         choices=CATEGORY_CHOICES
     )
+    def __str__(self):
+       return self.name
+
 
 
 class Team(models.Model):
