@@ -21,12 +21,20 @@ img {
 }
 </style>
 
-{% for events in event %}
+{% for events in tournament %}
 <div class="card">
  <div class="container">
    <h4><b>{{events.name}}</b></h4>
    <p>{{events.price}}</p>
    <p>{{events.category}}</p>
+   {% if not like  %}
+   <a href="{% url 'like' events.id %}">like</a>
+   {% else %}
+    <a href="{% url 'like' events.id %}">unlike</a>
+   {% endif %}
  </div>
 </div>
+
+<a href="{% url 'event-details' events.id %}">check out </a>
+
 {% endfor %}

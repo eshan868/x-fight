@@ -1,0 +1,14 @@
+
+<div class="card">
+ <div class="container">
+   <h4><b>{{event.name}}</b></h4>
+   <p>{{event.description}}</p>
+   <p>timeline</p>
+   <p>launch date :{{event.starting_time}}</p>
+   <p>dead line :{{event.starting_time}}</p>
+   <p>{{event.like}}</p>
+   <p>{{event.price}}</p>
+   <p>{{event.category}}</p>
+   <a href="{% url 'event-managemanet' event.id %} ">Settings</a>
+ </div>
+</div>

@@ -19,7 +19,7 @@ class Tournament(models.Model):
 
     price = models.CharField(max_length=100)
 
-    like = models.IntegerField(default=0)
+    like = models.ManyToManyField(User,blank=True,)
 
     category = models.CharField(
         max_length=20,

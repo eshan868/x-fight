@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from . forms import signup_form,signin_form
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
-
+from tournament.models import Team
 # Create your views here.
 def signup(request):
 
@@ -52,8 +52,9 @@ def signin(request):
     return render(request,"authentication/signin.html",{"form":form})
 
 def dashboard(request):
+     team=Team.objects.all()
      
-     return render(request,"user/dashboard.html")
+     return render(request,"user/dashboard.html",{"team":team})
 
 
          
