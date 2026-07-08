@@ -1,2 +1,15 @@
 <h1> Event Settings </h1>
 
+<h2>registerd teams</h2>
+
+{% if team %}
+     {% for teams in team %}
+
+        <p>{{teams.name}}</p>
+        <p>{{teams.max_players}}</p>
+    {% endfor %}
+
+{% else %}
+     <p>no teams registerd yet </p>
+{% endif %}
+

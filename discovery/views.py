@@ -1,5 +1,5 @@
 from django.shortcuts import render,get_object_or_404,redirect
-from tournament.models import Tournament
+from tournament.models import Tournament,Team
 from django.contrib.auth.models import User
 
 
@@ -11,7 +11,8 @@ def event_display(request):
 
 def event_details(request,event_id): 
     tournament_details=get_object_or_404(Tournament,id=event_id)
-    return render(request,"display/events_details.html", {"event":tournament_details})
+    teams = Team.objects.filter(user=request.user)
+    return render(request,"display/events_details.html", {"event":tournament_details,"team":teams})
 
 def like(request,id):
     tournament=get_object_or_404(Tournament,id=id)
