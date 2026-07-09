@@ -27,9 +27,25 @@ class signup_form(ModelForm):
                 "profile_image",
                 "password",
                 ]
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({
+                "class": "form-control",
+                "placeholder": field.label,
+            })
             
 class signin_form(forms.Form):
     
     username=forms.CharField(max_length=100)
     password = forms.CharField(widget=forms.PasswordInput())    
     
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            field.widget.attrs.update({
+                "class": "form-control",
+                "placeholder": field.label,
+            })

@@ -21,6 +21,7 @@ def team_making(request):
         if form.is_valid():
             team=form.save()
             team.save()
+            print("team created\n",team)
             return redirect("dashboard")
     else:
         form=team_making_form()

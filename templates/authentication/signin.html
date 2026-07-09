@@ -1,24 +1,79 @@
-<h1>login</h1>
+{% extends 'layouts/base_layout.html' %}
+{% block title %}Sign Up{% endblock %}
+{% block content %}
 
-<form  method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
+<section class="signup-section">
 
-    <button type="submit">Enter the Arena</button>
-</form>
+    <div class="container">
 
-<a href="/accounts/google/login/?process=login">
-    Login with Google
-</a>
+        <div class="row justify-content-center">
 
-<br>
+            <div class="col-lg-6 col-md-8 col-xl-5">
 
-<a href="/accounts/discord/login/">
-Login with Discord
-</a>
+                <div class="signup-card">
 
-<br>
+                    <div class="text-center mb-4">
 
-<a href="/accounts/password/reset/">
-Forgot Password
-</a>
+                        <h1>Welcome Back, Soldier</h1>
+
+                        <p class="text-light-emphasis">
+                            Sign in to show who you are.
+                        </p>
+
+                    </div>
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+                        {{form.as_p}}
+
+                        <div class="d-grid">
+                            <button class="btn btn-primary btn-lg">
+                                Enter the Arena
+                            </button>
+                        </div>
+
+                    </form>
+
+                    <div class="text-center my-4">
+                        <span class="text-secondary">
+                            ───── OR ─────
+                        </span>
+                    </div>
+
+                    <div class="d-grid">
+                        <a href="/accounts/google/login/?process=login"
+                           class="btn btn-light">
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg"
+                                 width="20"
+                                 class="me-2">
+                            Continue with Google
+                        </a>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="/accounts/password/reset/">
+                            Forgot Password?
+                        </a>
+                    </div>
+
+                    <hr>
+
+                    <p class="text-center mb-0">
+                        Don't have an account?
+                        <a href="{% url 'signup' %}">
+                            Create One
+                        </a>
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+{% endblock %}

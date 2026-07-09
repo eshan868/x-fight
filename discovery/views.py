@@ -6,7 +6,8 @@ from django.contrib.auth.models import User
 # Create your views here.
 
 def event_display(request):
-    tournament=Tournament.objects.all()
+    user=request.user
+    tournament=Tournament.objects.exclude(team__user=user).distinct()
     return render(request,"display/event_display.html",{"tournament":tournament})
 
 def event_details(request,event_id): 
@@ -26,5 +27,10 @@ def like(request,id):
         tournament.like.add(user)
         like=True
     return redirect("events-display")
+
+def home(request):
+  
+
+    return render(request,"home.html",)
         
 

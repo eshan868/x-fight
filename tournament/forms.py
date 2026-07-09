@@ -25,4 +25,14 @@ class team_making_form(ModelForm):
         model = Team
 
         fields = "__all__"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+
+           field.widget.attrs.update({
+            "class": "form-control",
+            "placeholder": field.label,
+          })
+
         

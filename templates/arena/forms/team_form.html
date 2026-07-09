@@ -1,6 +1,6 @@
-<h1> create your squad</h1>
+<h1>create squad </h1>
 
-<form method="post" enctype="multipart/form-data">
+<form  method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{form.as_p}}
     <button type="submit">create</button>

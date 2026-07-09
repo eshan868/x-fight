@@ -1,6 +1,66 @@
-<h1>signup</h1>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{form.as_p }}
-    <button type="submit">signup</button>
-</form>
+{% extends 'layouts/base_layout.html' %}
+{% block title %}Sign Up{% endblock %}
+{% block content %}
+
+<section class="signup-section">
+
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-lg-6 col-md-8">
+
+                <div class="signup-card">
+
+                    <div class="text-center mb-4">
+
+                        <h1>Create Account</h1>
+
+                        <p class="text-light-emphasis">
+                            Join tournaments. Compete. Win rewards.
+                        </p>
+
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data">
+
+                        {% csrf_token %}
+
+                        {{ form.as_p }}
+
+                        <div class="d-grid mt-4">
+
+                            <button class="btn btn-primary btn-lg" type="submit">
+
+                                <i class="bi bi-person-plus-fill"></i>
+                                Create Account
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                    <hr class="my-4">
+
+                    <p class="text-center mb-0">
+
+                        Already have an account?
+
+                        <a href="{% url 'signin' %}" class="text-decoration-none">
+                            Login
+                        </a>
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
