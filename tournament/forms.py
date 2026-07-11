@@ -17,7 +17,30 @@ class match_making_form(ModelForm):
         model = Match
 
         fields = "__all__"
-        exclude=["winner"]
+        exclude=["winner_team","tournament","winner_user"]
+
+        widgets = {
+            "name": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Enter match name"
+            }),
+            "match_date": forms.DateTimeInput(
+                attrs={
+                    "type": "datetime-local",
+                    "class": "form-control"
+                },
+                format="%Y-%m-%dT%H:%M"
+            ),
+            "game": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Game"
+            }),
+            "max_teams": forms.NumberInput(attrs={
+                "class": "form-control"
+            }),
+            "teams": forms.CheckboxSelectMultiple(),
+            "users": forms.CheckboxSelectMultiple(),
+        }
 
 
 class team_making_form(ModelForm):

@@ -1,0 +1,33 @@
+<h1>event Dashboard</h1>
+
+<table>
+    <caption>teams</caption>
+    <thead>
+        <tr>
+            <th>SI.no</th>
+            <th>Team name</th>
+            <th>number of players</th>
+
+        </tr>
+
+    </thead>
+    <tbody>
+        {% if teams %}
+            {% for team in teams %}
+            <tr>
+                <th>{{forloop.counter}}</th>
+                <th>{{team.name}}</th>
+                <th>
+                    {{team.user.count}}
+                </th>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <h3>no teams yet</h3>
+        {% endif %}
+
+    </tbody>
+
+</table>
+
+<a href="{% url 'event-management' events.id %}">settings</a>

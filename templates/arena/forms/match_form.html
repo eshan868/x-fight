@@ -1,0 +1,130 @@
+{% extends "layouts/base_layout.html" %}
+{% block title %}Create Match{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h3 class="mb-0">Create Match</h3>
+                </div>
+
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label">Match Name</label>
+                            {{ form.name }}
+                            {{ form.name.errors }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Game</label>
+                            {{ form.game }}
+                            {{ form.game.errors }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">match date</label>
+                            {{ form.match_date }}
+                            {{ form.match_date.errors }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Maximum Teams</label>
+                            {{ form.max_teams }}
+                            {{ form.max_teams.errors }}
+                        </div>
+
+                        <div class="dropdown mb-3">
+                            <button
+                                class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Select Teams
+                            </button>
+
+                            <ul class="dropdown-menu w-100 p-3" id="team-checkboxes">
+                                {% for checkbox in form.teams %}
+                                <li>
+                                    <div class="form-check">
+                                        {{ checkbox.tag }}
+                                        <label class="form-check-label">
+                                            {{ checkbox.choice_label }}
+                                        </label>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+
+                            <button type="button" class="btn btn-secondary mt-2 w-100" id="random-btn">
+                                🎲 Random Teams
+                            </button>
+                        </div>
+
+                        <div id="selected-container" class="mb-3" style="display:none;">
+                            <label class="form-label">Selected Teams</label>
+                            <ul class="list-group" id="team-names"></ul>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Select Players (Quick Match)</label>
+                            {{ form.users }}
+                            {{ form.users.errors }}
+                        </div>
+
+                        <div class="d-grid">
+                            <button class="btn btn-primary">
+                                Create Match
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById("random-btn").addEventListener("click", function () {
+
+    const maxTeams = parseInt(document.getElementById("id_max_teams").value);
+
+    if (!maxTeams || maxTeams <= 0) {
+        alert("Enter Maximum Teams first.");
+        return;
+    }
+
+    const checkboxes = Array.from(document.querySelectorAll('input[name="teams"]'));
+
+    checkboxes.forEach(cb => cb.checked = false);
+
+    checkboxes.sort(() => Math.random() - 0.5);
+
+    const list = document.getElementById("team-names");
+    list.innerHTML = "";
+
+    checkboxes.slice(0, maxTeams).forEach(cb => {
+        cb.checked = true;
+
+        const teamName = cb.parentElement.querySelector("label").innerText;
+
+        const li = document.createElement("li");
+        li.className = "list-group-item";
+        li.textContent = teamName;
+
+        list.appendChild(li);
+    });
+
+    document.getElementById("team-checkboxes").style.display = "none";
+    document.getElementById("selected-container").style.display = "block";
+
+});
+</script>
+
+{% endblock %}

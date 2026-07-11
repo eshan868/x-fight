@@ -535,3 +535,92 @@ footer a:hover{
 
     color:white;
 }
+
+.table-card{
+    background:var(--surface);
+    border:2.5px solid rgba(255, 0, 0, 0.521);
+    border-radius:22px;
+    overflow:hidden;
+}
+
+.card-header{
+    background:transparent;
+    border-bottom:2px solid rgba(255,0,0,.521);
+    padding:22px 30px;
+}
+
+.card-header h4{
+    color:#fff;
+    margin:0;
+    font-size:1.15rem;
+}
+
+.table{
+    width:100%;
+    margin:0;
+    border-collapse:collapse;
+    background:transparent;
+}
+
+.table thead{
+    background:transparent;
+}
+
+.table thead th{
+    color:#8d8d96;
+    text-transform:uppercase;
+    letter-spacing:2px;
+    font-size:.75rem;
+    font-weight:600;
+    padding:18px 24px;
+    border-bottom:1.5px solid rgba(255, 0, 0, 0.363);
+    background:transparent;
+}
+
+.table tbody tr{
+    background:transparent;
+    transition:.25s;
+}
+
+.table tbody tr:hover{
+    background:#18181f;
+}
+
+.table tbody td{
+    padding:20px 24px;
+    color:#fff;
+    border-bottom:1px solid rgba(255,255,255,.05);
+    background:transparent;
+}
+
+.table tbody tr:last-child td{
+    border-bottom:none;
+}
+
+.table td:first-child,
+.table th:first-child{
+    width:70px;
+    text-align:center;
+}
+
+.table td:nth-child(3),
+.table th:nth-child(3){
+    text-align:center;
+}
+
+.badge{
+    background:none !important;
+    color:#fff;
+    border:none;
+    padding:0;
+    border-radius:0;
+    font-weight:400;
+    margin-right:10px;
+}
+
+.text-muted{
+    color:#cfcfcf !important;
+}
+.card h6{
+    color:#e8e8e8;
+}

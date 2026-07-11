@@ -41,12 +41,8 @@ INSTALLED_APPS = [
     "discovery",
     "social",
     "tournament",
-    "django.contrib.sites",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "allauth.socialaccount.providers.google",
-    "allauth.socialaccount.providers.discord",
+    
+    
 ]
 
 MIDDLEWARE = [
@@ -55,15 +51,15 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    "allauth.account.middleware.AccountMiddleware",
+   
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-SITE_ID = 1
+
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend",
+    
 ]
 
 ROOT_URLCONF = "x_fight.urls"
@@ -126,13 +122,9 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-
-LOGIN_REDIRECT_URL="/dashboard/"
-ACCOUNT_LOGIN_REDIRECT_URL="/dashboard/"
-SOCIALACCOUNT_AUTO_SIGNUP=True
+LOGIN_URL = "signin"
+LOGIN_REDIRECT_URL = "/dashboard/"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
-DEFAULT_FROM_EMAIL = "x_fight@gmail.com"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/

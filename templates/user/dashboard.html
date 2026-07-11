@@ -1,4 +1,7 @@
-{% extends "layouts/base_layout.html" %} {% load static %} {% block title%}Dashboard{% endblock %} {% block content %}
+{% extends "layouts/base_layout.html" %} 
+{% load static %}
+{% block title%}Dashboard{% endblock %}
+{% block content %}
 
 <section class="event-page">
   <div class="container">
@@ -108,7 +111,9 @@
 
                 <p>Teams: {{ events.team.count }}</p>
 
-                <button class="btn btn-primary">View</button>
+                <a href="{% url 'tournament-dashboard' events.id %}">
+                  <button class="btn btn-primary">View</button>
+                </a>
               </div>
             </div>
             {% empty %}

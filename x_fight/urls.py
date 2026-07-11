@@ -26,7 +26,6 @@ urlpatterns = [
     path('account/',include("accounts.urls")),
     path('tournament/',include("tournament.urls")),
     path('display/',include("discovery.urls")),
-    path("accounts/",include("allauth.urls")),
     path("",home,name="home")
 
 

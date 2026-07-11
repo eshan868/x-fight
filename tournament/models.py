@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Tournament(models.Model):
@@ -43,20 +44,37 @@ class Team(models.Model):
     )
 
     max_players = models.IntegerField()
+     
+    def __str__(self):
+        return self.name
 
 
 class Match(models.Model):
 
     tournament = models.ForeignKey(
         Tournament,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name="matches",
+        null=True,
+        blank=True
     )
+    teams = models.ManyToManyField(Team,related_name="matches",blank=True)
+    user=models.ManyToManyField(User,blank=True)
 
-    winner = models.ForeignKey(
+    winner_team = models.ForeignKey(
         Team,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        related_name="won_team_matches"
+    )
+
+    winner_user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="won_solo_matches"
     )
 
     name = models.CharField(
@@ -69,4 +87,7 @@ class Match(models.Model):
     max_length=100,
     null=True,
     blank=True
-)   
+    )  
+
+    match_date=models.DateTimeField(default=timezone.now) 
+    
