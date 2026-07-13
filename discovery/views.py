@@ -2,13 +2,15 @@ from django.shortcuts import render,get_object_or_404,redirect
 from tournament.models import Tournament,Team
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.utils import  timezone
 
 
 # Create your views here.
 @login_required
 def event_display(request):
+    current_time=timezone.now().date()
     user=request.user
-    tournament=Tournament.objects.exclude(team__user=user).distinct()
+    tournament=Tournament.objects.exclude(team__user=user,end_time__gte=current_time).distinct()
     return render(request,"display/event_display.html",{"tournament":tournament})
 @login_required
 def event_details(request,event_id): 

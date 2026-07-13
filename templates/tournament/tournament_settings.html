@@ -129,6 +129,7 @@
                     <th class="text-center">Teams</th>
 
                     <th>Participants</th>
+                    <th>status</th>
 
                 </tr>
 
@@ -167,6 +168,7 @@
                         {% endfor %}
 
                     </td>
+                    <td><a href="{% url 'match-room' event.id match.id %}">enter</a></td>
 
                 </tr>
 

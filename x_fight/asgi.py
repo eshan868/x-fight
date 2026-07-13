@@ -9,8 +9,9 @@ https://docs.djangoproject.com/en/6.0/howto/deployment/asgi/
 
 import os
 
+from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
+from channels.auth import AuthMiddlewareStack
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'x_fight.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "x_fight.settings")
 
-application = get_asgi_application()

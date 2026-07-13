@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "discovery",
     "social",
     "tournament",
+   
     
     
 ]
@@ -51,7 +52,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-   
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -80,6 +80,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "x_fight.wsgi.application"
+
+
+
 
 
 # Database
@@ -124,7 +127,7 @@ USE_I18N = True
 USE_TZ = True
 LOGIN_URL = "signin"
 LOGIN_REDIRECT_URL = "/dashboard/"
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/

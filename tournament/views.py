@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from . forms import Tournament_Register_form,team_making_form,match_making_form
-from . models import Tournament,Team
+from . models import Tournament,Team,Match
 from django.utils import timezone
 # Create your views here.
 def tournament_making(request):
@@ -59,7 +59,7 @@ def match_creation(request,event_id):
                 form.save_m2m()
             
                 return redirect("event-management",event_id=event_id)
-            except Exception as e:   
+            except Exception as e:  
                 print(e)
         else:
             print(form.non_field_errors)
@@ -73,4 +73,12 @@ def match_creation(request,event_id):
         "tournament": tournament, })
 
 
+def match_room(request, event_id, match_room_id):
+    tournament = get_object_or_404(Tournament, id=event_id)
+    match = get_object_or_404(Match, id=match_room_id)
 
+    team = match.teams.filter(user=request.user).first()
+    print("User:", request.user.username)
+    print("Team:", team)
+
+    return render(request,"tournament/matches_display.html",{"tournament": tournament,"match": match,"team": team,})

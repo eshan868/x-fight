@@ -3,6 +3,7 @@ from . forms import signup_form,signin_form
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from tournament.models import Team,Tournament
+from django.contrib import messages
 # Create your views here.
 def signup(request):
 
@@ -12,16 +13,22 @@ def signup(request):
             form = signup_form(request.POST,request.FILES)
 
             if form.is_valid():
+               username = form.cleaned_data["username"]
 
-                user = User.objects.create_user(username=form.cleaned_data[ "username" ],password=form.cleaned_data["password"],email=form.cleaned_data["email"])
-                profile = form.save(
+               user_exists = User.objects.filter(username=username)
+               if user_exists.exists():
+                    messages.error(request, "Username already exists.")
+                    return render(request, "authentication/signup.html", {"form": form})
+
+               user = User.objects.create_user(username=form.cleaned_data[ "username" ],password=form.cleaned_data["password"],email=form.cleaned_data["email"])
+               profile = form.save(
                      commit=False
-                )
+               )
 
-                profile.user = user
+               profile.user = user
 
-                profile.save()
-                return redirect("home")
+               profile.save()
+               return redirect("home")
 
         else:
 
@@ -38,7 +45,7 @@ def signin(request):
          if form.is_valid():
               username=form.cleaned_data["username"]
               password=form.cleaned_data["password"]
-
+             
               user = authenticate(request,username=username,password=password)
               if user is not None:
                    login(request,user)
