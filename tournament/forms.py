@@ -17,7 +17,7 @@ class match_making_form(ModelForm):
         model = Match
 
         fields = "__all__"
-        exclude=["winner_team","tournament","winner_user"]
+        exclude=["winner_team","tournament","winner_user","status",]
 
         widgets = {
             "name": forms.TextInput(attrs={

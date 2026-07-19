@@ -10,8 +10,8 @@ from django.utils import  timezone
 def event_display(request):
     current_time=timezone.now().date()
     user=request.user
-    tournament=Tournament.objects.exclude(team__user=user,end_time__gte=current_time).distinct()
-    return render(request,"display/event_display.html",{"tournament":tournament})
+    tournaments = (Tournament.objects.filter(end_time__gte=current_time).exclude(team__user=request.user).distinct())
+    return render(request,"display/event_display.html",{"tournament":tournaments})
 @login_required
 def event_details(request,event_id): 
     tournament_details=get_object_or_404(Tournament,id=event_id)

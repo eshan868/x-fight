@@ -1,4 +1,4 @@
-{% extends "layouts/base_layout.html" %} {% load static %} {% block title%}Match Room{% endblock%} {% block content %}
+{% extends "layouts/base_layout.html" %} {% load static %} {% block title%}MatchRoom{% endblock%} {% block content %}
 
 <section>
   <div class="container py-5">
@@ -78,23 +78,37 @@
           <div class="card-body">
             {% for team in match.teams.all %}
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <div>
-                <h5 class="mb-1">{{ team.name }}</h5>
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5>{{ team.name }}</h5>
 
-                <small class="text-muted">
+                <span class="badge bg-primary">
                   {{ team.user.count }} Players
-                </small>
+                </span>
               </div>
 
-              <span class="text-success"> Ready ✓ </span>
-            </div>
+              <hr />
 
-            <hr />
+             {% for match_player in match_players %}
+                {% if match_player.user in team.user.all %}
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                  <div>{{ match_player.user.username }}</div>
 
-            {% empty %}
+                {% if match_player.ready %}
+                <span class="badge bg-success">Ready</span>
+                {% else %}
+                <span class="badge bg-secondary">Waiting</span>
+                {% endif %}
+                  </div>
+                {% endif %}
+              {% endfor %}
 
-            <p class="text-muted">No teams available.</p>
+               
+              </div>
+
+
+
+            <p class="text-muted">No teams registered.</p>
 
             {% endfor %}
           </div>
@@ -111,9 +125,15 @@
           <div class="card-body text-center">
             <h5 class="mb-3">Private Voice Room</h5>
 
-            <button class="btn btn-primary w-100" id="joinVoice">
-              🎤 Join Voice Channel
-            </button>
+            <form  method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              {% if not players.ready %}
+                <button type="submit" name="action" value="ready">Ready</button>
+              {% else %}
+                 <button type="submit" name="action" value="not-ready">not-ready</button>
+              {% endif %}
+
+            </form>
           </div>
         </div>
         <div class="card table-card mt-4">
@@ -138,6 +158,4 @@
   </div>
 </section>
 
-{% endblock %} {% block js %}
-<script src="{% static 'js/websocket.js' %}"></script>
 {% endblock %}

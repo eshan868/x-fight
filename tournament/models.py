@@ -91,3 +91,20 @@ class Match(models.Model):
 
     match_date=models.DateTimeField(default=timezone.now) 
     
+    status=models.CharField(
+        max_length=20,choices=[
+            ("waiting","Waiting"),
+            ("live","Live"),
+            ("finished","Finished")
+        ],
+        default="waiting"
+    )
+
+    started_at=models.DateTimeField(null=True,blank=True)
+    ended_at=models.DateTimeField(null=True,blank=True)
+
+class match_player(models.Model):
+    match = models.ForeignKey(Match, on_delete=models.CASCADE,related_name="match_player")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    joined = models.BooleanField(default=False)
+    ready = models.BooleanField(default=False)
