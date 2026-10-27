@@ -1,0 +1,243 @@
+{% load static %}
+
+<li class="nav-item notification-nav-item">
+
+    <!-- ================================
+         NOTIFICATION BUTTON
+    ================================= -->
+
+    <button class="notification-btn" id="notificationBtn" type="button" aria-label="Open notifications">
+
+        <i class="fa-solid fa-bell"></i>
+
+        {% if notification_count > 0 %}
+
+        <span class="notification-count">
+            {{ notification_count }}
+        </span>
+
+        {% endif %}
+
+    </button>
+
+</li>
+
+
+<!-- =====================================================
+     NOTIFICATION MODAL
+====================================================== -->
+
+<div class="notification-modal" id="notificationModal" aria-hidden="true">
+
+
+    <!-- BACKDROP -->
+
+    <div class="notification-backdrop" id="notificationBackdrop">
+    </div>
+
+
+    <!-- =================================================
+         NOTIFICATION BOX
+    ================================================== -->
+
+    <div class="notification-box" role="dialog" aria-modal="true" aria-labelledby="notificationTitle">
+
+
+        <!-- HEADER -->
+
+        <div class="notification-header">
+
+            <div>
+
+                <h3 id="notificationTitle">
+                    Notifications
+                </h3>
+
+                <p>
+                    Your latest updates
+                </p>
+
+            </div>
+
+
+            <div class="notification-header-actions">
+
+                {% if notifications %}
+
+                <a href="{% url 'clear_all_notifications' %}" class="clear-notifications-btn"
+                    onclick="return confirm('Clear all notifications?');">
+                    Clear All
+                </a>
+
+                {% endif %}
+
+
+                <button type="button" class="notification-close" id="notificationClose"
+                    aria-label="Close notifications">
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- =================================================
+             NOTIFICATION LIST
+        ================================================== -->
+
+        <div class="notification-list">
+
+
+            {% for notification in notifications %}
+
+
+            <div class="notification-card">
+
+
+                <div class="notification-content">
+
+
+                    <div class="notification-icon">
+
+                        {% if notification.notification_type == "game_mate_request" %}
+
+                        <i class="fa-solid fa-user-plus"></i>
+
+                        {% else %}
+
+                        <i class="fa-solid fa-gamepad"></i>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="notification-text">
+
+                        <p>
+                            {{ notification.text }}
+                        </p>
+
+                        <small>
+                            {{ notification.created_at|timesince }} ago
+                        </small>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- GAME MATE REQUEST -->
+
+                {% if notification.notification_type == "game_mate_request" %}
+
+                <div class="notification-actions">
+
+
+                    <a href="{% url 'accept_game_mate' notification.related_id %}"
+                        class="notification-action-btn accept-btn">
+
+                        <i class="fa-solid fa-check"></i>
+
+                        Accept
+
+                    </a>
+
+
+                    <a href="{% url 'reject_game_mate' notification.related_id %}"
+                        class="notification-action-btn reject-btn">
+
+                        <i class="fa-solid fa-xmark"></i>
+
+                        Reject
+
+                    </a>
+
+
+                </div>
+
+                {% elif notification.notification_type == "missed_call" %}
+
+
+                
+                    <div class="notification-text">
+
+                        <p>
+                            {{ notification.text }}
+                        </p>
+
+                        <small>
+                            {{ notification.created_at|timesince }} ago
+                        </small>
+
+                    </div>
+
+
+                
+                
+                {% endif %}
+
+
+            </div>
+
+
+            {% empty %}
+
+
+            <!-- EMPTY -->
+
+            <div class="empty-notification">
+
+
+                <div class="empty-notification-icon">
+
+                    <i class="fa-solid fa-bell-slash"></i>
+
+                </div>
+
+
+                <h4>
+                    No Notifications
+                </h4>
+
+
+                <p>
+                    You're all caught up.
+                </p>
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <div class="notification-footer">
+
+            <button type="button" class="notification-footer-close" id="notificationFooterClose">
+                Close
+            </button>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+{% block js %}
+
+<script src="{% static 'js/notification.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,245 @@
+/* =========================================================
+   X-FIGHT FORMS & CONTROLS (RESPONSIVE ESPORTS THEME)
+========================================================= */
+
+.form-control,
+.form-select,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="file"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="time"],
+textarea,
+select {
+    background: #000000 !important;
+    border: 1px solid var(--neon) !important;
+    color: #ffffff !important;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    font-family: 'Poppins', sans-serif;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.form-control:focus,
+.form-select:focus,
+input:focus,
+textarea:focus,
+select:focus {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ff4d4d !important;
+    box-shadow: 0 0 14px rgba(255, 26, 26, 0.45) !important;
+    outline: none !important;
+}
+
+.form-control::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+    opacity: 1;
+}
+
+.form-label,
+label {
+    display: block;
+    margin-bottom: 7px;
+    color: #ffffff !important;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+}
+
+.helptext,
+.form-text {
+    color: #ffffff !important;
+    font-size: 0.74rem;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Checkboxes & Radios */
+.form-check-input,
+input[type="checkbox"],
+input[type="radio"] {
+    background-color: #000000 !important;
+    border: 1px solid var(--neon) !important;
+    border-radius: 4px;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 0.15rem;
+    cursor: pointer;
+}
+
+.form-check-input:checked,
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+    background-color: var(--neon) !important;
+    border-color: var(--neon) !important;
+    box-shadow: 0 0 8px rgba(255, 26, 26, 0.6) !important;
+}
+
+.form-check-label {
+    color: #ffffff !important;
+    font-size: 0.85rem;
+    margin-left: 6px;
+    cursor: pointer;
+}
+
+/* File Selector */
+input[type="file"]::file-selector-button {
+    background: #000000;
+    color: #ffffff;
+    border: 1px solid var(--neon);
+    border-radius: 8px;
+    padding: 6px 14px;
+    margin-right: 12px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 0.78rem;
+    transition: all 0.25s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+    background: rgba(255, 26, 26, 0.15);
+    border-color: #ff4d4d;
+    box-shadow: 0 0 10px rgba(255, 26, 26, 0.4);
+}
+
+/* Select options */
+select option {
+    background: #000000 !important;
+    color: #ffffff !important;
+    padding: 10px;
+}
+
+/* Signup & Auth Cards */
+.signup-section {
+    min-height: calc(100vh - 160px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 16px 50px;
+}
+
+.signup-card {
+    width: 100%;
+    max-width: 540px;
+    margin: auto;
+    background: #000000;
+    border: 1px solid var(--neon);
+    box-shadow: var(--neon-glow);
+    border-radius: 20px;
+    padding: 36px 32px;
+}
+
+.signup-card h1 {
+    font-family: 'Aclonica', sans-serif;
+    font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+    color: #ffffff;
+    margin-bottom: 6px;
+}
+
+.signup-card p {
+    color: #9496a4;
+    font-size: 0.85rem;
+}
+
+.signup-card hr {
+    border-color: rgba(255, 26, 26, 0.3) !important;
+    margin: 24px 0;
+}
+
+.signup-card a {
+    color: var(--neon);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.signup-card a:hover {
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(255, 26, 26, 0.6);
+}
+
+/* Loot / Bounty Toggle Switch */
+.loot-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    background: rgba(255, 26, 26, 0.05);
+    border: 1px solid rgba(255, 26, 26, 0.3);
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.loot-toggle label {
+    margin: 0;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* Form Error Lists */
+.errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 6px 0 0;
+    color: #ff4d4d;
+    font-size: 0.76rem;
+    font-weight: 500;
+}
+
+.errorlist li {
+    margin-bottom: 2px;
+}
+
+/* Notification & User Search inputs */
+.notification-input,
+.notification-textarea {
+    width: 100%;
+    background: #000000;
+    border: 1px solid var(--neon);
+    border-radius: 10px;
+    color: #fff;
+    padding: 14px;
+    margin-bottom: 18px;
+}
+
+.notification-textarea {
+    resize: vertical;
+    min-height: 140px;
+}
+
+.search-user {
+    width: 100%;
+    padding: 12px 16px;
+    background: #000000;
+    border: 1px solid var(--neon);
+    border-radius: 10px;
+    color: #fff;
+    margin: 16px 0;
+}
+
+/* Responsive Overhauls */
+@media (max-width: 768px) {
+    .signup-card {
+        padding: 24px 18px;
+    }
+
+    .form-control,
+    .form-select,
+    input,
+    textarea,
+    select {
+        font-size: 16px !important; /* Prevents auto-zoom on mobile */
+        padding: 11px 13px;
+    }
+}

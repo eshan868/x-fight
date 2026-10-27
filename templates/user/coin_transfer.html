@@ -1,0 +1,277 @@
+{% extends "layouts/base_layout.html" %}
+{% load static %}
+
+{% block title %}Dispatch Battle Credits | X-Fight{% endblock %}
+
+{% block content %}
+<section class="page-shell">
+    <div class="container" style="max-width: 580px;">
+
+        <div style="margin-bottom: 24px;">
+            <a href="{% url 'dashboard' %}" class="dashboard-chip-btn" style="margin-bottom: 16px;">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Command Center</span>
+            </a>
+
+            <div class="page-heading" style="text-align: left; margin-bottom: 0;">
+                <span class="section-label">FINANCIAL DISPATCH</span>
+                <h1 style="font-size: clamp(1.8rem, 4vw, 2.4rem); font-family: 'Aclonica', sans-serif; margin: 6px 0;">
+                    Dispatch Battle Credits
+                </h1>
+                <p style="color: #ffffff; font-size: 0.85rem;">
+                    Transfer Arena Credits (BP) directly to your verified Squad Comrades.
+                </p>
+            </div>
+        </div>
+
+        <div class="xf-panel">
+
+            <!-- CURRENT BALANCE CARD -->
+            <div style="background: linear-gradient(135deg, rgba(255, 26, 26, 0.18), rgba(0, 0, 0, 0.9)); border: 1px solid var(--border); border-radius: 16px; padding: 22px; margin-bottom: 26px; display: flex; align-items: center; justify-content: space-between; gap: 14px;">
+                <div>
+                    <span style="display: block; font-size: 0.68rem; font-weight: 700; color: #ff6b6b; letter-spacing: 1.5px; text-transform: uppercase;">
+                        Available Battle Credits
+                    </span>
+                    <strong style="font-size: 2rem; font-family: 'Aclonica', sans-serif; color: #ffffff; display: block; margin-top: 4px;">
+                        <span id="currentBalance">{{ coins|default:"0" }}</span>
+                        <small style="font-size: 0.85rem; color: var(--neon); font-family: 'Poppins', sans-serif;">BP</small>
+                    </strong>
+                </div>
+                <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(255, 26, 26, 0.15); border: 1px solid var(--neon); display: flex; align-items: center; justify-content: center; color: var(--neon); font-size: 1.4rem;">
+                    <i class="fa-solid fa-coins"></i>
+                </div>
+            </div>
+
+            <!-- TRANSFER FORM -->
+            <form id="transferForm" method="POST" action="">
+                {% csrf_token %}
+
+                <!-- RECIPIENT -->
+                <div class="mb-4">
+                    <label for="recipient" class="form-label" style="font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; color: #ffffff;">
+                        SELECT SQUAD COMRADE
+                    </label>
+                    <select class="form-select" id="recipient" name="recipient_id" required style="padding: 12px 14px; font-size: 0.88rem;">
+                        <option value="" selected disabled>
+                            Choose an allied comrade...
+                        </option>
+                        {% for mate in game_mate %}
+                            {% if mate.user_id == request.user.id %}
+                            <option value="{{ mate.mate.id }}" data-name="{{ mate.mate.gamer_tag|default:mate.mate.username }}">
+                                @{{ mate.mate.gamer_tag|default:mate.mate.username }}
+                            </option>
+                            {% else %}
+                            <option value="{{ mate.user.id }}" data-name="{{ mate.user.gamer_tag|default:mate.user.username }}">
+                                @{{ mate.user.gamer_tag|default:mate.user.username }}
+                            </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- AMOUNT -->
+                <div class="mb-4">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label for="amount" class="form-label mb-0" style="font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; color: #ffffff;">
+                            AMOUNT TO DISPATCH (BP)
+                        </label>
+                        <button type="button" class="btn btn-link p-0 text-decoration-none" id="maxBtn" style="font-size: 0.72rem; color: var(--neon); font-weight: 600;">
+                            Use Max
+                        </button>
+                    </div>
+
+                    <div style="position: relative;">
+                        <input type="number" class="form-control" id="amount" name="amount" min="1" max="{{ coins|default:'0' }}" step="1" placeholder="0" required style="font-size: 1.2rem; font-weight: 700; padding: 12px 60px 12px 14px;">
+                        <span style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 0.75rem; font-weight: 700; color: var(--neon); pointer-events: none;">
+                            BP
+                        </span>
+                    </div>
+
+                    <!-- QUICK AMOUNT PILLS -->
+                    <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+                        <button type="button" class="quick-amt-btn dashboard-chip-btn" data-amt="50" style="padding: 4px 12px; font-size: 0.7rem; cursor: pointer;">
+                            50 BP
+                        </button>
+                        <button type="button" class="quick-amt-btn dashboard-chip-btn" data-amt="100" style="padding: 4px 12px; font-size: 0.7rem; cursor: pointer;">
+                            100 BP
+                        </button>
+                        <button type="button" class="quick-amt-btn dashboard-chip-btn" data-amt="250" style="padding: 4px 12px; font-size: 0.7rem; cursor: pointer;">
+                            250 BP
+                        </button>
+                        <button type="button" class="quick-amt-btn dashboard-chip-btn" data-amt="500" style="padding: 4px 12px; font-size: 0.7rem; cursor: pointer;">
+                            500 BP
+                        </button>
+                    </div>
+
+                    <div class="error" id="amountError" style="color: #ff4d4d; font-size: 0.75rem; margin-top: 6px; display: none;"></div>
+                </div>
+
+                <!-- TRANSFER SUMMARY PREVIEW -->
+                <div style="background: rgba(255, 26, 26, 0.05); border: 1px solid rgba(255, 26, 26, 0.25); border-radius: 12px; padding: 16px; margin: 24px 0;">
+                    <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: #ff6b6b; margin-bottom: 12px;">
+                        DISPATCH SUMMARY
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 8px; color: #ffffff;">
+                        <span>Target Recipient</span>
+                        <strong style="color: #ffffff;" id="summaryRecipient">Not selected</strong>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 8px; color: #ffffff;">
+                        <span>Credits Dispatched</span>
+                        <strong style="color: #ff4d4d;"><span id="summaryAmount">0</span> BP</strong>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; padding-top: 10px; border-top: 1px solid rgba(255, 26, 26, 0.2); color: #ffffff;">
+                        <span>Remaining Balance</span>
+                        <strong style="color: #22c55e;"><span id="summaryBalance">{{ coins|default:"0" }}</span> BP</strong>
+                    </div>
+                </div>
+
+                <button type="submit" class="dashboard-primary-btn w-100" id="reviewBtn" style="padding: 14px; font-size: 0.9rem; cursor: pointer;">
+                    <i class="fa-solid fa-paper-plane me-2"></i>
+                    Dispatch Credits
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- CONFIRMATION MODAL -->
+<div class="modal fade" id="confirmationModalBootstrap" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: #000000; border: 1px solid var(--neon); box-shadow: var(--neon-glow); border-radius: 18px; padding: 10px;">
+            <div class="modal-body text-center p-4">
+                <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255, 26, 26, 0.15); border: 1px solid var(--neon); color: var(--neon); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 18px;">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <h3 style="font-family: 'Aclonica', sans-serif; font-size: 1.25rem; margin-bottom: 8px;">
+                    Confirm Dispatch
+                </h3>
+                <p style="color: #ffffff; font-size: 0.85rem; margin-bottom: 20px;">
+                    You are transferring <strong id="modalAmountConfirm" style="color: #ff4d4d;">0 BP</strong> to <strong id="modalRecipientConfirm" style="color: #ffffff;">comrade</strong>.
+                </p>
+
+                <div class="d-flex gap-3">
+                    <button type="button" class="btn btn-outline-light w-100" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary w-100" id="finalConfirmBtn">
+                        Confirm & Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const totalCoins = parseInt("{{ coins|default:'0' }}") || 0;
+    const recipientSelect = document.getElementById("recipient");
+    const amountInput = document.getElementById("amount");
+    const maxBtn = document.getElementById("maxBtn");
+    const summaryRecipient = document.getElementById("summaryRecipient");
+    const summaryAmount = document.getElementById("summaryAmount");
+    const summaryBalance = document.getElementById("summaryBalance");
+    const amountError = document.getElementById("amountError");
+    const transferForm = document.getElementById("transferForm");
+    const finalConfirmBtn = document.getElementById("finalConfirmBtn");
+
+    const modalEl = document.getElementById("confirmationModalBootstrap");
+    let confirmModal = null;
+    if (modalEl && typeof bootstrap !== "undefined") {
+        confirmModal = new bootstrap.Modal(modalEl);
+    }
+
+    function updateSummary() {
+        const amt = parseInt(amountInput.value) || 0;
+        const selectedOpt = recipientSelect.options[recipientSelect.selectedIndex];
+
+        if (selectedOpt && selectedOpt.value) {
+            summaryRecipient.textContent = selectedOpt.textContent.trim();
+        } else {
+            summaryRecipient.textContent = "Not selected";
+        }
+
+        summaryAmount.textContent = amt;
+        const remaining = totalCoins - amt;
+        summaryBalance.textContent = remaining >= 0 ? remaining : 0;
+
+        if (amt > totalCoins) {
+            amountError.textContent = "Amount exceeds available balance (" + totalCoins + " BP).";
+            amountError.style.display = "block";
+            return false;
+        } else if (amt <= 0 && amountInput.value !== "") {
+            amountError.textContent = "Enter an amount of at least 1 BP.";
+            amountError.style.display = "block";
+            return false;
+        } else {
+            amountError.style.display = "none";
+            return true;
+        }
+    }
+
+    if (recipientSelect) recipientSelect.addEventListener("change", updateSummary);
+    if (amountInput) amountInput.addEventListener("input", updateSummary);
+
+    if (maxBtn) {
+        maxBtn.addEventListener("click", function () {
+            amountInput.value = totalCoins;
+            updateSummary();
+        });
+    }
+
+    document.querySelectorAll(".quick-amt-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            const val = parseInt(btn.getAttribute("data-amt")) || 0;
+            amountInput.value = Math.min(val, totalCoins);
+            updateSummary();
+        });
+    });
+
+    let isConfirmed = false;
+
+    if (transferForm) {
+        transferForm.addEventListener("submit", function (e) {
+            if (!isConfirmed) {
+                e.preventDefault();
+                const isValid = updateSummary();
+                if (!isValid) return;
+
+                const recipientVal = recipientSelect.value;
+                if (!recipientVal) {
+                    alert("Please select a comrade recipient.");
+                    return;
+                }
+
+                const amt = parseInt(amountInput.value) || 0;
+                if (amt <= 0 || amt > totalCoins) return;
+
+                document.getElementById("modalAmountConfirm").textContent = amt + " BP";
+                document.getElementById("modalRecipientConfirm").textContent = summaryRecipient.textContent;
+
+                if (confirmModal) {
+                    confirmModal.show();
+                } else {
+                    isConfirmed = true;
+                    transferForm.submit();
+                }
+            }
+        });
+    }
+
+    if (finalConfirmBtn) {
+        finalConfirmBtn.addEventListener("click", function () {
+            isConfirmed = true;
+            if (confirmModal) confirmModal.hide();
+            transferForm.submit();
+        });
+    }
+});
+</script>
+{% endblock %}

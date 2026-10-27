@@ -1,0 +1,1645 @@
+{% extends 'layouts/base_layout.html' %}
+{% load static %}
+
+{% block title %}Chat Interface{% endblock %}
+
+{% block content %}
+
+<style>
+    /* ==========================================
+       STOP WHOLE PAGE SCROLLING
+    ========================================== */
+
+    html,
+    body {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    /* ==========================================
+       MAIN CHAT LAYOUT
+    ========================================== */
+
+    .chat-layout {
+        width: 100%;
+        height: calc(100dvh - 80px);
+        /* Adjusted to remove top gap */
+        margin: 0;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    @media (min-width: 768px) {
+        .chat-layout {
+            height: calc(100vh - 90px);
+            /* Fills screen cleanly below navbar */
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+    }
+
+    /* ==========================================
+       SIDEBAR & CHAT WRAPPERS (FLEX LAYOUT)
+    ========================================== */
+
+    .sidebar-wrapper {
+        width: 300px;
+        flex-shrink: 0;
+        transition: width 0.3s ease, margin 0.3s ease, opacity 0.3s ease;
+        height: 100%;
+    }
+
+    .chat-area-wrapper {
+        min-width: 0;
+        transition: all 0.3s ease;
+    }
+
+    /* Mobile View - Sidebar Hidden by default, absolute position */
+    @media (max-width: 767px) {
+        .sidebar-wrapper {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            /* Hidden off-screen */
+            width: 100%;
+            z-index: 1050;
+            background-color: var(--background, #000);
+            padding-right: 24px;
+            transition: left 0.3s ease;
+        }
+
+        .sidebar-wrapper.mobile-open {
+            left: 12px;
+            width: calc(100% - 24px);
+        }
+
+        .sidebar-wrapper.me-md-3 {
+            margin-right: 0 !important;
+        }
+    }
+
+    /* Desktop View - Toggle to hide sidebar completely */
+    @media (min-width: 768px) {
+        .sidebar-wrapper.desktop-closed {
+            width: 0;
+            margin-right: 0 !important;
+            opacity: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+    }
+
+    /* ==========================================
+       SIDEBAR
+    ========================================== */
+
+    .sidebar {
+        width: 100%;
+        height: 100%;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .sidebar-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-header h3 {
+        margin: 0;
+        color: white;
+        font-size: 16px;
+    }
+
+    .chat-search {
+        width: 100%;
+        margin-top: 10px;
+        padding: 10px 14px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: white;
+        outline: none;
+        font-size: 13px;
+    }
+
+    .chat-search:focus {
+        border-color: var(--primary);
+    }
+
+    /* ==========================================
+       SIDEBAR CHAT LIST
+    ========================================== */
+
+    .chat-list {
+        min-height: 0;
+        overflow-y: auto;
+        padding: 10px;
+    }
+
+    .chat-list::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .chat-list::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 20px;
+    }
+
+    /* ==========================================
+       CHAT USER / SIDEBAR ITEM
+    ========================================== */
+
+    .chat-user {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        gap: 12px;
+        padding: 11px;
+        border-radius: 10px;
+        color: white;
+        text-decoration: none;
+        transition: .2s ease;
+        box-sizing: border-box;
+    }
+
+    .chat-user:hover,
+    .chat-user.active {
+        background: var(--surface-2);
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(255, 0, 0, .1);
+        border: 1px solid rgba(255, 0, 0, .3);
+        color: var(--primary);
+        font-weight: bold;
+    }
+
+    .user-details {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .user-details h4 {
+        margin: 0;
+        color: white;
+        font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user-details p {
+        margin: 2px 0 0;
+        color: var(--text-light);
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* ==========================================
+       CHAT AREA
+    ========================================== */
+
+    .chat-area {
+        min-width: 0;
+        height: 100%;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    /* ==========================================
+       COMPACT CHAT HEADER & BUTTON UI
+    ========================================== */
+
+    .chat-header {
+        min-height: 56px;
+        /* Compact Header Height */
+        height: 56px;
+        gap: 12px;
+        padding: 0 18px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+        background: var(--surface);
+    }
+
+    .chat-header-left {
+        gap: 10px;
+        min-width: 0;
+    }
+
+    .chat-avatar {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: rgba(255, 0, 0, .08);
+        border: 1px solid rgba(255, 0, 0, .35);
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 15px;
+    }
+
+    .chat-info {
+        min-width: 0;
+    }
+
+    .chat-info h1 {
+        margin: 0;
+        color: white;
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .chat-info p {
+        margin: 2px 0 0;
+        color: var(--text-light);
+        font-size: 11px;
+        line-height: 1;
+    }
+
+    /* Modern Shared Header Button Styles */
+    .header-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        height: 34px;
+        padding: 0 12px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text-light);
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        outline: none;
+    }
+
+    .header-btn:hover {
+        background: rgba(255, 0, 0, 0.12);
+        border-color: var(--primary);
+        color: #ffffff;
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+    }
+
+    .header-btn i {
+        font-size: 14px;
+    }
+
+    /* Icon-Only Compact Header Buttons */
+    .header-btn-icon {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: 8px;
+    }
+
+    .toggle-sidebar-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-light);
+        font-size: 22px;
+        cursor: pointer;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s ease;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+    }
+
+    .toggle-sidebar-btn:hover {
+        color: var(--primary);
+        background: var(--surface-2);
+    }
+
+    .chat-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .gamearena-call-buttons {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* ==========================================
+       INVITE BUTTON & CALL BUTTONS
+    ========================================== */
+
+    .invite-btn,
+    .info-btn {
+        extend: header-btn;
+    }
+
+    /* ==========================================
+       MESSAGE AREA
+    ========================================== */
+
+    .messages {
+        min-height: 0;
+        padding: 20px;
+        overflow-y: auto;
+        gap: 12px;
+        background: var(--background);
+    }
+
+    .messages::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .messages::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .messages::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 20px;
+    }
+
+    .messages::-webkit-scrollbar-thumb:hover {
+        background: var(--primary);
+    }
+
+    /* ==========================================
+       EMPTY CHAT
+    ========================================== */
+
+    .empty-chat {
+        color: var(--text-light);
+        text-align: center;
+    }
+
+
+
+    /* ==========================================
+       INVITE MODAL
+    ========================================== */
+
+    .invite-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 999999;
+        padding: 20px;
+        background: rgba(0, 0, 0, .8);
+        backdrop-filter: blur(5px);
+        align-items: center;
+        justify-content: center;
+    }
+
+    .invite-popup {
+        position: relative;
+        width: 100%;
+        max-width: 450px;
+        max-height: 80vh;
+        overflow-y: auto;
+        padding: 20px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+    }
+
+    @media (min-width: 768px) {
+        .invite-popup {
+            padding: 28px;
+        }
+    }
+
+    .invite-popup h2 {
+        margin: 0 35px 20px 0;
+        color: white;
+        font-size: 18px;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 12px;
+        right: 15px;
+        width: 38px;
+        height: 38px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--text-light);
+        font-size: 26px;
+        cursor: pointer;
+    }
+
+    .close-btn:hover {
+        color: var(--primary);
+    }
+
+    /* ==========================================
+       GAMEMATE LIST
+    ========================================== */
+
+    .gamemate-list {
+        gap: 10px;
+    }
+
+    .gamemate-item {
+        gap: 15px;
+        padding: 12px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: white;
+    }
+
+    .gamemate-item a {
+        text-decoration: none;
+    }
+
+    .sendInviteBtn {
+        padding: 6px 14px;
+        border: 1px solid var(--primary);
+        border-radius: 7px;
+        background: var(--primary);
+        color: white;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    /* ==========================================
+       CHAT FILTERS
+    ========================================== */
+
+    .chat-filters {
+        gap: 6px;
+        padding: 10px 10px 6px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .chat-filter {
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface-2);
+        color: var(--text-light);
+        font-size: 12px;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+    .chat-filter:hover {
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .chat-filter.active {
+        background: #1c080a;
+        border-color: var(--primary);
+        color: white;
+    }
+
+    /* ==========================================
+       FILTER EMPTY STATE
+    ========================================== */
+
+    .empty-chat-list {
+        padding: 25px 15px;
+        color: var(--text-light);
+        font-size: 13px;
+        text-align: center;
+    }
+
+    /* ==========================================
+       GROUP INVITATION MESSAGE BUBBLE
+    ========================================== */
+
+    .received-message {
+        display: flex;
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .group-invite-message {
+        width: 100%;
+        min-width: 0;
+        max-width: 420px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 15px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--primary);
+        border-radius: 14px;
+        box-sizing: border-box;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    @media (min-width: 768px) {
+        .group-invite-message {
+            padding: 18px 20px;
+        }
+    }
+
+    /* ==========================================
+       INVITATION HEADER
+    ========================================== */
+
+    .group-invite-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .invite-icon {
+        font-size: 18px;
+    }
+
+    .group-invite-header h3 {
+        margin: 0;
+        color: white;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    /* ==========================================
+       INVITATION TEXT
+    ========================================== */
+
+    .invite-text {
+        margin: 0 0 15px;
+        color: var(--text-light);
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .invite-text strong {
+        color: white;
+    }
+
+    /* ==========================================
+       MESSAGE ROW
+    ========================================== */
+
+    /* =========================================================
+   CHAT MESSAGE ROW
+========================================================= */
+
+.message-row {
+    width: 100%;
+    display: flex;
+    margin-bottom: 12px;
+    padding: 0 14px;
+    box-sizing: border-box;
+}
+
+.message-row.sent {
+    justify-content: flex-end;
+}
+
+.message-row.received {
+    justify-content: flex-start;
+}
+
+
+/* =========================================================
+   MESSAGE CONTENT
+========================================================= */
+
+.message-content {
+    max-width: 72%;
+    min-width: 70px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =========================================================
+   SENT / RECEIVED ALIGNMENT
+========================================================= */
+
+.message-row.sent .message-content {
+    align-items: flex-end;
+}
+
+.message-row.received .message-content {
+    align-items: flex-start;
+}
+
+
+/* =========================================================
+   MESSAGE AUTHOR
+========================================================= */
+
+.message-author {
+    color: #ff0000;
+
+    font-family: "Aclonica", sans-serif;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    margin-bottom: 5px;
+    padding-left: 5px;
+}
+
+
+/* =========================================================
+   TEXT MESSAGE
+========================================================= */
+
+.chat-message {
+    max-width: 100%;
+
+    padding: 10px 14px;
+
+    border-radius: 16px;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 14px;
+    line-height: 1.5;
+
+    word-break: break-word;
+    overflow-wrap: anywhere;
+
+    white-space: pre-wrap;
+}
+
+
+/* =========================================================
+   SENT MESSAGE
+========================================================= */
+
+.message-row.sent .chat-message {
+    background: #000000;
+
+    color: #ffffff;
+
+    border: 1px solid rgba(255, 0, 0, 0.55);
+
+    border-bottom-right-radius: 5px;
+}
+
+
+/* =========================================================
+   RECEIVED MESSAGE
+========================================================= */
+
+.message-row.received .chat-message {
+    background: #14141A;
+
+    color: #eeeeee;
+
+    border: 1px solid #24242d;
+
+    border-bottom-left-radius: 5px;
+}
+
+
+/* =========================================================
+   IMAGE MESSAGE
+========================================================= */
+
+.chat-image-message {
+    width: min(420px, 65vw);
+
+    border-radius: 16px;
+
+    overflow: hidden;
+
+    background: #14141A;
+
+    border: 1px solid rgba(255, 0, 0, 0.25);
+}
+
+.chat-image-message img {
+    display: block;
+
+    width: 100%;
+    height: auto;
+
+    max-height: 420px;
+
+    object-fit: cover;
+}
+
+
+/* =========================================================
+   FILE MESSAGE
+========================================================= */
+
+.chat-file-message {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    width: min(360px, 65vw);
+
+    padding: 12px 14px;
+
+    background: #14141A;
+
+    border: 1px solid rgba(255, 0, 0, 0.25);
+
+    border-radius: 14px;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        transform .2s ease;
+}
+
+.chat-file-message:hover {
+    background: #1b1b23;
+
+    border-color: #ff0000;
+
+    transform: translateY(-1px);
+}
+
+.chat-file-message i {
+    flex-shrink: 0;
+
+    color: #ff0000;
+
+    font-size: 22px;
+}
+
+.chat-file-info {
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.chat-file-name {
+    overflow: hidden;
+
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.chat-file-size {
+    color: #777783;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   CHAT FOOTER
+========================================================= */
+
+.chat-footer {
+    padding: 12px 16px 16px;
+
+    background: #09090B;
+
+    border-top: 1px solid rgba(255, 0, 0, 0.12);
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   CHAT FORM
+========================================================= */
+
+.chat-form {
+    width: 100%;
+
+    margin: 0;
+}
+
+
+/* =========================================================
+   MAIN COMPOSER
+========================================================= */
+
+.chat-composer {
+    width: 100%;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    gap: 8px;
+
+    padding: 8px;
+
+    box-sizing: border-box;
+
+    background: #09090B;
+
+    border: 1px solid #ff0000;
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 0 8px rgba(255, 0, 0, 0.12),
+        inset 0 0 12px rgba(255, 0, 0, 0.025);
+
+    transition: .25s ease;
+}
+
+
+/* =========================================================
+   COMPOSER FOCUS
+========================================================= */
+
+.chat-composer:focus-within {
+    border-color: #ff0000;
+
+    box-shadow:
+        0 0 12px rgba(255, 0, 0, 0.22),
+        0 0 25px rgba(255, 0, 0, 0.06),
+        inset 0 0 15px rgba(255, 0, 0, 0.03);
+}
+
+
+/* =========================================================
+   TEXTAREA WRAPPER
+========================================================= */
+
+.chat-textarea-wrapper {
+    flex: 1;
+
+    min-width: 0;
+
+    display: flex;
+
+    align-items: center;
+}
+
+
+/* =========================================================
+   MESSAGE TEXTAREA
+========================================================= */
+
+.chat-message-input {
+    display: block;
+
+    width: 100%;
+
+    min-height: 42px;
+    max-height: 160px;
+
+    padding: 11px 5px;
+
+    box-sizing: border-box;
+
+    background: transparent;
+
+    border: none;
+    outline: none;
+
+    resize: none;
+
+    overflow-y: auto;
+
+    color: #ffffff;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 14px;
+
+    line-height: 20px;
+
+    white-space: pre-wrap;
+
+    overflow-wrap: anywhere;
+
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   PLACEHOLDER
+========================================================= */
+
+.chat-message-input::placeholder {
+    color: #666672;
+
+    opacity: 1;
+}
+
+
+/* =========================================================
+   TEXTAREA SCROLLBAR
+========================================================= */
+
+.chat-message-input::-webkit-scrollbar {
+    width: 4px;
+}
+
+.chat-message-input::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-message-input::-webkit-scrollbar-thumb {
+    background: #3a1111;
+
+    border-radius: 10px;
+}
+
+.chat-message-input::-webkit-scrollbar-thumb:hover {
+    background: #ff0000;
+}
+
+
+/* =========================================================
+   UPLOAD BUTTON
+========================================================= */
+
+.chat-upload-btn {
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    border: 1px solid #ff0000;
+
+    border-radius: 11px;
+
+    background: #09090B;
+
+    color: #ff0000;
+
+    font-size: 19px;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+
+    position: relative;
+
+    z-index: 5;
+}
+
+.chat-upload-btn:hover {
+    background: #ff0000;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 0 10px rgba(255, 0, 0, 0.4);
+
+    transform: translateY(-1px);
+}
+
+.chat-upload-btn:active {
+    transform: scale(.94);
+}
+
+
+/* =========================================================
+   SEND BUTTON
+========================================================= */
+
+.chat-send-btn {
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    border: 1px solid #ff0000;
+
+    border-radius: 11px;
+
+    background: #ff0000;
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+    transition: .2s ease;
+}
+
+.chat-send-btn:hover {
+    background: #d90000;
+
+    box-shadow:
+        0 0 12px rgba(255, 0, 0, 0.45);
+
+    transform: translateY(-1px);
+}
+
+.chat-send-btn:active {
+    transform: scale(.94);
+}
+
+
+/* =========================================================
+   FILE SELECTED
+========================================================= */
+
+.chat-upload-btn.file-selected {
+    background: #ff0000;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 0 12px rgba(255, 0, 0, 0.5);
+
+    animation: filePulse 1.2s infinite;
+}
+
+
+@keyframes filePulse {
+
+    0% {
+        box-shadow:
+            0 0 5px rgba(255, 0, 0, 0.25);
+    }
+
+    50% {
+        box-shadow:
+            0 0 16px rgba(255, 0, 0, 0.65);
+    }
+
+    100% {
+        box-shadow:
+            0 0 5px rgba(255, 0, 0, 0.25);
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .chat-footer {
+        padding: 8px 8px 10px;
+    }
+
+    .chat-composer {
+        padding: 6px;
+
+        border-radius: 13px;
+    }
+
+    .chat-upload-btn,
+    .chat-send-btn {
+        width: 39px;
+        height: 39px;
+
+        border-radius: 10px;
+    }
+
+    .chat-message-input {
+        font-size: 13px;
+
+        min-height: 39px;
+
+        padding: 9px 4px;
+    }
+
+    .message-row {
+        padding: 0 8px;
+    }
+
+    .message-content {
+        max-width: 82%;
+    }
+
+    .chat-message {
+        font-size: 13px;
+
+        padding: 9px 12px;
+    }
+
+    .chat-image-message {
+        width: min(320px, 78vw);
+    }
+
+    .chat-file-message {
+        width: min(300px, 78vw);
+    }
+}
+
+</style>
+
+<section class="chat-layout container-fluid px-md-3">
+
+    <div class="d-flex h-100 position-relative">
+
+        <!-- ==========================================
+             LEFT SIDEBAR (Toggleable)
+        =========================================== -->
+
+        <div id="sidebarWrapper" class="sidebar-wrapper me-md-3">
+
+            <aside class="sidebar w-100 d-flex flex-column">
+
+                <div class="sidebar-header d-flex align-items-center justify-content-between">
+                    <h3>Messages</h3>
+                    <button type="button" id="closeSidebarMobileBtn" class="btn btn-link text-light p-0 d-md-none fs-5">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+
+                <div class="px-3 pb-2">
+                    <input type="text" class="chat-search m-0" placeholder="Search chats...">
+                </div>
+
+                <div class="chat-list flex-grow-1">
+
+                    <div class="chat-filters d-flex">
+                        <button type="button" class="chat-filter active" data-filter="all">All</button>
+                        <button type="button" class="chat-filter" data-filter="gamemate">GameMates</button>
+                        <button type="button" class="chat-filter" data-filter="group">Groups</button>
+                    </div>
+
+                    <div id="chatItems">
+
+                        {% for gm in game_mates %}
+                        {% if gm.user == request.user %}
+                        <a href="{% url 'start-chat' gm.mate.username %}"
+                            class="chat-user search-item chat-item gamemate {% if game_mate == gm.mate %}active{% endif %}"
+                            data-name="{{ gm.mate.username|lower }}" data-type="gamemate">
+                            <div class="user-avatar d-flex align-items-center justify-content-center">
+                                {{ gm.mate.username|slice:":1"|upper }}
+                            </div>
+                            <div class="user-details">
+                                <h4>{{ gm.mate.username }}</h4>
+                                <p>Start chatting</p>
+                            </div>
+                        </a>
+                        {% else %}
+                        <a href="{% url 'start-chat' gm.user.username %}"
+                            class="chat-user search-item chat-item gamemate {% if game_mate == gm.user %}active{% endif %}"
+                            data-name="{{ gm.user.username|lower }}" data-type="gamemate">
+                            <div class="user-avatar d-flex align-items-center justify-content-center">
+                                {{ gm.user.username|slice:":1"|upper }}
+                            </div>
+                            <div class="user-details">
+                                <h4>{{ gm.user.username }}</h4>
+                                <p>Start chatting</p>
+                            </div>
+                        </a>
+                        {% endif %}
+                        {% endfor %}
+
+                        {% for group in joined_groups %}
+                        <a href="{% url 'chatroom' group.group_name %}"
+                            class="chat-user search-item chat-item group {% if chat_group.group_name == group.group_name %}active{% endif %}"
+                            data-name="{% if group.groupchat_name %}{{ group.groupchat_name|lower }}{% else %}{{ group.group_name|lower }}{% endif %}"
+                            data-type="group">
+                            <div class="user-avatar d-flex align-items-center justify-content-center">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                            <div class="user-details">
+                                <h4>
+                                    {% if group.groupchat_name %}
+                                    {{ group.groupchat_name }}
+                                    {% else %}
+                                    {{ group.group_name }}
+                                    {% endif %}
+                                </h4>
+                                <p>{{ group.members.count }} member{{ group.members.count|pluralize }}</p>
+                            </div>
+                        </a>
+                        {% endfor %}
+
+                        {% if not game_mates and not joined_groups %}
+                        <div id="noChatsMessage" class="empty-chat-list">No chats yet</div>
+                        {% endif %}
+                        <div id="noFilterResults" class="empty-chat-list d-none">No chats found</div>
+
+                    </div>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+        <!-- ==========================================
+             RIGHT CHAT AREA
+        =========================================== -->
+
+        <div class="chat-area-wrapper flex-grow-1 h-100">
+
+            <main class="chat-area h-100 d-flex flex-column">
+
+                <!-- CHAT HEADER -->
+                <div class="chat-header d-flex align-items-center justify-content-between">
+
+                    <div class="chat-header-left d-flex align-items-center">
+
+                        <button type="button" id="toggleSidebarBtn" class="toggle-sidebar-btn" title="Toggle Sidebar">
+                            <i class="bi bi-list"></i>
+                        </button>
+
+                        <div class="chat-avatar d-flex align-items-center justify-content-center">
+                            X
+                        </div>
+
+                        <div class="chat-info">
+                            {% if chat_group.groupchat_name %}
+                            <h1>{{ chat_group.groupchat_name }}</h1>
+                            <p>{{ chat_group.members.count }} Members <span id="online_count"></span></p>
+
+                            {% elif game_mate %}
+                            <h1>{{ game_mate.username }}</h1>
+                            <p><span id="online_count"></span></p>
+
+                            {% else %}
+                            <h1>X Fight Chat</h1>
+                            <p><span id="online_count"></span></p>
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                    <div class="chat-header-actions">
+
+                        <!-- Call Buttons -->
+                        <div class="gamearena-call-buttons">
+                            <button type="button" class="header-btn header-btn-icon"
+                                onclick="startGameArenaCall('voice',this.dataset.chatroomName)"
+                                data-chatroom-name="{{ chatroom_name }}" title="Voice Call">
+                                <i class="bi bi-telephone-fill"></i>
+                            </button>
+                            <button type="button" class="header-btn header-btn-icon"
+                                onclick="startGameArenaCall('video',this.dataset.chatroomName)"
+                                data-chatroom-name="{{ chatroom_name }}" title="Video Call">
+                                <i class="bi bi-camera-video-fill"></i>
+                            </button>
+                        </div>
+
+                        {% if chat_group.groupchat_name %}
+                        <a href="{% url 'chat-group-detail' chat_group.group_name %}" class="header-btn"
+                            title="Group Details">
+                            <i class="bi bi-info-circle-fill"></i>
+                            <span class="d-none d-sm-inline">Info</span>
+                        </a>
+                        <button type="button" id="inviteBtn" class="header-btn" title="Invite GameMate">
+                            <i class="bi bi-person-plus-fill"></i>
+                            <span class="d-none d-sm-inline">Invite</span>
+                        </button>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <!-- MESSAGES -->
+                <div class="messages flex-grow-1 d-flex flex-column" id="messages">
+                    {% for chat_message in chat_messages %}
+                    {% include 'social/group_chat_messages.html' %}
+                    {% empty %}
+                    <div class="empty-chat flex-grow-1 d-flex align-items-center justify-content-center">
+                        <p class="m-0">No messages yet. Start the conversation.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- MESSAGE INPUT -->
+                <div class="chat-footer">
+                    <form class="chat-form" id="chat-message-form" enctype="multipart/form-data" method="post"
+                        hx-ext="ws" ws-connect="/ws/chatroom/{{ chatroom_name }}/" ws-send>
+                        {% csrf_token %}
+                        <div class="chat-composer">
+                            <input type="file" name="file" id="chat-file-input" hidden>
+                            <input type="file" name="file" id="chat-file-input" hidden>
+                            <label for="chat-file-input" class="chat-upload-btn" title="Attach file">
+                                <i class="bi bi-paperclip"></i>
+                            </label>
+                                <div class="chat-textarea-wrapper">
+                                    <textarea name="body" id="chat-message-input" class="chat-message-input"
+                                        placeholder="Type a message..." rows="1" autocomplete="off"></textarea>
+                                </div>
+                                <button type="submit" class="chat-send-btn" aria-label="Send message"
+                                    title="Send message">
+                                    <i class="bi bi-send-fill"></i>
+                                </button>
+                        </div>
+                    </form>
+
+                    <form enctype="multipart/form-data" id="chat_form-file"
+                        hx-post="{% url 'chat-file-upload' chat_group.group_name %}" hx-swap="none"
+                        style="display: none;">
+                        {% csrf_token %}
+                        <input type="file" name="file" id="chat-file-upload-input">
+                    </form>
+                </div>
+
+            </main>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ==========================================
+     INVITE MODAL
+========================================== -->
+
+{% if chat_group.groupchat_name %}
+<div id="inviteOverlay" class="invite-overlay">
+    <div class="invite-popup">
+        <button type="button" id="closeInvite" class="close-btn">&times;</button>
+        <h2>Invite GameMate</h2>
+        <div class="gamemate-list d-flex flex-column">
+            {% for relation in game_mates %}
+            {% if relation.user == request.user %}
+            {% with mate=relation.mate %}
+            <div class="gamemate-item d-flex align-items-center justify-content-between">
+                <span>{{ mate.username }}</span>
+                <a href="{% url 'send-group-invite' chat_group.group_name mate.id %}">
+                    <button type="button" class="sendInviteBtn">Send</button>
+                </a>
+            </div>
+            {% endwith %}
+            {% else %}
+            {% with mate=relation.user %}
+            <div class="gamemate-item d-flex align-items-center justify-content-between">
+                <span>{{ mate.username }}</span>
+                <a href="{% url 'send-group-invite' chat_group.group_name mate.id %}">
+                    <button type="button" class="sendInviteBtn">Send</button>
+                </a>
+            </div>
+            {% endwith %}
+            {% endif %}
+            {% empty %}
+            <p style="color: var(--text-light);">You don't have any GameMates.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- OUTGOING CALL POPUP -->
+<div id="outgoing-call-popup" class="outgoing-call-popup hidden">
+    <div class="outgoing-call-content">
+        <div class="outgoing-call-icon">
+            <i class="fa-solid fa-phone-volume"></i>
+        </div>
+        <h3 id="outgoing-call-title">Calling...</h3>
+        <p id="outgoing-call-type">Waiting for the other player to answer</p>
+        <div class="outgoing-call-loader">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <button id="cancel-outgoing-call" class="cancel-call-button">
+            <i class="fa-solid fa-phone-slash"></i>
+            Cancel
+        </button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+
+<script>
+    // ==========================================
+    // SIDEBAR TOGGLE LOGIC
+    // ==========================================
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleBtn = document.getElementById('toggleSidebarBtn');
+        const closeMobileBtn = document.getElementById('closeSidebarMobileBtn');
+        const sidebarWrapper = document.getElementById('sidebarWrapper');
+
+        function toggleSidebar() {
+            if (window.innerWidth < 768) {
+                sidebarWrapper.classList.toggle('mobile-open');
+            } else {
+                sidebarWrapper.classList.toggle('desktop-closed');
+            }
+        }
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', toggleSidebar);
+        }
+
+        if (closeMobileBtn) {
+            closeMobileBtn.addEventListener('click', () => {
+                sidebarWrapper.classList.remove('mobile-open');
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                sidebarWrapper.classList.remove('mobile-open');
+            }
+        });
+    });
+
+    // ==========================================
+    // CALL LOGIC 
+    // ==========================================
+    let outgoingCall = null;
+    const outgoingCallPopup = document.getElementById("outgoing-call-popup");
+    const outgoingCallTitle = document.getElementById("outgoing-call-title");
+    const outgoingCallType = document.getElementById("outgoing-call-type");
+    const cancelOutgoingCallButton = document.getElementById("cancel-outgoing-call");
+
+    window.showOutgoingCall = function (callData) {
+        outgoingCall = callData;
+        outgoingCallTitle.textContent = "Calling...";
+        outgoingCallType.textContent =
+            callData.call_type === "voice"
+                ? "Starting Voice Call..."
+                : "Starting Video Call...";
+        outgoingCallPopup.classList.remove("hidden");
+    };
+
+    window.hideOutgoingCall = function () {
+        outgoingCall = null;
+        outgoingCallPopup.classList.add("hidden");
+    };
+
+    if (cancelOutgoingCallButton) {
+        cancelOutgoingCallButton.addEventListener("click", () => {
+            if (outgoingCall) {
+                if (window.gameArenaSocket && window.gameArenaSocket.readyState === WebSocket.OPEN) {
+                    window.gameArenaSocket.send(
+                        JSON.stringify({
+                            action: "cancel_call",
+                            channel_name: outgoingCall.channel_name,
+                        })
+                    );
+                }
+            }
+            window.hideOutgoingCall();
+        });
+    }
+
+    // ==========================================
+    // UI BEHAVIOR LOGIC
+    // ==========================================
+    const inviteBtn = document.getElementById('inviteBtn');
+    const inviteOverlay = document.getElementById('inviteOverlay');
+    const closeInvite = document.getElementById('closeInvite');
+    const searchInput = document.querySelector('.chat-search');
+    const chatItemsContainer = document.getElementById('chatItems');
+    const chatItemsList = document.querySelectorAll('.chat-item');
+    const filters = document.querySelectorAll('.chat-filter');
+    const noFilterResults = document.getElementById('noFilterResults');
+    const chatMessageInput = document.getElementById('chat-message-input');
+    const chatFileInput = document.getElementById('chat-file-input');
+    const chatFileUploadInput = document.getElementById('chat-file-upload-input');
+    const chatFormFile = document.getElementById('chat_form-file');
+
+    function scrollToBottom() {
+        const messagesDiv = document.getElementById('messages');
+        if (messagesDiv) {
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+    }
+
+    window.addEventListener('load', scrollToBottom);
+
+    document.body.addEventListener('htmx:afterSettle', function (evt) {
+        if (evt.detail.target.id === "messages") {
+            scrollToBottom();
+            const form = document.getElementById('chat-message-form');
+            if (form) form.reset();
+        }
+    });
+
+    if (inviteBtn && inviteOverlay && closeInvite) {
+        inviteBtn.addEventListener('click', () => {
+            inviteOverlay.style.display = 'flex';
+        });
+
+        closeInvite.addEventListener('click', () => {
+            inviteOverlay.style.display = 'none';
+        });
+
+        inviteOverlay.addEventListener('click', (e) => {
+            if (e.target === inviteOverlay) {
+                inviteOverlay.style.display = 'none';
+            }
+        });
+    }
+
+    if (chatFileInput && chatFileUploadInput && chatFormFile) {
+        chatFileInput.addEventListener('change', function (e) {
+            if (e.target.files.length > 0) {
+                chatFileUploadInput.files = e.target.files;
+                chatFormFile.dispatchEvent(new Event('submit', { cancelable: true }));
+                e.target.value = '';
+            }
+        });
+    }
+
+    if (chatMessageInput) {
+        chatMessageInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const form = this.closest('form');
+                if (this.value.trim() !== '') {
+                    form.dispatchEvent(new Event('submit', { cancelable: true }));
+                }
+            }
+        });
+
+        chatMessageInput.addEventListener('input', function () {
+            this.style.height = 'auto';
+            const newHeight = Math.min(this.scrollHeight, 120);
+            this.style.height = (newHeight > 44 ? newHeight : 44) + 'px';
+        });
+    }
+
+    if (searchInput && filters.length > 0 && chatItemsList.length > 0) {
+        function filterChats() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const activeFilter = document.querySelector('.chat-filter.active').dataset.filter;
+            let visibleCount = 0;
+
+            chatItemsList.forEach(item => {
+                const itemName = item.dataset.name;
+                const itemType = item.dataset.type;
+
+                const matchesSearch = itemName.includes(searchTerm);
+                const matchesFilter = activeFilter === 'all' || itemType === activeFilter;
+
+                if (matchesSearch && matchesFilter) {
+                    item.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            if (noFilterResults) {
+                if (visibleCount === 0) {
+                    noFilterResults.classList.remove('d-none');
+                } else {
+                    noFilterResults.classList.add('d-none');
+                }
+            }
+        }
+
+        searchInput.addEventListener('input', filterChats);
+
+        filters.forEach(filter => {
+            filter.addEventListener('click', () => {
+                filters.forEach(f => f.classList.remove('active'));
+                filter.classList.add('active');
+                filterChats();
+            });
+        });
+    }
+</script>
+{% endblock %}

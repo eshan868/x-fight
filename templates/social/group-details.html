@@ -1,0 +1,974 @@
+{% extends 'layouts/base_layout.html' %}
+
+{% block title %}Group Details{% endblock %}
+
+{% block content %}
+
+<style>
+    /* ==========================================
+   GROUP DETAILS PAGE
+========================================== */
+
+    .group-details-page {
+        min-height: calc(100vh - 10vh);
+
+        padding: 30px 20px;
+
+        margin-top: 8vh;
+
+        color: white;
+    }
+
+
+    /* ==========================================
+   MAIN CONTAINER
+========================================== */
+
+    .group-details-container {
+        width: 100%;
+        max-width: 900px;
+
+        margin: 0 auto;
+
+        background: var(--surface);
+
+        border: 1px solid var(--border);
+
+        border-radius: 18px;
+
+        overflow: hidden;
+
+        box-shadow: 0 15px 40px rgba(0, 0, 0, .25);
+    }
+
+
+    /* ==========================================
+   HEADER
+========================================== */
+
+    .group-details-header {
+        padding: 25px 30px;
+
+        display: flex;
+        align-items: center;
+        gap: 18px;
+
+        border-bottom: 1px solid var(--border);
+
+        background: var(--surface);
+    }
+
+
+    .group-details-icon {
+        width: 55px;
+        height: 55px;
+
+        flex-shrink: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: rgba(255, 0, 0, .08);
+
+        border: 1px solid rgba(255, 0, 0, .3);
+
+        color: var(--primary);
+
+        font-size: 23px;
+    }
+
+
+    .group-details-title {
+        min-width: 0;
+    }
+
+
+    .group-details-title h1 {
+        margin: 0;
+
+        color: white;
+
+        font-size: 22px;
+
+        font-weight: 700;
+
+        word-break: break-word;
+    }
+
+
+    .group-details-title p {
+        margin: 5px 0 0;
+
+        color: var(--text-light);
+
+        font-size: 13px;
+    }
+
+
+    /* ==========================================
+   CONTENT
+========================================== */
+
+    .group-details-content {
+        padding: 25px 30px;
+    }
+
+
+    /* ==========================================
+   SECTION
+========================================== */
+
+    .group-section {
+        margin-bottom: 25px;
+    }
+
+
+    .group-section:last-child {
+        margin-bottom: 0;
+    }
+
+
+    .group-section-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        margin: 0 0 12px;
+
+        color: white;
+
+        font-size: 15px;
+
+        font-weight: 600;
+    }
+
+
+    .group-section-title i {
+        color: var(--primary);
+    }
+
+
+    /* ==========================================
+   ADMIN LIST
+========================================== */
+
+    .admin-list {
+        display: flex;
+        flex-direction: column;
+
+        gap: 8px;
+    }
+
+
+    .admin-item {
+        display: flex;
+        align-items: center;
+
+        gap: 12px;
+
+        padding: 12px 14px;
+
+        background: var(--surface-1);
+
+        border: 1px solid var(--border);
+
+        border-radius: 10px;
+    }
+
+
+    .admin-avatar {
+        width: 38px;
+        height: 38px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        border-radius: 50%;
+
+        background: rgba(255, 0, 0, .1);
+
+        border: 1px solid rgba(255, 0, 0, .3);
+
+        color: var(--primary);
+
+        font-weight: 700;
+    }
+
+
+    .admin-name {
+        color: white;
+
+        font-size: 14px;
+
+        font-weight: 500;
+    }
+
+
+    .admin-badge {
+        margin-left: auto;
+
+        padding: 4px 8px;
+
+        border-radius: 6px;
+
+        background: rgba(255, 0, 0, .1);
+
+        color: var(--primary);
+
+        font-size: 11px;
+    }
+
+
+    /* ==========================================
+   MEMBER COUNT
+========================================== */
+
+    .member-count {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        padding: 16px;
+
+        background: var(--surface-1);
+
+        border: 1px solid var(--border);
+
+        border-radius: 12px;
+    }
+
+
+    .member-count-icon {
+        color: var(--primary);
+
+        font-size: 20px;
+    }
+
+
+    .member-count-text {
+        color: var(--text-light);
+
+        font-size: 13px;
+    }
+
+
+    .member-count-number {
+        color: white;
+
+        font-size: 18px;
+
+        font-weight: 700;
+    }
+
+
+    /* ==========================================
+   MEMBERS
+========================================== */
+
+    .member-list {
+        display: flex;
+        flex-direction: column;
+
+        gap: 10px;
+    }
+
+
+    .member-item {
+        display: flex;
+        align-items: center;
+
+        gap: 12px;
+
+        padding: 13px;
+
+        background: var(--surface-1);
+
+        border: 1px solid var(--border);
+
+        border-radius: 11px;
+
+        transition: .2s ease;
+    }
+
+
+    .member-item:hover {
+        border-color: var(--primary);
+
+        transform: translateY(-1px);
+    }
+
+
+    .member-avatar {
+        width: 42px;
+        height: 42px;
+
+        flex-shrink: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: rgba(255, 0, 0, .08);
+
+        border: 1px solid rgba(255, 0, 0, .25);
+
+        color: var(--primary);
+
+        font-weight: 700;
+    }
+
+
+    .member-info {
+        flex: 1;
+
+        min-width: 0;
+    }
+
+
+    .member-name {
+        color: white;
+
+        font-size: 14px;
+
+        font-weight: 500;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+
+        white-space: nowrap;
+    }
+
+
+    .member-role {
+        margin-top: 3px;
+
+        color: var(--text-light);
+
+        font-size: 11px;
+    }
+
+
+    /* ==========================================
+   MEMBER ACTIONS
+========================================== */
+
+    .member-actions {
+        display: flex;
+        align-items: center;
+
+        gap: 7px;
+
+        flex-wrap: wrap;
+
+        justify-content: flex-end;
+    }
+
+
+   /* ==========================================
+   GROUP ACTION BUTTON
+========================================== */
+
+.group-action-btn {
+    position: relative;
+
+    padding: 7px 11px;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 9px;
+
+    background: transparent;
+
+    color: white;
+    font-size: 12px;
+
+    cursor: pointer;
+
+    overflow: hidden;
+
+    isolation: isolate;
+}
+
+
+/* ==========================================
+   RED LINE TRAVELLING ON BORDER
+========================================== */
+
+.group-action-btn::before {
+    content: "";
+
+    position: absolute;
+
+    width: 35px;
+    height: 2px;
+
+    background: #fd0000;
+
+    border-radius: 50%;
+
+   
+
+    top: -1px;
+    left: -35px;
+
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+
+/* ==========================================
+   HOVER
+========================================== */
+
+.group-action-btn:hover::before {
+    opacity: 1;
+
+    animation: borderRunner 1.5s linear infinite;
+}
+
+
+/* ==========================================
+   MOVE AROUND BORDER
+========================================== */
+
+@keyframes borderRunner {
+
+    /* TOP */
+    0% {
+        top: -1px;
+        left: -35px;
+        transform: rotate(0deg);
+    }
+
+    24% {
+        top: -1px;
+        left: calc(100% - 5px);
+        transform: rotate(0deg);
+    }
+
+
+    /* RIGHT */
+    25% {
+        top: -35px;
+        left: calc(100% - 1px);
+        transform: rotate(90deg);
+    }
+
+    49% {
+        top: calc(100% - 5px);
+        left: calc(100% - 1px);
+        transform: rotate(90deg);
+    }
+
+
+    /* BOTTOM */
+    50% {
+        top: calc(100% - 1px);
+        left: calc(100% + 35px);
+        transform: rotate(180deg);
+    }
+
+    74% {
+        top: calc(100% - 1px);
+        left: -35px;
+        transform: rotate(180deg);
+    }
+
+
+    /* LEFT */
+    75% {
+        top: calc(100% + 2px);
+        left: -1px;
+        transform: rotate(270deg);
+    }
+
+    99% {
+        top: -35px;
+        left: -1px;
+        transform: rotate(270deg);
+    }
+
+
+    /* RESET */
+    100% {
+        top: -1px;
+        left: -35px;
+        transform: rotate(360deg);
+    }
+}
+
+
+/* ==========================================
+   BUTTON TYPES
+========================================== */
+
+.remove-btn {
+    color: #fdfcfc;
+}
+
+.make-admin-btn {
+    color: white;
+}
+
+.remove-admin-btn {
+    color: #f3f2f0;
+}
+
+
+/* ==========================================
+   HOVER GLOW
+========================================== */
+
+.group-action-btn:hover {
+    text-shadow: 0 0 7px currentColor;
+}
+
+
+    /* ==========================================
+   EMPTY
+========================================== */
+
+    .group-empty {
+        padding: 20px;
+
+        text-align: center;
+
+        color: var(--text-light);
+
+        background: var(--surface-2);
+
+        border: 1px solid var(--border);
+
+        border-radius: 10px;
+
+        font-size: 13px;
+    }
+
+
+    /* ==========================================
+   MOBILE
+========================================== */
+
+    @media (max-width: 768px) {
+
+        .group-details-page {
+            padding: 20px 10px;
+
+            margin-top: 7vh;
+        }
+
+
+        .group-details-header {
+            padding: 20px;
+        }
+
+
+        .group-details-content {
+            padding: 20px;
+        }
+
+
+        .group-details-title h1 {
+            font-size: 18px;
+        }
+
+
+        .member-item {
+            align-items: flex-start;
+
+            flex-wrap: wrap;
+        }
+
+
+        .member-actions {
+            width: 100%;
+
+            margin-left: 54px;
+
+            justify-content: flex-start;
+        }
+
+    }
+</style>
+
+
+<section class="group-details-page">
+
+    <div class="group-details-container">
+
+
+        <!-- ==========================================
+             GROUP HEADER
+        =========================================== -->
+
+        <div class="group-details-header">
+
+            <div class="group-details-icon">
+
+                <i class="bi bi-people-fill"></i>
+
+            </div>
+
+
+            <div class="group-details-title">
+
+                <h1>
+                    {{ chat_group.groupchat_name }}
+                </h1>
+
+                <p>
+                    Group Information
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ==========================================
+             CONTENT
+        =========================================== -->
+
+        <div class="group-details-content">
+
+
+            <!-- ==========================================
+                 ADMINS
+            =========================================== -->
+
+            <div class="group-section">
+
+                <h3 class="group-section-title">
+
+                    <i class="bi bi-shield-fill-check"></i>
+
+                    Group Admins
+
+                </h3>
+
+
+                <div class="admin-list">
+
+                    {% for admin in chat_group.admin.all %}
+
+                    <div class="admin-item">
+
+                        <div class="admin-avatar">
+
+                            {{ admin.username|slice:":1"|upper }}
+
+                        </div>
+
+
+                        <span class="admin-name">
+
+                            {{ admin.username }}
+
+                        </span>
+
+
+                        <span class="admin-badge">
+
+                            ADMIN
+
+                        </span>
+
+                    </div>
+
+                    {% empty %}
+
+                    <div class="group-empty">
+
+                        No admins
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ==========================================
+                 MEMBER COUNT
+            =========================================== -->
+
+            <div class="group-section">
+
+                <h3 class="group-section-title">
+
+                    <i class="bi bi-people"></i>
+
+                    Members
+
+                </h3>
+
+
+                <div class="member-count">
+
+                    <div class="member-count-icon">
+
+                        <i class="bi bi-person-check-fill"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <div class="member-count-number">
+
+                            {{ chat_group.members.count }}
+
+                        </div>
+
+                        <div class="member-count-text">
+
+                            Total members joined
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ==========================================
+                 MEMBER LIST
+            =========================================== -->
+
+            <div class="group-section">
+
+                <h3 class="group-section-title">
+
+                    <i class="bi bi-person-lines-fill"></i>
+
+                    Group Members
+
+                </h3>
+
+
+                <div class="member-list">
+
+
+                    {% if request.user in chat_group.admin.all %}
+
+
+                    {% for members in member %}
+
+                    <div class="member-item">
+
+
+                        <div class="member-avatar">
+
+                            {{ members.username|slice:":1"|upper }}
+
+                        </div>
+
+
+                        <div class="member-info">
+
+                            <div class="member-name">
+
+                                {{ members.username }}
+
+                            </div>
+
+
+                            {% if members in chat_group.admin.all %}
+
+                            <div class="member-role">
+
+                                Group Administrator
+
+                            </div>
+
+                            {% else %}
+
+                            <div class="member-role">
+
+                                Group Member
+
+                            </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- ACTIONS -->
+
+                        <div class="member-actions">
+
+
+                            <!-- REMOVE MEMBER -->
+
+                            <form method="POST">
+
+                                {% csrf_token %}
+
+                                <input type="hidden" name="action" value="remove">
+
+                                <input type="hidden" name="user_id" value="{{ members.id }}">
+
+                                <button type="submit" class="group-action-btn remove-btn">
+
+                                    <i class="bi bi-person-dash"></i>
+
+                                    Remove
+
+                                </button>
+
+                            </form>
+
+
+
+                            {% if members not in chat_group.admin.all %}
+
+
+                            <!-- MAKE ADMIN -->
+
+                            <form method="POST">
+
+                                {% csrf_token %}
+
+                                <input type="hidden" name="action" value="make_admin">
+
+                                <input type="hidden" name="user_id" value="{{ members.id }}">
+
+                                <button type="submit" class="group-action-btn make-admin-btn">
+
+                                    <i class="bi bi-shield-plus"></i>
+
+                                    Make Admin
+
+                                </button>
+
+                            </form>
+
+
+                            {% else %}
+
+
+                            <!-- REMOVE ADMIN -->
+
+                            <form method="POST">
+
+                                {% csrf_token %}
+
+                                <input type="hidden" name="action" value="remove_admin">
+
+                                <input type="hidden" name="user_id" value="{{ members.id }}">
+
+                                <button type="submit" class="group-action-btn remove-admin-btn">
+
+                                    <i class="bi bi-shield-minus"></i>
+
+                                    Remove Admin
+
+                                </button>
+
+                            </form>
+
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+
+                    {% else %}
+
+
+                    <!-- ==========================================
+                             NORMAL MEMBER VIEW
+                        =========================================== -->
+
+                    {% for members in member %}
+
+                    <div class="member-item">
+
+                        <div class="member-avatar">
+
+                            {{ members.username|slice:":1"|upper }}
+
+                        </div>
+
+
+                        <div class="member-info">
+
+                            <div class="member-name">
+
+                                {{ members.username }}
+
+                            </div>
+
+
+                            {% if members in chat_group.admin.all %}
+
+                            <div class="member-role">
+
+                                Group Administrator
+
+                            </div>
+
+                            {% else %}
+
+                            <div class="member-role">
+
+                                Group Member
+
+                            </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        {% if members in chat_group.admin.all %}
+
+                        <span class="admin-badge">
+
+                            ADMIN
+
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+                    {% endfor %}
+
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+{% endblock %}

@@ -1,0 +1,440 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}X Fight{% endblock %}
+    </title>
+
+
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Aclonica&family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+   <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- X-Fight CSS -->
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/table.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/webkit.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/pages.css' %}">
+    <link rel="stylesheet" href="{% static 'css/call_room.css' %}">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    {% block css %}{% endblock %}
+
+</head>
+
+
+<body>
+
+
+    {% include 'layouts/navbar.html' %}
+
+    <main class="site-main">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-row">
+                <p>X-Fight — compete, climb, and win.</p>
+                <p>
+                    <a href="{% url 'home' %}">Home</a>
+                    &nbsp;·&nbsp;
+                    <a href="{% url 'events-display' %}">Tournaments</a>
+                    &nbsp;·&nbsp;
+                    <a href="{% url 'leaderboard' %}">Leaderboard</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+
+
+
+    {% if request.user.is_authenticated %}
+
+    <div id="global-call-popup" class="global-call-popup hidden">
+        <h3 id="global-caller-name">
+            Incoming Call
+        </h3>
+
+        <p id="global-call-type">
+            Someone is calling you
+        </p>
+
+        <button id="accept-global-call">
+            Accept
+        </button>
+
+        <button id="decline-global-call">
+            Decline
+        </button>
+    </div>
+
+
+    <script>
+        let incomingCall = null;
+
+        const callPopup =
+            document.getElementById(
+                "global-call-popup"
+            );
+
+        const callerName =
+            document.getElementById(
+                "global-caller-name"
+            );
+
+        const callTypeText =
+            document.getElementById(
+                "global-call-type"
+            );
+
+        const acceptButton =
+            document.getElementById(
+                "accept-global-call"
+            );
+
+        const declineButton =
+            document.getElementById(
+                "decline-global-call"
+            );
+
+
+        function getGlobalCallSocketUrl() {
+            const protocol =
+                window.location.protocol === "https:"
+                    ? "wss://"
+                    : "ws://";
+
+            return (
+                protocol +
+                window.location.host +
+                "/ws/global-calls/"
+            );
+        }
+
+
+        const globalCallSocket =
+            new WebSocket(
+                getGlobalCallSocketUrl()
+            );
+
+
+        globalCallSocket.onopen = function () {
+            console.log(
+                "[GameArena] Global call socket connected."
+            );
+        };
+
+
+        globalCallSocket.onclose = function () {
+            console.log(
+                "[GameArena] Global call socket disconnected."
+            );
+        };
+
+
+        globalCallSocket.onerror = function (error) {
+            console.error(
+                "[GameArena] Global call socket error:",
+                error
+            );
+        };
+
+
+        globalCallSocket.onmessage = function (event) {
+
+            const data = JSON.parse(event.data);
+
+            console.log("[GameArena] Global call event:", data);
+
+
+            /*
+             * RECEIVER:
+             * Display the existing incoming call popup.
+             */
+            if (data.type === "incoming_call") {
+
+                incomingCall = data;
+
+                callerName.textContent =
+                    data.caller_name + " is calling you";
+
+                callTypeText.textContent =
+                    data.call_type === "voice"
+                        ? "Incoming voice call"
+                        : "Incoming video call";
+
+                callPopup.classList.remove("hidden");
+
+                return;
+            }
+
+            if (data.type === "call_cancelled") {
+
+                if (!incomingCall) {
+                    return;
+                }
+
+
+                if (
+                    data.room_id !== incomingCall.room_id
+                ) {
+
+                    return;
+                }
+
+
+                console.log(
+                    "[GameArena] Caller cancelled the call."
+                );
+
+
+                /*
+                 * Remove the receiver's incoming call.
+                 */
+
+                incomingCall = null;
+
+
+                callPopup.classList.add("hidden");
+
+
+                callerName.textContent = "";
+
+                callTypeText.textContent = "";
+
+
+                return;
+            }
+
+
+            /*
+             * CALLER:
+             * Receiver accepted the call.
+             */
+            if (data.type === "call_accepted") {
+
+                if (!outgoingCall) {
+                    return;
+                }
+
+                if (data.room_id !== outgoingCall.room_id) {
+                    return;
+                }
+
+                console.log("[GameArena] Call accepted");
+
+                window.hideOutgoingCall();
+
+                /*
+                 * Caller enters the same room as the receiver.
+                 */
+                window.openGameArenaCallingRoom(
+                    data.room_id,
+                    data.call_type,
+                    "caller",
+                    true
+                );
+
+                return;
+            }
+
+
+            /*
+             * CALLER:
+             * Receiver declined the call.
+             */
+            if (data.type === "call_declined") {
+
+                if (!outgoingCall) {
+                    return;
+                }
+
+                if (data.room_id !== outgoingCall.room_id) {
+                    return;
+                }
+
+                window.hideOutgoingCall();
+
+                alert(
+                    data.receiver_name + " declined your call."
+                );
+
+                return;
+            }
+        };
+
+
+        /*
+         * Receiver accepts the call.
+         */
+        acceptButton.onclick = function () {
+
+            if (!incomingCall) {
+                return;
+            }
+
+            if (globalCallSocket.readyState !== WebSocket.OPEN) {
+                alert("Connection is not ready. Please try again.");
+                return;
+            }
+
+
+            globalCallSocket.send(
+                JSON.stringify({
+
+                    type: "accept_call",
+
+                    caller_id: incomingCall.caller_id,
+
+                    room_id: incomingCall.room_id,
+
+                    call_type: incomingCall.call_type
+
+                })
+            );
+
+
+            const acceptedCall = incomingCall;
+
+            incomingCall = null;
+
+            callPopup.classList.add("hidden");
+
+
+            /*
+             * Receiver enters the shared room.
+             */
+            window.openGameArenaCallingRoom(
+                acceptedCall.room_id,
+                acceptedCall.call_type,
+                "receiver"
+            );
+        };
+
+
+        /*
+         * Receiver declines the call.
+         */
+        declineButton.onclick = function () {
+            if (!incomingCall) {
+                return;
+            }
+
+            if (
+                globalCallSocket.readyState ===
+                WebSocket.OPEN
+            ) {
+                globalCallSocket.send(
+                    JSON.stringify({
+                        type: "decline_call",
+                        caller_id: incomingCall.caller_id,
+                        room_id: incomingCall.room_id
+                    })
+                );
+            }
+
+            incomingCall = null;
+
+            callPopup.classList.add(
+                "hidden"
+            );
+        };
+
+
+        function openGameArenaCallingRoom(
+            roomId,
+            callType
+        ) {
+            const url =
+                "/social/calling/?room_id=" +
+                encodeURIComponent(roomId) +
+                "&call_type=" +
+                encodeURIComponent(callType);
+
+            window.location.href = url;
+        }
+    </script>
+
+    {% endif %}
+
+
+
+    <script src="https://unpkg.com/zego-zim-web@2.5.0/index.js"></script>
+
+    <!-- Bootstrap -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <!-- jQuery -->
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+
+    <!-- Select2 -->
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+    <!-- HTMX -->
+
+    <script src="https://unpkg.com/htmx.org@2.0.7"></script>
+
+
+    <!-- HTMX WebSocket -->
+
+    <script src="https://unpkg.com/htmx-ext-ws@2.0.2/ws.js"></script>
+
+
+    <!-- Existing notification system -->
+
+    <script src="{% static 'js/notification.js' %}"></script>
+
+
+    <!-- ========================================= -->
+    <!-- X-FIGHT GLOBAL CALL SYSTEM -->
+    <!-- ========================================= -->
+    <script src="{% static 'js/chat.js' %}"></script>
+
+
+    {% block js %}{% endblock %}
+
+</body>
+
+</html>

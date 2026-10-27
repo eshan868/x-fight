@@ -1,0 +1,226 @@
+{% if chat_message.message_type == "group_invite" %}
+
+<div class="message-row received-message">
+    <div class="group-invite-message">
+
+        <div class="group-invite-header">
+            <span class="invite-icon">🎮</span>
+            <h3>Group Invitation</h3>
+        </div>
+
+        {% if chat_message.author_id != user.id %}
+
+            <p class="invite-text">
+                <strong>{{ chat_message.author.username }}</strong>
+                invited you to join a group.
+            </p>
+
+            <a href="{% url 'chatroom' chat_message.body %}"
+               class="join-group-btn">
+                JOIN GROUP
+            </a>
+
+        {% else %}
+
+            <p class="invite-text">
+                Invite sent successfully
+            </p>
+
+        {% endif %}
+
+    </div>
+</div>
+
+
+{% else %}
+
+<div class="message-row
+    {% if chat_message.author_id == user.id %}sent{% else %}received{% endif %}"
+    data-message-id="{{ chat_message.id }}">
+
+    <div class="message-content">
+
+        {% if chat_message.author_id != user.id %}
+            <div class="message-author">
+                {{ chat_message.author.username }}
+            </div>
+        {% endif %}
+
+
+        <!-- ==========================================
+             MESSAGE BODY
+        =========================================== -->
+
+        <div class="message-main">
+
+            <!-- FILE / IMAGE -->
+            {% if chat_message.file %}
+
+                {% if chat_message.is_image %}
+
+                    <div class="chat-image-message">
+
+                        <a href="{{ chat_message.file.url }}"
+                           target="_blank"
+                           class="chat-image-link">
+
+                            <img
+                                src="{{ chat_message.file.url }}"
+                                alt="Uploaded image"
+                                class="chat-uploaded-image"
+                            >
+
+                        </a>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="chat-file-message">
+
+                        <div class="chat-file-icon">
+                            <i class="bi bi-file-earmark-fill"></i>
+                        </div>
+
+                        <div class="chat-file-info">
+
+                            <div class="chat-file-name">
+                                {{ chat_message.file.name|cut:"chat_files/" }}
+                            </div>
+
+                            <div class="chat-file-type">
+                                File
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            {% endif %}
+
+
+            <!-- TEXT -->
+            {% if chat_message.body %}
+                <div class="chat-message">
+                    {{ chat_message.body }}
+                </div>
+            {% endif %}
+
+
+            <!-- ==========================================
+                 MESSAGE ACTIONS
+            =========================================== -->
+
+            <div class="message-actions">
+
+                <!-- Forward -->
+                <button
+                    type="button"
+                    class="message-action-btn"
+                    onclick="openForwardMenu('{{ chat_message.id }}')"
+                    title="Forward">
+
+                    <i class="bi bi-arrow-right"></i>
+
+                </button>
+
+
+                <!-- File menu -->
+                {% if chat_message.file %}
+
+                    <div class="message-menu-wrapper">
+
+                        <button
+                            type="button"
+                            class="message-action-btn message-menu-btn"
+                            onclick="toggleMessageMenu(this)"
+                            title="More options">
+
+                            <i class="bi bi-chevron-down"></i>
+
+                        </button>
+
+                        <div class="message-dropdown">
+
+                            <!-- Download -->
+                            <a
+                                href="{{ chat_message.file.url }}"
+                                download
+                                class="message-dropdown-item">
+
+                                <i class="bi bi-download"></i>
+                                <span>Download</span>
+
+                            </a>
+
+
+                            <!-- Forward -->
+                            <button
+                                type="button"
+                                class="message-dropdown-item"
+                                onclick="openForwardMenu('{{ chat_message.id }}')">
+
+                                <i class="bi bi-forward"></i>
+                                <span>Forward</span>
+
+                            </button>
+
+
+                            <!-- Delete -->
+                            {% if chat_message.author_id == user.id %}
+
+                                <button
+                                    type="button"
+                                    class="message-dropdown-item danger"
+                                    onclick="deleteMessage('{{ chat_message.id }}')">
+
+                                    <i class="bi bi-trash3"></i>
+                                    <span>Delete</span>
+
+                                </button>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    <!-- TEXT MESSAGE DELETE -->
+                    {% if chat_message.author_id == user.id %}
+
+                        <button
+                            type="button"
+                            class="message-action-btn"
+                            onclick="deleteMessage('{{ chat_message.id }}')"
+                            title="Delete">
+
+                            <i class="bi bi-trash3"></i>
+
+                        </button>
+
+                    {% endif %}
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================================
+             SMALL MESSAGE TIME
+        =========================================== -->
+
+        <div class="message-time">
+            {{ chat_message.created|date:"g:i a" }}
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}

@@ -1,0 +1,153 @@
+{% extends 'layouts/base_layout.html' %}
+{% load static %}
+
+{% block title %}Home | X-Fight{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="container">
+        <div class="row align-items-center g-4">
+
+            <div class="col-lg-6 hero-copy">
+                <span class="eyebrow">
+                    <i class="bi bi-controller"></i>
+                    Gaming Tournament Platform
+                </span>
+
+                <h1 class="display-4 mb-4">
+                    Play.<br>
+                    Compete.<br>
+                    Win.
+                </h1>
+
+                <p class="lead mb-4">
+                    Join tournaments, compete with the best players,
+                    and climb the leaderboard for rewards.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="{% url 'events-display' %}" class="btn btn-primary">
+                        Explore Tournaments
+                    </a>
+
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-light">
+                            Open My Space
+                        </a>
+                    {% else %}
+                        <a href="{% url 'signup' %}" class="btn btn-outline-light">
+                            Create Account
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="hero-frame">
+                    <div class="hero-art">
+                        <i class="bi bi-trophy"></i>
+                        <h3>Enter the Arena</h3>
+                        <p>Black nights. Neon red lines. White scores.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<section>
+    <div class="container">
+        <div class="page-heading">
+            <h2>Featured Tournaments</h2>
+            <p>Jump into the competitions running right now.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4 class="card-title">Valorant Cup</h4>
+                        <p>Prize pool ₹25,000</p>
+                        <a href="{% url 'events-display' %}" class="btn btn-primary w-100">Join Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4 class="card-title">BGMI Championship</h4>
+                        <p>Prize pool ₹50,000</p>
+                        <a href="{% url 'events-display' %}" class="btn btn-primary w-100">Join Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4 class="card-title">FIFA League</h4>
+                        <p>Prize pool ₹10,000</p>
+                        <a href="{% url 'events-display' %}" class="btn btn-primary w-100">Join Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section id="why">
+    <div class="container">
+        <div class="page-heading">
+            <h2>Why X-Fight?</h2>
+            <p>Built for players who want clean matches and fair rewards.</p>
+        </div>
+
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="card h-100 p-4">
+                    <div class="feature-icon"><i class="bi bi-trophy"></i></div>
+                    <h4>Prize Pools</h4>
+                    <p>Compete for cash and in-platform coins.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 p-4">
+                    <div class="feature-icon"><i class="bi bi-controller"></i></div>
+                    <h4>Multiple Games</h4>
+                    <p>Valorant, BGMI, FIFA, CS2 and more.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 p-4">
+                    <div class="feature-icon"><i class="bi bi-shield-check"></i></div>
+                    <h4>Fair Play</h4>
+                    <p>Verified players and structured match rooms.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section>
+    <div class="container">
+        <div class="cta-band">
+            <h2 class="mb-3">Ready to become the next champion?</h2>
+            <p class="mb-4">Register today and start competing in esports tournaments.</p>
+            {% if user.is_authenticated %}
+                <a href="{% url 'events-display' %}" class="btn btn-primary btn-lg">Browse Tournaments</a>
+            {% else %}
+                <a href="{% url 'signup' %}" class="btn btn-primary btn-lg">Get Started</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{% endblock %}

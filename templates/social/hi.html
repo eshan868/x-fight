@@ -1,0 +1,175 @@
+{% extends 'layouts/base_layout.html' %}
+{% load static %}
+
+{% block content %}
+<section>
+<div class="chat-page">
+
+    <div class="chat-container">
+
+        <!-- CHAT HEADER -->
+        <div class="chat-header">
+
+            <div class="chat-header-left">
+
+                <div class="chat-avatar">
+                    X
+                </div>
+
+                <div class="chat-info">
+
+                    {% if chat_group.groupchat_name %}
+
+                        <h1>{{ chat_group.groupchat_name }}</h1>
+
+                        <p>
+                            {{ chat_group.members.count }} Members
+                            <span id="online_count"></span>
+                        </p>
+
+                    {% elif game_mate %}
+
+                        <h1>{{ game_mate.username }}</h1>
+                        <p><span id="online_count"></span></p>
+
+                    {% else %}
+
+                        <h1>X Fight Chat</h1>
+                        <p><span id="online_count"></span></p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            {% if chat_group.groupchat_name %}
+                <button type="button" id="inviteBtn" class="invite-btn">
+                    🎮 Invite
+                </button>
+            {% endif %}
+
+        </div>
+
+
+        <!-- MESSAGES -->
+        <div class="messages" id="messages">
+
+            {% for chat_message in chat_messages %}
+                {% include 'social/group_chat_messages.html' %}
+            {% empty %}
+                <div class="empty-chat">
+                    No messages yet. Start the conversation.
+                </div>
+            {% endfor %}
+
+        </div>
+
+
+        <!-- MESSAGE INPUT -->
+        <div class="chat-footer">
+
+            <form
+                class="chat-form"
+                enctype="multipart/form-data"
+                method="post"
+                hx-ext="ws"
+                ws-connect="/ws/chatroom/{{ chatroom_name }}/"
+                ws-send
+                _="on htmx:wsAfterSend reset me"
+            >
+
+                {% csrf_token %}
+
+                {{ form.body }}
+
+                <button type="submit" class="chat-send-btn">
+                    ➤
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- INVITE MODAL -->
+{% if chat_group.groupchat_name %}
+
+<div id="inviteOverlay" class="invite-overlay">
+
+    <div class="invite-popup">
+
+        <button type="button" id="closeInvite" class="close-btn">
+            ×
+        </button>
+
+        <h2>Invite GameMate</h2>
+
+        <div class="gamemate-list">
+
+            {% for relation in game_mates %}
+
+                {% if relation.user == request.user %}
+
+                    {% with mate=relation.mate %}
+
+                        <div class="gamemate-item">
+
+                            <span>{{ mate.username }}</span>
+
+                            <a href="{% url 'send-group-invite' chat_group.group_name mate.id %}">
+                                <button type="button" class="sendInviteBtn">
+                                    Send
+                                </button>
+                            </a>
+
+                        </div>
+
+                    {% endwith %}
+
+                {% else %}
+
+                    {% with mate=relation.user %}
+
+                        <div class="gamemate-item">
+
+                            <span>{{ mate.username }}</span>
+
+                            <a href="{% url 'send-group-invite' chat_group.group_name mate.id %}">
+                                <button type="button" class="sendInviteBtn">
+                                    Send
+                                </button>
+                            </a>
+
+                        </div>
+
+                    {% endwith %}
+
+                {% endif %}
+
+            {% empty %}
+
+                <p>You don't have any GameMates.</p>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}
+</section>
+{% endblock %}
+
+{% block js %}
+
+<script src="{% static 'js/chat.js' %}"></script>
+
+{% endblock %}

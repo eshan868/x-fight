@@ -1,0 +1,582 @@
+{% extends "layouts/base_layout.html" %}
+{% load static %}
+
+{% block title %}MatchRoom{% endblock %}
+
+{% block content %}
+
+<section class="match-room-page">
+    <div class="container">
+
+        <!-- MATCH HEADER -->
+        <div class="match-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="match-header-left">
+                    <h2>{{ match.name }}</h2>
+                    <div class="match-game">
+                        {{ match.game|default:"Gaming Match" }}
+                    </div>
+                </div>
+
+                <div class="match-header-right">
+                    {% if match.status == "finished" %}
+                    <span class="live-badge finished-badge">
+                        <span class="live-dot"></span>
+                        FINISHED
+                    </span>
+                    {% elif match.status == "scheduled" or match.status == "open" %}
+                    <span class="live-badge upcoming-badge">
+                        <span class="live-dot"></span>
+                        UPCOMING
+                    </span>
+                    {% else %}
+                    <span class="live-badge">
+                        <span class="live-dot"></span>
+                        LIVE
+                    </span>
+                    {% endif %}
+
+                    <div class="round-text">
+                        {% if is_friendly %}
+                        Friendly Match
+                        {% else %}
+                        Round 1
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MATCH DATA -->
+        <div id="match-data" data-match-id="{{ match.id }}" data-team-id="{% if team %}{{ team.id }}{% endif %}"
+            data-username="{{ user.username }}" data-friendly="{% if is_friendly %}true{% else %}false{% endif %}">
+        </div>
+
+        <!-- WEBSOCKET CONNECTION -->
+        <div id="match-websocket" hx-ext="ws" ws-connect="/ws/match/{{ match.id }}/">
+
+            <!-- MATCH INFORMATION -->
+            <div class="row g-3 match-info">
+
+                <div class="col-6 col-md-3">
+                    <div class="info-box">
+                        <div class="info-label">Started</div>
+                        <div id="started-time" class="info-value">
+                            {% if match.match_start_time %}
+                            {{ match.match_start_time|date:"H:i" }}
+                            {% else %}
+                            --
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="info-box">
+                        <div class="info-label">Elapsed</div>
+                        <div id="timer" class="info-value">00:00</div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="info-box">
+                        <div class="info-label">Participants</div>
+                        <div class="info-value">
+                            {% if is_friendly %}
+                            {{ friendly_players|length }}
+                            {% elif match.tournament and match.tournament.category == "solo" %}
+                            {{ match.match_players.count }}
+                            {% elif match.tournament and match.tournament.category == "team" %}
+                            {{ match.teams.count }}
+                            {% else %}
+                            0
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="info-box">
+                        <div class="info-label">Status</div>
+                        <div id="match-status" class="info-value">
+                            {{ match.status|upper }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN CONTENT -->
+            <div class="row g-4">
+
+                <!-- PLAYERS AND TEAMS -->
+                <div class="col-lg-7">
+                    <div class="teams-card">
+                        <div class="match-card-header">
+                            <h4>Players</h4>
+                        </div>
+
+                        <div class="teams-container" id="teams-container">
+
+                            {% if is_friendly %}
+
+                            <div class="team-section friendly-players-section">
+                                <div class="team-header">
+                                    <span>Friendly Match</span>
+                                    <span class="team-player-count">
+                                        {{ friendly_players|length }} Players
+                                    </span>
+                                </div>
+
+                                {% for item in friendly_players %}
+                                <div class="player-row" data-user-id="{{ item.user.id }}">
+
+                                    <div class="player-name">
+                                        {{ item.user.username }}
+
+                                        {% if item.user.id == request.user.id %}
+                                        <span class="you-label">You</span>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if item.match_player and item.match_player.ready %}
+                                    <span class="ready">Ready</span>
+                                    {% else %}
+                                    <span class="waiting">Waiting</span>
+                                    {% endif %}
+                                </div>
+                                {% empty %}
+                                <div class="empty-message">
+                                    No players joined this match.
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            {% else %}
+
+                            {% for item in team_data %}
+                            <div class="team-section">
+                                <div class="team-header">
+                                    <span>{{ item.team.name }}</span>
+                                    <span class="team-player-count">
+                                        {{ item.players|length }} Players
+                                    </span>
+                                </div>
+
+                                {% for member in item.players %}
+                                <div class="player-row" data-user-id="{{ member.user.id }}">
+
+                                    <div class="player-name">
+                                        {{ member.user.username }}
+
+                                        {% if member.user.id == request.user.id %}
+                                        <span class="you-label">You</span>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if member.ready %}
+                                    <span class="ready">Ready</span>
+                                    {% else %}
+                                    <span class="waiting">Waiting</span>
+                                    {% endif %}
+                                </div>
+                                {% empty %}
+                                <div class="empty-message">
+                                    No players in this team.
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% empty %}
+                            <div class="empty-message">
+                                No teams registered.
+                            </div>
+                            {% endfor %}
+
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT SIDE -->
+                <div class="col-lg-5">
+
+                    <!-- VOICE CHANNEL -->
+                    <div class="voice-card">
+                        <div class="match-card-header">
+                            <h4>
+                                {% if is_friendly %}
+                                Match Voice Channel
+                                {% else %}
+                                Team Voice Channel
+                                {% endif %}
+                            </h4>
+                        </div>
+
+                        <div class="voice-content">
+                            <div class="ready-area" id="ready-container-{{ request.user.id }}">
+                                {% include "tournament/partials/ready_button.html" %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VOICE MEMBERS -->
+                    <div class="voice-card members-card">
+                        <div class="match-card-header">
+                            <h4>Voice Members</h4>
+                        </div>
+
+                        <div class="members-body">
+                            <ul id="members-list" class="list-group"></ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM ACTIONS -->
+        <div class="bottom-actions">
+            <button type="button" class="action-btn leave-btn" id="leave-match-btn">
+                Leave Match
+            </button>
+
+            {% if can_upload_report and not is_friendly %}
+            <a href="{% url 'match-scoreboard-form' match.id %}" class="action-btn report-btn">
+                Report Result
+            </a>
+            {% elif is_friendly and request.user == report_upload_player %}
+            <a href="{% url 'match-scoreboard-form' match.id %}" class="action-btn report-btn">
+                Report Result
+            </a>
+            {% endif %} 
+        </div>
+
+    </div>
+</section>
+
+<style>
+    .match-room-page {
+        width: 100%;
+        padding: 25px 0 40px;
+    }
+
+    .match-header {
+        background: linear-gradient(135deg, #14141a, #1e1e26);
+        border: 1px solid #2b0053;
+        border-radius: 18px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+    }
+
+    .match-header-left h2 {
+        color: #fff;
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .match-game {
+        color: #b8b8c5;
+        font-size: 14px;
+        margin-top: 8px;
+    }
+
+    .match-header-right {
+        text-align: right;
+    }
+
+    .live-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: rgba(255, 0, 0, .12);
+        border: 1px solid #f00;
+        color: #ff4444;
+        border-radius: 30px;
+        padding: 6px 12px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .finished-badge {
+        background: rgba(184, 184, 197, .12);
+        border-color: #b8b8c5;
+        color: #b8b8c5;
+    }
+
+    .upcoming-badge {
+        background: rgba(255, 170, 0, .12);
+        border-color: #ffaa00;
+        color: #ffaa00;
+    }
+
+    .live-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .round-text {
+        color: #b8b8c5;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+
+    .match-info {
+        margin-bottom: 25px;
+    }
+
+    .info-box {
+        background: #14141a;
+        border: 1px solid #252532;
+        border-radius: 14px;
+        padding: 18px;
+        min-height: 90px;
+    }
+
+    .info-label {
+        color: #8c8c9a;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .info-value {
+        color: #fff;
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .teams-card,
+    .voice-card {
+        background: #14141a;
+        border: 1px solid #252532;
+        border-radius: 18px;
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .match-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #1e1e26;
+        border-bottom: 1px solid #2b0053;
+        padding: 18px 22px;
+    }
+
+    .match-card-header h4 {
+        color: #fff;
+        font-size: 17px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .teams-container {
+        padding: 20px;
+    }
+
+    .team-section {
+        background: #09090b;
+        border: 1px solid #282832;
+        border-radius: 14px;
+        overflow: hidden;
+        margin-bottom: 18px;
+    }
+
+    .team-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .team-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        background: #1e1e26;
+        border-bottom: 1px solid #2b0053;
+        padding: 14px 16px;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .team-player-count {
+        color: #b8b8c5;
+        font-size: 11px;
+        font-weight: 400;
+    }
+
+    .player-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        padding: 14px 16px;
+        border-bottom: 1px solid #202027;
+    }
+
+    .player-row:last-child {
+        border-bottom: none;
+    }
+
+    .player-name {
+        color: #fff;
+        font-size: 14px;
+        font-weight: 500;
+        overflow-wrap: anywhere;
+    }
+
+    .you-label {
+        display: inline-block;
+        color: #f00;
+        font-size: 10px;
+        font-weight: 700;
+        margin-left: 6px;
+    }
+
+    .ready,
+    .waiting {
+        display: inline-block;
+        border-radius: 20px;
+        padding: 5px 10px;
+        font-size: 10px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .ready {
+        background: rgba(0, 200, 100, .12);
+        border: 1px solid #00c864;
+        color: #00e879;
+    }
+
+    .waiting {
+        background: rgba(255, 170, 0, .12);
+        border: 1px solid #ffaa00;
+        color: #ffaa00;
+    }
+
+    .empty-message {
+        color: #8c8c9a;
+        font-size: 13px;
+        text-align: center;
+        padding: 25px 15px;
+    }
+
+    .voice-content {
+        padding: 20px;
+    }
+
+    .ready-area {
+        width: 100%;
+    }
+
+    .members-card {
+        height: auto;
+        margin-top: 20px;
+    }
+
+    .members-body {
+        padding: 15px;
+    }
+
+    #members-list {
+        background: transparent;
+        border: none;
+    }
+
+    #members-list li {
+        background: #09090b;
+        border: 1px solid #282832;
+        color: #fff;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        padding: 10px 12px;
+    }
+
+    .bottom-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 25px;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        border-radius: 10px;
+        padding: 12px 22px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: .25s ease;
+    }
+
+    .leave-btn {
+        background: transparent;
+        border: 1px solid #f00;
+        color: #f00;
+    }
+
+    .leave-btn:hover {
+        background: #f00;
+        color: #fff;
+    }
+
+    .report-btn {
+        background: #2b0053;
+        border: 1px solid #6d19b8;
+        color: #fff;
+    }
+
+    .report-btn:hover {
+        background: #6d19b8;
+        color: #fff;
+    }
+
+    @media (max-width: 768px) {
+        .match-room-page {
+            padding: 15px 0 25px;
+        }
+
+        .match-header {
+            padding: 20px;
+        }
+
+        .match-header-left h2 {
+            font-size: 21px;
+        }
+
+        .match-header-right {
+            margin-left: 10px;
+        }
+
+        .round-text {
+            font-size: 10px;
+        }
+
+        .info-box {
+            padding: 14px;
+        }
+
+        .info-value {
+            font-size: 17px;
+        }
+
+        .bottom-actions {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .action-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,262 @@
+<div class="sidebar-content h-100 d-flex flex-column">
+
+
+    <!-- TOP HEADER -->
+
+    <div class="sidebar-top">
+
+        <div class="brand-icon">
+            X
+        </div>
+
+        <div class="brand-title">
+            X Fight Chat
+        </div>
+
+
+        <a
+            href="{% url 'dashboard' %}"
+            class="dashboard-btn"
+            title="Dashboard">
+
+            <i class="bi bi-house-door-fill"></i>
+
+        </a>
+
+    </div>
+
+
+
+    <!-- SEARCH -->
+
+    <div class="search-area">
+
+        <div class="search-wrapper">
+
+            <i class="bi bi-search"></i>
+
+            <input
+                type="text"
+                class="chat-search"
+                placeholder="Search chats...">
+
+        </div>
+
+    </div>
+
+
+
+    <!-- CHAT LIST -->
+
+    <div class="chat-list">
+
+
+        <!-- GAME MATES -->
+
+        <div class="section-header">
+
+            <span class="section-title">
+                GAME MATES
+            </span>
+
+        </div>
+
+
+        {% if game_mates %}
+
+            {% for gm in game_mates %}
+
+
+                {% if gm.user == request.user %}
+
+                    <a
+                        href="{% url 'start-chat' gm.mate.username %}"
+                        class="chat-profile {% if game_mate == gm.mate %}active{% endif %}"
+                        data-name="{{ gm.mate.username|lower }}">
+
+
+                        <div class="profile-avatar">
+
+                            {{ gm.mate.username|slice:":1"|upper }}
+
+                        </div>
+
+
+                        <div class="chat-profile-info">
+
+                            <div class="profile-top">
+
+                                <span class="profile-name">
+                                    {{ gm.mate.username }}
+                                </span>
+
+                                <span class="profile-type">
+                                    Chat
+                                </span>
+
+                            </div>
+
+
+                            <div class="profile-last">
+                                Start chatting
+                            </div>
+
+                        </div>
+
+                    </a>
+
+
+                {% else %}
+
+                    <a
+                        href="{% url 'start-chat' gm.user.username %}"
+                        class="chat-profile {% if game_mate == gm.user %}active{% endif %}"
+                        data-name="{{ gm.user.username|lower }}">
+
+
+                        <div class="profile-avatar">
+
+                            {{ gm.user.username|slice:":1"|upper }}
+
+                        </div>
+
+
+                        <div class="chat-profile-info">
+
+                            <div class="profile-top">
+
+                                <span class="profile-name">
+                                    {{ gm.user.username }}
+                                </span>
+
+                                <span class="profile-type">
+                                    Chat
+                                </span>
+
+                            </div>
+
+
+                            <div class="profile-last">
+                                Start chatting
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                {% endif %}
+
+
+            {% endfor %}
+
+
+        {% else %}
+
+            <div class="empty-list">
+                No GameMates yet
+            </div>
+
+        {% endif %}
+
+
+
+        <!-- GROUP CHATS -->
+
+        <div class="section-header mt-3">
+
+            <span class="section-title">
+                GROUP CHATS
+            </span>
+
+
+            <a
+                href="{% url 'new-groupchat' %}"
+                class="create-group"
+                title="Create Group">
+
+                <i class="bi bi-plus-lg"></i>
+
+            </a>
+
+        </div>
+
+
+
+        {% for group in joined_groups %}
+
+            <a
+                href="{% url 'chatroom' group.group_name %}"
+
+                class="chat-profile
+                {% if chat_group.group_name == group.group_name %}
+                    active
+                {% endif %}"
+
+                data-name="
+                {% if group.groupchat_name %}
+                    {{ group.groupchat_name|lower }}
+                {% else %}
+                    {{ group.group_name|lower }}
+                {% endif %}
+                ">
+
+
+                <div class="profile-avatar group-avatar">
+
+                    <i class="bi bi-controller"></i>
+
+                </div>
+
+
+                <div class="chat-profile-info">
+
+
+                    <div class="profile-top">
+
+                        <span class="profile-name">
+
+                            {% if group.groupchat_name %}
+
+                                {{ group.groupchat_name }}
+
+                            {% else %}
+
+                                {{ group.group_name }}
+
+                            {% endif %}
+
+                        </span>
+
+
+                        <span class="profile-type">
+                            Group
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-last">
+
+                        {{ group.members.count }}
+                        member{{ group.members.count|pluralize }}
+
+                    </div>
+
+
+                </div>
+
+            </a>
+
+
+        {% empty %}
+
+            <div class="empty-list">
+                No groups joined yet
+            </div>
+
+        {% endfor %}
+
+
+    </div>
+
+</div>

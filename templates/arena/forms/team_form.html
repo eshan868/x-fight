@@ -1,0 +1,75 @@
+{% extends "layouts/base_layout.html" %}
+{% load static %}
+
+{% block title %}Create Tactical Squad | X-Fight{% endblock %}
+
+{% block content %}
+
+<section class="page-shell">
+
+    <div class="container" style="max-width: 650px;">
+
+        <div style="margin-bottom: 24px;">
+            <a href="{% url 'dashboard' %}" class="dashboard-chip-btn" style="margin-bottom: 16px;">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Command Center</span>
+            </a>
+
+            <div class="page-heading" style="text-align: left; margin-bottom: 0;">
+                <span class="section-label">SQUAD ASSEMBLY</span>
+                <h1 style="font-size: clamp(1.8rem, 4vw, 2.4rem); font-family: 'Aclonica', sans-serif; margin: 6px 0;">
+                    Create Tactical Squad
+                </h1>
+                <p style="color: #ffffff; font-size: 0.85rem;">
+                    Assemble your competitive roster and recruit your Squad Comrades for upcoming tournaments.
+                </p>
+            </div>
+        </div>
+
+        <div class="create-squad-form" style="margin: 0; background: #000000; border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: 18px; padding: 30px;">
+
+            <form method="post" enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger" style="background: rgba(255, 26, 26, 0.15); border: 1px solid var(--neon); color: #ffffff;">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                {% for field in form %}
+                <div class="mb-4">
+                    <label for="{{ field.id_for_label }}" class="form-label" style="font-size: 0.78rem; font-weight: 700; letter-spacing: 1px; color: #ffffff; text-transform: uppercase;">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                    <small class="form-text" style="color: #8a8d9c; font-size: 0.75rem; display: block; margin-top: 4px;">
+                        {{ field.help_text }}
+                    </small>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                    <div style="color: #ff4d4d; font-size: 0.75rem; margin-top: 4px;">
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+
+                <button type="submit" class="dashboard-primary-btn w-100" style="padding: 14px; font-size: 0.95rem; cursor: pointer; margin-top: 10px;">
+                    <i class="fa-solid fa-shield-halved me-2"></i>
+                    Initialize Squad
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>
+{% endblock %}

@@ -1,0 +1,375 @@
+.table {
+    width: 100%;
+    margin: 0;
+
+    border-collapse: collapse;
+    background: transparent;
+    color: white;
+}
+
+.table-card {
+    background: var(--surface);
+    border: 1px solid var(--neon);
+    box-shadow: var(--neon-glow);
+    border-radius: 22px;
+    overflow: hidden;
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 2px solid var(--border-muted);
+    padding: 22px 30px;
+}
+
+.card-header h4 {
+    color: #fff;
+    margin: 0;
+    font-size: 1.15rem;
+}
+
+.table thead {
+    background: transparent;
+}
+
+.table thead th {
+    color: var(--text);
+
+    text-transform: uppercase;
+    letter-spacing: 2px;
+
+    font-size: .75rem;
+    font-weight: 600;
+
+    padding: 18px 24px;
+
+    border-bottom: 1.5px solid var(--border-muted);
+    background: transparent;
+}
+
+.table tbody tr {
+    background: transparent;
+    transition: .25s;
+}
+
+.table tbody tr:hover {
+    background: var(--surface-2);
+}
+
+.table tbody td {
+    padding: 20px 24px;
+    color: #fff;
+
+    border-bottom: 1px solid rgba(255, 255, 255, .05);
+    background: transparent;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table td:first-child,
+.table th:first-child {
+    width: 70px;
+    text-align: center;
+}
+
+.table td:nth-child(3),
+.table th:nth-child(3) {
+    text-align: center;
+}
+/* ==========================================
+   LEADERBOARD LAYOUT & RESPONSIVE DESIGN
+========================================== */
+.leaderboard-title {
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.leaderboard-subtitle {
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+.controls-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.search-box {
+    position: relative;
+    flex: 1;
+    max-width: 320px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px 14px 10px 38px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.search-box input:focus {
+    border-color: var(--neon);
+    box-shadow: var(--neon-glow);
+}
+
+.search-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+}
+
+/* ==========================================
+   PODIUM (TOP 3 PLAYERS)
+========================================== */
+.podium-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+    align-items: flex-end;
+}
+
+.podium-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    position: relative;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.podium-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--neon);
+    box-shadow: var(--neon-glow);
+}
+
+.podium-card.rank-1 {
+    order: 2;
+    border-color: var(--neon);
+    box-shadow: var(--neon-glow);
+}
+
+.podium-card.rank-2 {
+    order: 1;
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.podium-card.rank-3 {
+    order: 3;
+}
+
+.podium-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--neon);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.podium-avatar {
+    margin: 0.5rem auto 0.75rem;
+}
+
+.podium-name {
+    color: white;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ==========================================
+   LEADERBOARD CARD & TABLE
+========================================== */
+.leaderboard-card {
+    background: #000000;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.leaderboard-table {
+    color: white;
+    margin: 0;
+}
+
+.leaderboard-table thead {
+    background: #000000;
+}
+
+.leaderboard-table thead th {
+    color: var(--text-light);
+    border: none;
+    padding: 16px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+}
+
+.leaderboard-table tbody tr {
+    transition: transform 0.25s ease, background 0.25s ease;
+    border-color: var(--border);
+    background: transparent;
+}
+
+.leaderboard-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+    transform: scale(1.005);
+}
+
+.leaderboard-table td {
+    padding: 16px 18px;
+    border-color: var(--border);
+    vertical-align: middle;
+}
+
+.leaderboard-rank {
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.leaderboard-player-name {
+    color: white;
+    font-weight: 600;
+}
+
+.player-avatar {
+    width: 45px;
+    height: 45px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--neon);
+    color: var(--text);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.leaderboard-table tbody tr:hover .player-avatar {
+    border-color: var(--primary);
+    box-shadow: var(--neon-glow);
+}
+
+.xp-badge {
+    display: inline-block;
+    background: var(--bg);
+    border: 1px solid var(--neon);
+    color: var(--text);
+    padding: 7px 15px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.leaderboard-table tbody tr:nth-child(1) {
+    background: var(--bg);
+    border-left: 3px solid var(--neon);
+}
+
+.leaderboard-table tbody tr:nth-child(1) .leaderboard-rank {
+    color: var(--primary);
+}
+
+.leaderboard-table tbody tr:nth-child(2) {
+    background: rgba(255, 255, 255, .025);
+}
+
+.leaderboard-table tbody tr:nth-child(3) {
+    background: var(--bg);
+}
+
+/* ==========================================
+   MOBILE RESPONSIVENESS
+========================================== */
+@media (max-width: 768px) {
+    .podium-container {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    .podium-card.rank-1, 
+    .podium-card.rank-2, 
+    .podium-card.rank-3 {
+        order: initial;
+    }
+
+    .podium-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        text-align: left;
+    }
+
+    .podium-badge {
+        position: static;
+        transform: none;
+    }
+
+    .podium-avatar {
+        margin: 0;
+        width: 38px;
+        height: 38px;
+        font-size: 14px;
+    }
+
+    .podium-name {
+        margin-bottom: 0;
+    }
+
+    .leaderboard-table thead th,
+    .leaderboard-table td {
+        padding: 12px 10px;
+    }
+
+    .player-avatar {
+        width: 38px;
+        height: 38px;
+        font-size: 14px;
+    }
+
+    .xp-badge {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .controls-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-box {
+        max-width: 100%;
+    }
+}

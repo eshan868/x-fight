@@ -1,0 +1,1276 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>GameArena | Calling Room</title>
+    <script src="{% static 'zego-sdk/zegoExpressWebRTC-3.12.0.js' %}"></script>
+
+    <style>
+        /* =========================================================
+           GLOBAL THEME & RESET (NEON RED & BLACK)
+        ========================================================= */
+        :root {
+            --bg-black: #000000;
+            --bg-card: #0a0a0a;
+            --neon-red: #ff073a;
+            --neon-red-glow: rgba(255, 7, 58, 0.4);
+            --neon-red-border: rgba(255, 7, 58, 0.6);
+            --text-white: #ffffff;
+            --text-gray: #a0a0a0;
+            --icon-gray: #808080;
+            --btn-bg: rgba(20, 20, 20, 0.85);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            background-color: var(--bg-black);
+            color: var(--text-white);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Shared Waiting Modal (Neon Red Theme) */
+        .waiting-panel {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 24px;
+            color: var(--text-white);
+        }
+
+        .waiting-icon {
+            width: 84px;
+            height: 84px;
+            background: var(--bg-card);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            border: 2px solid var(--neon-red);
+            box-shadow: 0 0 20px var(--neon-red-glow);
+            color: var(--neon-red);
+            animation: pulse-red 2s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(255, 7, 58, 0.6); }
+            70% { box-shadow: 0 0 0 22px rgba(255, 7, 58, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 7, 58, 0); }
+        }
+
+        .waiting-panel h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-white);
+            letter-spacing: -0.3px;
+        }
+
+        .waiting-panel p {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            max-width: 320px;
+        }
+
+        .waiting-dots {
+            margin-top: 20px;
+            font-size: 1.8rem;
+            color: var(--neon-red);
+            letter-spacing: 6px;
+            animation: fade-dots 1.5s infinite;
+        }
+
+        @keyframes fade-dots {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* =========================================================
+           1. VOICE CALL UI STYLES (NEON RED + BLACK)
+        ========================================================= */
+        .voice-container {
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            background-color: var(--bg-black);
+            color: var(--text-white);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 48px 24px 52px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Neon Ambient Glow Behind Avatar */
+        .voice-container::before {
+            content: "";
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle, var(--neon-red-glow) 0%, transparent 70%);
+            filter: blur(50px);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .voice-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            z-index: 2;
+            margin-top: 8px;
+        }
+
+        .voice-status {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .voice-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-white);
+            letter-spacing: -0.5px;
+        }
+
+        .voice-main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            width: 100%;
+            max-width: 400px;
+            margin: auto 0;
+        }
+
+        /* Avatar Container with Neon Red Border */
+        .voice-avatar-wrapper {
+            position: relative;
+            width: min(240px, 60vw);
+            height: min(240px, 60vw);
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .voice-avatar-ball {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #0d0d0d;
+            border: 2px solid var(--neon-red);
+            box-shadow: 0 0 30px var(--neon-red-glow), inset 0 0 20px rgba(255, 7, 58, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: float-ball 4s ease-in-out infinite;
+            position: relative;
+        }
+
+        @keyframes float-ball {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Avatar Face Features */
+        .avatar-face {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 22px;
+            position: relative;
+            top: -2px;
+        }
+
+        .avatar-eye {
+            width: 14px;
+            height: 14px;
+            background-color: var(--neon-red);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-red);
+        }
+
+        .avatar-smile {
+            width: 18px;
+            height: 9px;
+            border-bottom: 3px solid var(--neon-red);
+            border-radius: 0 0 12px 12px;
+            position: relative;
+            top: 4px;
+        }
+
+        .voice-timer-text {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-white);
+            letter-spacing: 0.5px;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 4px;
+        }
+
+        .voice-substatus {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        /* Controls Bar */
+        .voice-controls-bar {
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            z-index: 2;
+        }
+
+        .icon-circle-btn {
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            border: 1px solid var(--neon-red-border);
+            background: var(--btn-bg);
+            color: var(--icon-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .icon-circle-btn:active:not(:disabled) {
+            transform: scale(0.92);
+        }
+
+        .icon-circle-btn.off-state {
+            border-color: var(--neon-red);
+            background: rgba(255, 7, 58, 0.15);
+            color: var(--neon-red);
+            box-shadow: 0 0 15px var(--neon-red-glow);
+        }
+
+        .icon-circle-btn.leave-btn {
+            background: var(--neon-red);
+            border-color: var(--neon-red);
+            color: #ffffff;
+            box-shadow: 0 0 25px var(--neon-red-glow);
+        }
+
+        .icon-circle-btn.leave-btn:active:not(:disabled) {
+            background: #d6002f;
+        }
+
+        .icon-circle-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2;
+            pointer-events: none;
+        }
+
+        .audio-only-streams {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+
+        /* =========================================================
+           2. VIDEO CALL UI STYLES (FULLSCREEN & ORIENTATION FIX)
+        ========================================================= */
+        .video-container {
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            background-color: var(--bg-black);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-full-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background-color: #000000;
+        }
+
+        /* Remote Video Fullscreen Frame & Mobile Orientation Fix */
+        #remote-video {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            inset: 0;
+            background-color: var(--bg-black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #remote-video video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background-color: #000000;
+        }
+
+        .empty-video-message {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            background: var(--bg-black);
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Top Left Info Overlay */
+        .video-top-left-overlay {
+            position: absolute;
+            top: env(safe-area-inset-top, 20px);
+            left: 20px;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .video-top-left-overlay * {
+            pointer-events: auto;
+        }
+
+        .video-user-name {
+            color: var(--text-white);
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+            letter-spacing: -0.2px;
+        }
+
+        .video-time-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(12px);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--neon-red-border);
+            color: var(--text-white);
+            font-size: 0.8rem;
+            font-weight: 600;
+            width: fit-content;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .live-dot-icon {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--neon-red);
+            box-shadow: 0 0 8px var(--neon-red);
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Tool Buttons (Flip Camera, etc.) */
+        .video-side-tools {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .tool-icon-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--btn-bg);
+            border: 1px solid var(--neon-red-border);
+            color: var(--icon-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .tool-icon-btn:active {
+            transform: scale(0.92);
+        }
+
+        .tool-icon-btn.active {
+            color: var(--neon-red);
+            border-color: var(--neon-red);
+            box-shadow: 0 0 12px var(--neon-red-glow);
+        }
+
+        .tool-icon-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+        }
+
+        /* Local Picture-in-Picture Thumbnail */
+        .video-pip-wrapper {
+            position: absolute;
+            top: env(safe-area-inset-top, 20px);
+            right: 20px;
+            width: 105px;
+            height: 150px;
+            border-radius: 16px;
+            overflow: hidden;
+            z-index: 20;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), 0 0 12px var(--neon-red-glow);
+            border: 1.5px solid var(--neon-red-border);
+            background-color: var(--bg-black);
+        }
+
+        #local-video {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        #local-video video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background-color: #000000;
+        }
+
+        /* Center Tag */
+        .filter-tag-wrapper {
+            position: absolute;
+            bottom: 110px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .filter-tag {
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--neon-red-border);
+            color: var(--text-white);
+            padding: 5px 16px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Bottom Floating Bar Controls */
+        .video-controls-bar {
+            position: absolute;
+            bottom: env(safe-area-inset-bottom, 32px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .compatibility-badges {
+            display: none !important;
+        }
+
+        /* Responsiveness */
+        @media (max-width: 480px) {
+            .voice-container {
+                padding: 36px 18px 40px;
+            }
+
+            .video-pip-wrapper {
+                width: 90px;
+                height: 130px;
+                top: env(safe-area-inset-top, 16px);
+                right: 14px;
+            }
+
+            .video-top-left-overlay {
+                top: env(safe-area-inset-top, 16px);
+                left: 14px;
+            }
+
+            .video-controls-bar {
+                gap: 14px;
+            }
+
+            .icon-circle-btn {
+                width: 54px;
+                height: 54px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    {% if call_type == 'voice' %}
+    <!-- =========================================================
+         VOICE CALL LAYOUT
+    ========================================================= -->
+    <main class="voice-container">
+
+        <!-- Voice Header -->
+        <header class="voice-header">
+            <span class="voice-status" id="call-status">Connecting...</span>
+            <h1 class="voice-title" id="remote-user-display">{{ remote_user_name|default:"GameArena Player" }}</h1>
+        </header>
+
+        <!-- Waiting Panel Modal -->
+        <section id="waiting-panel" class="waiting-panel hidden">
+            <div class="waiting-icon">📞</div>
+            <h2 id="waiting-title">Calling...</h2>
+            <p id="waiting-description">Waiting for the other player to accept your call.</p>
+            <div class="waiting-dots">• • •</div>
+        </section>
+
+        <!-- Voice Avatar & Duration Section -->
+        <section id="video-section" class="voice-main">
+            <div class="voice-avatar-wrapper">
+                <div class="voice-avatar-ball">
+                    <div class="avatar-face">
+                        <div class="avatar-eye"></div>
+                        <div class="avatar-smile"></div>
+                        <div class="avatar-eye"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="voice-timer-text call-timer-display">00:00</div>
+            <div class="voice-substatus" id="voice-substatus">Voice Call in Progress</div>
+
+            <!-- Audio Streams Container for ZEGOCLOUD -->
+            <div class="audio-only-streams">
+                <div id="local-video"></div>
+                <div id="remote-video"></div>
+            </div>
+        </section>
+
+        <!-- Voice Controls -->
+        <div class="voice-controls-bar">
+            <button id="join-button" class="hidden">Join Call</button>
+            
+            <button id="mute-button" class="icon-circle-btn" disabled title="Mute Mic">
+                <svg id="mute-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </button>
+
+            <!-- Hidden camera button to preserve JS reference -->
+            <button id="camera-button" class="hidden"></button>
+
+            <button id="leave-button" class="icon-circle-btn leave-btn" title="End Call">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+
+        <div class="compatibility-badges">
+            <span id="call-type-badge">Voice Call</span>
+            <span id="role-badge">Preparing</span>
+        </div>
+
+    </main>
+
+    {% else %}
+    <!-- =========================================================
+         VIDEO CALL LAYOUT
+    ========================================================= -->
+    <main class="video-container">
+
+        <!-- Waiting Panel Modal -->
+        <section id="waiting-panel" class="waiting-panel hidden">
+            <div class="waiting-icon">📞</div>
+            <h2 id="waiting-title">Calling...</h2>
+            <p id="waiting-description">Waiting for the other player to accept your call.</p>
+            <div class="waiting-dots">• • •</div>
+        </section>
+
+        <!-- Video Wrapper -->
+        <section id="video-section" class="video-full-wrapper">
+            
+            <!-- Fullscreen Remote Video -->
+            <div id="remote-video">
+                <div class="empty-video-message">Waiting for player connection...</div>
+            </div>
+
+            <!-- Top Left Info Overlay -->
+            <div class="video-top-left-overlay">
+                <h1 class="video-user-name" id="remote-user-display">{{ remote_user_name|default:"GameArena Player" }}</h1>
+                
+                <div class="video-time-pill">
+                    <span class="live-dot-icon"></span>
+                    <span id="call-status">Connecting...</span>
+                    <span style="opacity: 0.4;">|</span>
+                    <span class="call-timer-display">00:00</span>
+                </div>
+
+                <div class="video-side-tools">
+                    <button id="flip-camera-button" class="tool-icon-btn" title="Flip Camera">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Floating PIP Local Camera -->
+            <div class="video-pip-wrapper">
+                <div id="local-video">
+                    <div class="empty-video-message">Camera</div>
+                </div>
+            </div>
+
+            <!-- Filter Tag -->
+            <div class="filter-tag-wrapper">
+                <span class="filter-tag">Neon Red</span>
+            </div>
+
+        </section>
+
+        <!-- Video Bottom Controls -->
+        <div class="video-controls-bar">
+            <button id="join-button" class="hidden">Join Call</button>
+
+            <button id="camera-button" class="icon-circle-btn" disabled title="Turn Camera Off">
+                <svg id="camera-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </button>
+
+            <button id="leave-button" class="icon-circle-btn leave-btn" title="End Call">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 2.59 3.4z"/><line x1="23" y1="1" x2="1" y2="23" stroke="#ffffff" stroke-width="2.2"/></svg>
+            </button>
+
+            <button id="mute-button" class="icon-circle-btn" disabled title="Mute Mic">
+                <svg id="mute-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </button>
+        </div>
+
+        <div class="compatibility-badges">
+            <span id="call-type-badge">Video Call</span>
+            <span id="role-badge">Preparing</span>
+        </div>
+
+    </main>
+    {% endif %}
+
+
+    <!-- =========================================================
+         JAVASCRIPT LOGIC
+    ========================================================= -->
+    <script>
+        /* -----------------------------
+           CALL INFORMATION
+        ----------------------------- */
+        const roomIdFromDjango = "{{ room_id|escapejs }}";
+        const userID = "{{ request.user.id|escapejs }}";
+        const callType = "{{ call_type|escapejs }}";
+
+        const params = new URLSearchParams(window.location.search);
+        const callRole = params.get("role") || "receiver";
+        const callAccepted = params.get("accepted") === "true";
+        const currentPath = window.location.pathname;
+
+        const referrerPath =
+            document.referrer &&
+            new URL(document.referrer, window.location.origin).origin === window.location.origin
+                ? new URL(document.referrer).pathname +
+                  new URL(document.referrer).search +
+                  new URL(document.referrer).hash
+                : "";
+
+        const returnUrl =
+            params.get("return_url") ||
+            (referrerPath && !referrerPath.startsWith("/social/calling/") ? referrerPath : "/");
+
+        /* -----------------------------
+           DOM ELEMENTS
+        ----------------------------- */
+        const statusText = document.getElementById("call-status");
+        const callTypeBadge = document.getElementById("call-type-badge");
+        const roleBadge = document.getElementById("role-badge");
+        const waitingPanel = document.getElementById("waiting-panel");
+        const waitingTitle = document.getElementById("waiting-title");
+        const waitingDescription = document.getElementById("waiting-description");
+        const videoSection = document.getElementById("video-section");
+        const joinButton = document.getElementById("join-button");
+        const leaveButton = document.getElementById("leave-button");
+        const muteButton = document.getElementById("mute-button");
+        const cameraButton = document.getElementById("camera-button");
+        const localVideo = document.getElementById("local-video");
+        const remoteVideo = document.getElementById("remote-video");
+        const flipCameraButton = document.getElementById("flip-camera-button");
+
+        /* -----------------------------
+           ZEGOCLOUD & STATE VARIABLES
+        ----------------------------- */
+        let zg = null;
+        let localStream = null;
+        let localView = null;
+
+        let currentRoomId = null;
+        let currentStreamId = null;
+
+        let isMuted = false;
+        let isCameraOff = false;
+        let isJoined = false;
+        let isCleaningUp = false;
+
+        let isCameraFlipped = false;
+
+        let callSocket = null;
+        let activeParticipants = new Set();
+        let currentUserId = String(userID);
+        activeParticipants.add(currentUserId);
+
+        const remoteStreams = new Map();
+
+        /* -----------------------------
+           REAL-TIME CALL TIMER
+        ----------------------------- */
+        let callTimerInterval = null;
+        let callDurationSeconds = 0;
+
+        function startCallTimer() {
+            stopCallTimer();
+            callDurationSeconds = 0;
+            updateTimerDisplays("00:00");
+            callTimerInterval = setInterval(() => {
+                callDurationSeconds++;
+                const mins = String(Math.floor(callDurationSeconds / 60)).padStart(2, '0');
+                const secs = String(callDurationSeconds % 60).padStart(2, '0');
+                updateTimerDisplays(`${mins}:${secs}`);
+            }, 1000);
+        }
+
+        function stopCallTimer() {
+            if (callTimerInterval) {
+                clearInterval(callTimerInterval);
+                callTimerInterval = null;
+            }
+        }
+
+        function updateTimerDisplays(timeStr) {
+            const timerElems = document.querySelectorAll(".call-timer-display");
+            timerElems.forEach(el => {
+                el.textContent = timeStr;
+            });
+        }
+
+        /* -----------------------------
+           STATUS LOGGING
+        ----------------------------- */
+        function updateStatus(message) {
+            if (statusText) statusText.textContent = message;
+            console.log("[GameArena Calling]", message);
+        }
+
+        /* -----------------------------
+           UI CONFIGURATION
+        ----------------------------- */
+        function configureCallType() {
+            if (callType === "voice") {
+                if (callTypeBadge) callTypeBadge.textContent = "Voice Call";
+                if (cameraButton) cameraButton.classList.add("hidden");
+                if (localVideo) {
+                    localVideo.innerHTML = `<div class="empty-video-message">Microphone active</div>`;
+                }
+            } else {
+                if (callTypeBadge) callTypeBadge.textContent = "Video Call";
+            }
+        }
+
+        function configureRole() {
+            if (callRole === "caller") {
+                if (roleBadge) roleBadge.textContent = "Outgoing Call";
+                waitingPanel.classList.remove("hidden");
+                waitingTitle.textContent = "Calling...";
+                waitingDescription.textContent = "Waiting for player to accept...";
+                videoSection.classList.add("hidden");
+                joinButton.classList.add("hidden");
+                updateStatus("Ringing...");
+            } else {
+                if (roleBadge) roleBadge.textContent = "Accepted Call";
+                waitingPanel.classList.add("hidden");
+                videoSection.classList.remove("hidden");
+                updateStatus("Preparing...");
+            }
+        }
+
+        function showConnectedUI() {
+            waitingPanel.classList.add("hidden");
+            videoSection.classList.remove("hidden");
+            startCallTimer();
+        }
+
+        function showWaitingUI(title, description) {
+            waitingPanel.classList.remove("hidden");
+            videoSection.classList.add("hidden");
+            waitingTitle.textContent = title;
+            waitingDescription.textContent = description;
+            stopCallTimer();
+        }
+
+        function setCallButtons(joined) {
+            isJoined = joined;
+            if (joinButton) joinButton.disabled = joined;
+            if (leaveButton) leaveButton.disabled = false;
+            if (muteButton) muteButton.disabled = !joined;
+            if (cameraButton) cameraButton.disabled = !joined || callType === "voice";
+        }
+
+        /* -----------------------------
+           SVG ICON PRESERVATION HELPERS
+        ----------------------------- */
+        const MIC_ON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>`;
+        const MIC_OFF_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>`;
+
+        const CAM_ON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
+        const CAM_OFF_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l22 22"/><path d="M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34"/></svg>`;
+
+        function renderMuteIcon() {
+            if (!muteButton) return;
+            if (isMuted) {
+                muteButton.classList.add("off-state");
+                muteButton.innerHTML = MIC_OFF_SVG;
+                muteButton.title = "Unmute Mic";
+            } else {
+                muteButton.classList.remove("off-state");
+                muteButton.innerHTML = MIC_ON_SVG;
+                muteButton.title = "Mute Mic";
+            }
+        }
+
+        function renderCameraIcon() {
+            if (!cameraButton) return;
+            if (isCameraOff) {
+                cameraButton.classList.add("off-state");
+                cameraButton.innerHTML = CAM_OFF_SVG;
+                cameraButton.title = "Turn Camera On";
+            } else {
+                cameraButton.classList.remove("off-state");
+                cameraButton.innerHTML = CAM_ON_SVG;
+                cameraButton.title = "Turn Camera Off";
+            }
+        }
+
+        /* -----------------------------
+           ZEGOCLOUD TOKEN & CALL JOIN
+        ----------------------------- */
+        async function getTokenFromDjango() {
+            const response = await fetch("{% url 'zego_token' %}", {
+                method: "GET",
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            });
+
+            if (!response.ok) {
+                throw new Error("Could not obtain authentication token.");
+            }
+            return await response.json();
+        }
+
+        function createStreamId(userId, roomId) {
+            const safeRoomId = roomId.replace(/[^a-zA-Z0-9_-]/g, "_");
+            return `${safeRoomId}_${userId}_main`;
+        }
+
+        async function joinCall() {
+            if (isJoined) return;
+
+            try {
+                if (typeof ZegoExpressEngine === "undefined") {
+                    throw new Error("ZEGOCLOUD SDK not loaded.");
+                }
+
+                if (!roomIdFromDjango) {
+                    throw new Error("Room ID is missing.");
+                }
+
+                showConnectedUI();
+                updateStatus("Authenticating...");
+
+                const tokenData = await getTokenFromDjango();
+                const appId = Number(tokenData.app_id);
+                const userId = String(tokenData.user_id);
+                const token = tokenData.token;
+
+                if (!appId || !userId || !token) {
+                    throw new Error("Invalid token response.");
+                }
+
+                currentRoomId = roomIdFromDjango;
+                currentUserId = String(userId);
+                currentStreamId = createStreamId(userId, currentRoomId);
+
+                activeParticipants.clear();
+                activeParticipants.add(currentUserId);
+
+                updateStatus("Initializing engine...");
+                zg = new ZegoExpressEngine(appId, "");
+
+                /* Room User Updates */
+                zg.on("roomUserUpdate", function (updatedRoomId, updateType, userList) {
+                    if (isCleaningUp) return;
+
+                    const usersBefore = activeParticipants.size;
+
+                    if (updateType === "ADD") {
+                        for (const u of userList) {
+                            activeParticipants.add(String(u.userID));
+                        }
+                    }
+
+                    if (updateType === "DELETE") {
+                        if (usersBefore === 2) {
+                            updateStatus("Call ended");
+                            leaveCall();
+                            return;
+                        }
+                        for (const u of userList) {
+                            activeParticipants.delete(String(u.userID));
+                        }
+                    }
+                });
+
+                /* Stream Updates */
+                zg.on("roomStreamUpdate", async (updatedRoomId, updateType, streamList) => {
+                    if (isCleaningUp) return;
+
+                    if (updateType === "ADD") {
+                        for (const streamInfo of streamList) {
+                            await playRemoteStream(streamInfo.streamID);
+                        }
+                    }
+
+                    if (updateType === "DELETE") {
+                        for (const streamInfo of streamList) {
+                            stopRemoteStream(streamInfo.streamID);
+                        }
+                    }
+                });
+
+                updateStatus("Joining room...");
+                const loginResult = await zg.loginRoom(
+                    currentRoomId,
+                    token,
+                    { userID: userId, userName: `Player ${userId}` },
+                    { userUpdate: true }
+                );
+
+                if (!loginResult) {
+                    throw new Error("Failed to join call room.");
+                }
+
+                isJoined = true;
+                updateStatus("Starting media...");
+
+                const streamConfig = {
+                    camera: {
+                        video: callType !== "voice",
+                        audio: true
+                    }
+                };
+
+                localStream = await zg.createStream(streamConfig);
+
+                if (callType !== "voice") {
+                    localView = zg.createLocalStreamView(localStream);
+                    localView.play("local-video");
+                } else if (localVideo) {
+                    localVideo.innerHTML = `<div class="empty-video-message">Microphone active</div>`;
+                }
+
+                updateStatus("Publishing stream...");
+                await zg.startPublishingStream(currentStreamId, localStream);
+
+                setCallButtons(true);
+                renderMuteIcon();
+                renderCameraIcon();
+
+                updateStatus("In Call");
+
+            } catch (error) {
+                console.error("[GameArena] Join call error:", error);
+                updateStatus(error.message || "Could not join call.");
+                await cleanupCall();
+            }
+        }
+
+        /* -----------------------------
+           REMOTE STREAMS
+        ----------------------------- */
+        async function playRemoteStream(streamId) {
+            try {
+                if (!zg || remoteStreams.has(streamId)) return;
+
+                updateStatus("Connecting user...");
+                const remoteStream = await zg.startPlayingStream(streamId);
+                const remoteView = zg.createRemoteStreamView(remoteStream);
+
+                if (remoteVideo) remoteVideo.innerHTML = "";
+                remoteView.play("remote-video", { enableAutoplayDialog: true });
+
+                remoteStreams.set(streamId, { stream: remoteStream, view: remoteView });
+                updateStatus("Connected");
+
+            } catch (error) {
+                console.error("[GameArena] Remote stream error:", error);
+                updateStatus("Remote stream error.");
+            }
+        }
+
+        function stopRemoteStream(streamId) {
+            if (!zg) return;
+            try {
+                zg.stopPlayingStream(streamId);
+            } catch (err) {
+                console.error("Stop stream error:", err);
+            }
+            remoteStreams.delete(streamId);
+
+            if (remoteStreams.size === 0 && remoteVideo) {
+                remoteVideo.innerHTML = `<div class="empty-video-message">Waiting for player connection...</div>`;
+            }
+        }
+
+        /* -----------------------------
+           WEBSOCKET HANDLING
+        ----------------------------- */
+        function connectCallSocket() {
+            const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+            const socketUrl = protocol + window.location.host + "/ws/global-calls/";
+
+            callSocket = new WebSocket(socketUrl);
+
+            callSocket.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+
+                if (data.type === "call_accepted" && callRole === "caller") {
+                    if (data.room_id !== roomIdFromDjango) return;
+                    showConnectedUI();
+                    updateStatus("Connecting...");
+                    joinCall();
+                }
+
+                if (data.type === "call_declined" && callRole === "caller") {
+                    if (data.room_id !== roomIdFromDjango) return;
+                    showWaitingUI("Call Declined", "Player declined the call.");
+                    updateStatus("Call declined.");
+                    setTimeout(() => { window.location.href = "/"; }, 1800);
+                }
+            };
+        }
+
+        /* -----------------------------
+           CONTROLS: MUTE, CAMERA, FLIP
+        ----------------------------- */
+        async function toggleMute() {
+            if (!localStream) return;
+            try {
+                const audioTracks = localStream.getAudioTracks();
+                if (audioTracks.length === 0) return;
+
+                isMuted = !isMuted;
+                audioTracks.forEach(track => { track.enabled = !isMuted; });
+
+                renderMuteIcon();
+                updateStatus(isMuted ? "Microphone muted" : "Microphone unmuted");
+            } catch (error) {
+                console.error("Mute toggle error:", error);
+            }
+        }
+
+        async function toggleCamera() {
+            if (!localStream || callType === "voice") return;
+            try {
+                const videoTracks = localStream.getVideoTracks();
+                if (videoTracks.length === 0) return;
+
+                isCameraOff = !isCameraOff;
+                videoTracks.forEach(track => { track.enabled = !isCameraOff; });
+
+                renderCameraIcon();
+                updateStatus(isCameraOff ? "Camera turned off" : "Camera turned on");
+            } catch (error) {
+                console.error("Camera toggle error:", error);
+            }
+        }
+
+        /* Flip Camera Toggle Functionality */
+        if (flipCameraButton) {
+            flipCameraButton.addEventListener("click", async () => {
+                if (!localStream || !zg) return;
+                try {
+                    isCameraFlipped = !isCameraFlipped;
+                    const videoElem = document.querySelector("#local-video video");
+                    if (videoElem) {
+                        videoElem.style.transform = isCameraFlipped ? "scaleX(-1)" : "scaleX(1)";
+                    }
+                    flipCameraButton.classList.toggle("active", isCameraFlipped);
+                } catch (err) {
+                    console.warn("Camera flip warning:", err);
+                }
+            });
+        }
+
+        /* -----------------------------
+           CLEANUP & LEAVE
+        ----------------------------- */
+        async function cleanupCall() {
+            if (isCleaningUp) return;
+            isCleaningUp = true;
+            stopCallTimer();
+
+            try {
+                if (zg && currentStreamId) {
+                    await zg.stopPublishingStream(currentStreamId);
+                }
+            } catch (e) {}
+
+            try {
+                if (localStream) {
+                    localStream.getTracks().forEach(track => track.stop());
+                }
+            } catch (e) {}
+
+            if (zg) {
+                for (const streamId of remoteStreams.keys()) {
+                    try { zg.stopPlayingStream(streamId); } catch (e) {}
+                }
+                try { await zg.logoutRoom(); } catch (e) {}
+                try { zg.destroyEngine(); } catch (e) {}
+            }
+
+            if (localVideo) localVideo.innerHTML = "";
+            if (remoteVideo) remoteVideo.innerHTML = "";
+            remoteStreams.clear();
+
+            zg = null;
+            localStream = null;
+            localView = null;
+            currentRoomId = null;
+            currentStreamId = null;
+
+            isMuted = false;
+            isCameraOff = false;
+            isJoined = false;
+
+            setCallButtons(false);
+            isCleaningUp = false;
+        }
+
+        async function leaveCall() {
+            if (isCleaningUp) return;
+            isCleaningUp = true;
+            stopCallTimer();
+
+            updateStatus("Ending call...");
+
+            try {
+                if (callSocket && (callSocket.readyState === WebSocket.OPEN || callSocket.readyState === WebSocket.CONNECTING)) {
+                    callSocket.close();
+                }
+
+                await cleanupCall();
+                activeParticipants.clear();
+                currentUserId = null;
+                isJoined = false;
+
+                let destination = returnUrl || "/";
+                if (!destination || destination === currentPath || destination.startsWith("/social/calling/")) {
+                    destination = "/";
+                }
+
+                setTimeout(() => {
+                    window.location.replace(destination);
+                }, 400);
+
+            } catch (error) {
+                console.error("Leave call error:", error);
+                window.location.replace("/");
+            }
+        }
+
+        /* -----------------------------
+           EVENT LISTENERS
+        ----------------------------- */
+        if (joinButton) joinButton.addEventListener("click", joinCall);
+        if (leaveButton) leaveButton.addEventListener("click", leaveCall);
+        if (muteButton) muteButton.addEventListener("click", toggleMute);
+        if (cameraButton) cameraButton.addEventListener("click", toggleCamera);
+
+        window.addEventListener("beforeunload", () => {
+            if (zg) {
+                try { zg.logoutRoom(); } catch (e) {}
+            }
+        });
+
+        /* -----------------------------
+           INITIALIZATION
+        ----------------------------- */
+        configureCallType();
+        configureRole();
+        setCallButtons(false);
+
+        if (typeof ZegoExpressEngine === "undefined") {
+            updateStatus("SDK failed to load.");
+        } else {
+            if (callAccepted) {
+                joinCall();
+            } else if (callRole === "caller") {
+                connectCallSocket();
+            } else {
+                joinCall();
+            }
+        }
+
+        history.replaceState(null, "", window.location.href);
+    </script>
+</body>
+</html>

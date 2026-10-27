@@ -1,0 +1,153 @@
+{% extends "layouts/base_layout.html" %}
+{% load static %}
+
+{% block title %}Match Scoreboard{% endblock %}
+
+{% block content %}
+
+<section class="page-shell">
+<div class="container" style="max-width: 900px;">
+
+    <a href="javascript:history.back()" class="dashboard-chip-btn mb-3">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Back</span>
+    </a>
+
+    <h1 class="match-scoreboard-title">
+        Match Scoreboard
+    </h1>
+
+    <p class="match-scoreboard-subtitle">
+        Live tournament match results, competing squads, and verified victors.
+    </p>
+
+    <div class="scoreboard-card table-responsive" style="overflow-x: auto;">
+
+        <table class="scoreboard-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Match Name
+                    </th>
+
+                    <th>
+                        Teams
+                    </th>
+
+                    <th>
+                        Winner
+                    </th>
+
+                    <th>
+                        Game
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for matches in match %}
+
+                <tr>
+
+
+                    <td>
+
+                        <span class="match-name">
+                            {{ matches.name }}
+                        </span>
+
+                    </td>
+
+
+               
+
+                    <td>
+
+                        <div class="match-teams">
+
+                            {% for team in matches.teams.all %}
+
+                            <span class="match-team">
+                                {{ team.name }}
+                            </span>
+
+                            {% empty %}
+
+                            <span class="no-winner">
+                                No teams
+                            </span>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </td>
+
+
+                    <td>
+
+                        {% if matches.winner_team %}
+
+                        <span class="match-winner">
+                            {{ matches.winner_team }}
+                        </span>
+
+                        {% elif matches.winner_user %}
+
+                        <span class="match-winner">
+                            {{ matches.winner_user }}
+                        </span>
+
+                        {% else %}
+
+                        <span class="no-winner">
+                            No winner announced yet
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="match-game">
+                            {{ matches.game }}
+                        </span>
+
+                    </td>
+
+                </tr>
+
+
+                {% empty %}
+
+                <tr>
+
+                    <td
+                        colspan="4"
+                        class="scoreboard-empty"
+                    >
+                        No matches available yet.
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+</div>
+</section>
+
+{% endblock %}

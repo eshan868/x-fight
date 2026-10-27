@@ -1,0 +1,75 @@
+{% load static %}
+
+<div class="gamemate-modal" id="gamemateModal">
+
+    <div class="gamemate-box">
+
+        <div class="modal-header">
+
+            <div>
+                <h3>Find Game Mate</h3>
+                <p>Connect with players and build your squad.</p>
+            </div>
+
+            <button type="button" class="close-btn" onclick="closeGameMateSearch(); return false;">
+
+                &times;
+
+            </button>
+
+        </div>
+
+
+        <div class="gamemate-search-wrapper">
+
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <input type="text" id="searchUser" class="search-user" placeholder="Search by username..."
+                autocomplete="off">
+
+        </div>
+
+
+        <div class="user-list" id="userList">
+
+            {% for user in users %}
+
+            <div class="user-item" data-username="{{ user.username|lower }}">
+
+                <div class="user-info">
+
+                    <div class="user-avatar">
+                        {{ user.username|first|upper }}
+                    </div>
+
+                    <div>
+                        <h5>{{ user.username }}</h5>
+                        <small>{{ user.email }}</small>
+                    </div>
+
+                </div>
+
+
+                <a href="{% url 'game-mate' request.user.id user.id %}" class="send-request-btn">
+
+                    Add
+
+                </a>
+
+            </div>
+
+            {% empty %}
+
+            <div class="empty-users">
+                <i class="fa-solid fa-user-group"></i>
+                <h4>No players found</h4>
+                <p>There are no users available right now.</p>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>

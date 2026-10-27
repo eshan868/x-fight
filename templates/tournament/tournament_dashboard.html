@@ -1,0 +1,537 @@
+{% extends "layouts/base_layout.html" %}
+
+{% block title %}Event Settings{% endblock %}
+
+{% block content %}
+<section>
+    <section class="event-settings-page">
+
+        <div class="event-settings-layout">
+
+            <!-- ==========================================
+             SIDEBAR
+        ========================================== -->
+
+            <aside class="event-settings-sidebar">
+
+                <div class="event-sidebar-header">
+                    <h3>{{ event.name }}</h3>
+                    <span>Event Management</span>
+                </div>
+
+                <nav class="event-sidebar-nav">
+
+                    <button type="button" class="event-nav-item active" onclick="showEventSection('overview', this)">
+                        <span>⌂</span>
+                        Overview
+                    </button>
+
+                    <button type="button" class="event-nav-item" onclick="showEventSection('participants', this)">
+                        <span>♟</span>
+                        Participants
+                    </button>
+
+                    <button type="button" class="event-nav-item" onclick="showEventSection('matches', this)">
+                        <span>⚔</span>
+                        Matches
+                    </button>
+
+                    <a href="{% url 'scoreboard' event.id %}" class="event-nav-item event-nav-link">
+                        <span>▣</span>
+                        Scoreboard
+                    </a>
+
+                </nav>
+
+            </aside>
+
+
+            <!-- ==========================================
+             MAIN CONTENT
+        ========================================== -->
+
+            <main class="event-settings-main">
+
+                <!-- HEADER -->
+
+                <div class="event-settings-header">
+                </div>
+
+
+                <!-- ==========================================
+                 OVERVIEW
+            ========================================== -->
+
+                <div id="overview" class="event-section active">
+
+                    <div class="event-section-heading">
+
+                        <div>
+                            <h1>Event Settings</h1>
+
+                            <p>
+                                Manage your tournament and participants.
+                            </p>
+                        </div>
+                    </div>
+
+
+                    <!-- STAT CARDS -->
+
+                    <div class="event-stat-grid">
+
+                        <div class="event-stat-card">
+                            <span class="event-stat-label">
+                                Registered Squads
+                            </span>
+                            <strong>
+                                {{ teams.count }}
+                            </strong>
+                        </div>
+
+                        <div class="event-stat-card">
+                            <span class="event-stat-label">
+                                Combat Encounters
+                            </span>
+                            <strong>
+                                {{ matches.count }}
+                            </strong>
+                        </div>
+
+                        <div class="event-stat-card">
+                            <span class="event-stat-label">
+                                Operations Category
+                            </span>
+                            <strong>
+                                {{ event.category|title }}
+                            </strong>
+                        </div>
+
+                        <div class="event-stat-card">
+                            <span class="event-stat-label">
+                                Prize Bounty
+                            </span>
+                            <strong style="color: #22c55e;">
+                                ₹{{ event.price|default:"N/A" }}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <!-- EVENT INFORMATION -->
+                    <div class="event-info-card" style="margin-top: 20px;">
+
+                        <h3>Event Specifications</h3>
+
+                        <div class="event-info-grid">
+
+                            <div>
+                                <span>Championship</span>
+                                <strong>{{ event.name }}</strong>
+                            </div>
+
+                            <div>
+                                <span>Discipline</span>
+                                <strong>{{ event.category|title }}</strong>
+                            </div>
+
+                            <div>
+                                <span>Registered Squads</span>
+                                <strong>{{ teams.count }} Squads</strong>
+                            </div>
+
+                            <div>
+                                <span>Scheduled Matches</span>
+                                <strong>{{ matches.count }} Matches</strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+
+                <!-- ==========================================
+ PARTICIPANTS
+========================================== -->
+
+                <div id="participants" class="event-section">
+
+                    <div class="event-section-heading">
+
+                        <h2>Participants</h2>
+
+                        {% if event.category == "team" %}
+
+                        <p>
+                            Teams registered for this tournament.
+                        </p>
+
+                        {% elif event.category == "solo" %}
+
+                        <p>
+                            Players registered for this tournament.
+                        </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="table-card">
+
+                        <div class="card-header">
+
+                            {% if event.category == "team" %}
+
+                            <h4>Registered Teams</h4>
+
+                            {% elif event.category == "solo" %}
+
+                            <h4>Registered Players</h4>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- TEAM PARTICIPANTS -->
+
+                        {% if event.category == "team" %}
+
+                        {% if teams %}
+
+                        <div class="table-responsive">
+
+                            <table class="table">
+
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Team</th>
+                                        <th>Players</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    {% for team in teams %}
+
+                                    <tr>
+
+                                        <td>
+                                            {{ forloop.counter }}
+                                        </td>
+
+                                        <td>
+                                            <span class="event-team-name">
+                                                {{ team.name }}
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            {{ team.user.count }}
+                                        </td>
+
+                                    </tr>
+
+                                    {% endfor %}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        {% else %}
+
+                        <div class="event-empty-state">
+
+                            <h5>No teams registered.</h5>
+
+                            <p>
+                                Teams will appear here when they join.
+                            </p>
+
+                        </div>
+
+                        {% endif %}
+
+
+                        <!-- SOLO PARTICIPANTS -->
+
+                        {% elif event.category == "solo" %}
+
+                        {% if players %}
+
+                        <div class="table-responsive">
+
+                            <table class="table">
+
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Username</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    {% for player in players %}
+
+                                    <tr>
+
+                                        <td>
+                                            {{ forloop.counter }}
+                                        </td>
+
+                                        <td>
+                                            <span class="event-team-name">
+                                                {{ player.get_full_name|default:player.username }}
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            @{{ player.username }}
+                                        </td>
+
+                                    </tr>
+
+                                    {% endfor %}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        {% else %}
+
+                        <div class="event-empty-state">
+
+                            <h5>No players registered.</h5>
+
+                            <p>
+                                Players will appear here when they join.
+                            </p>
+
+                        </div>
+
+                        {% endif %}
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+                <!-- ==========================================
+                 MATCHES
+            ========================================== -->
+
+                <div id="matches" class="event-section">
+
+                    <div class="event-section-heading">
+
+                        <h2>Matches</h2>
+
+                        <p>
+                            View and manage the tournament schedule.
+                        </p>
+
+                    </div>
+
+
+                    <div class="table-card">
+
+                        <div class="card-header">
+
+                            <h4>Match Schedule</h4>
+
+                        </div>
+
+
+                        {% if matches %}
+
+                        <div class="table-responsive">
+
+                            <table class="table">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>#</th>
+
+                                        <th>Match</th>
+
+                                        <th>Date</th>
+
+                                        <th>Teams</th>
+
+                                        <th>Participants</th>
+
+                                        <th>Status</th>
+
+                                    </tr>
+
+                                </thead>
+
+
+                                <tbody>
+
+                                    {% for match in matches %}
+
+                                    <tr>
+
+                                        <td>
+                                            {{ forloop.counter }}
+                                        </td>
+
+
+                                        <td>
+                                            {{ match.name }}
+                                        </td>
+
+
+                                        <td>
+                                            {{ match.match_date|date:"d M Y H:i" }}
+                                        </td>
+
+
+                                        <td>
+                                            {{ match.teams.count }}
+                                        </td>
+
+
+
+                                        <td>
+                                            {% if tournament.category == "team" %}
+                                            {% for data in match.teams.all %}
+                                            <span class="event-team-badge">
+                                                {{ data.name }}
+                                            </span>
+                                            {% empty %}
+                                            <span class="event-muted">
+                                                No teams selected
+                                            </span>
+                                            {% endfor %}
+
+                                            {% elif tournament.category == "solo" %}
+                                            {% for data in match.match_players.all %}
+                                            <span class="event-team-badge">
+                                                {{ data.username }}
+                                            </span>
+                                            {% empty %}
+                                            <span class="event-muted">
+                                                No players selected
+                                            </span>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </td>
+
+
+
+                                        <td>
+
+                                            {% if match.user_is_participant %}
+
+                                            <a href="{% url 'match-room' event.id match.id %}" class="event-enter-btn">
+                                                Enter
+                                            </a>
+
+                                            {% else %}
+
+                                            <span class="event-muted">
+                                                —
+                                            </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+                                    </tr>
+
+                                    {% endfor %}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        {% else %}
+
+                        <div class="event-empty-state">
+
+                            <h5>No matches scheduled.</h5>
+
+                            <p>
+                                Scheduled matches will appear here.
+                            </p>
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </main>
+
+        </div>
+
+    </section>
+</section>
+
+
+<script>
+
+    function showEventSection(sectionId, button) {
+
+        /* Hide every section */
+
+        document.querySelectorAll(".event-section").forEach(function (section) {
+
+            section.classList.remove("active");
+
+        });
+
+
+        /* Show selected section */
+
+        const selectedSection = document.getElementById(sectionId);
+
+        if (selectedSection) {
+
+            selectedSection.classList.add("active");
+
+        }
+
+
+        /* Remove active state from sidebar */
+
+        document.querySelectorAll(".event-nav-item").forEach(function (item) {
+
+            item.classList.remove("active");
+
+        });
+
+
+        /* Add active state */
+
+        if (button) {
+
+            button.classList.add("active");
+
+        }
+
+    }
+
+</script>
+
+{% endblock %}

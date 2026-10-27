@@ -1,0 +1,1295 @@
+
+{% extends "layouts/base_layout.html" %}
+
+{% block title %}
+    Join Tournament | X-Fight
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+    /* ========================================
+       JOIN TOURNAMENT PAGE
+    ======================================== */
+
+    .join-page {
+        min-height: calc(100vh - 100px);
+        padding: 40px 25px 60px;
+        color: #ffffff;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .join-container {
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    /* ========================================
+       BREADCRUMB
+    ======================================== */
+
+    .join-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 28px;
+        color: #92929e;
+        font-size: 13px;
+    }
+
+    .join-breadcrumb a {
+        color: #ff3333;
+        text-decoration: none;
+        transition: 0.3s ease;
+    }
+
+    .join-breadcrumb a:hover {
+        color: #ffffff;
+    }
+
+    .breadcrumb-arrow {
+        color: #555563;
+    }
+
+    /* ========================================
+       PAGE HEADER
+    ======================================== */
+
+    .join-header {
+        margin-bottom: 30px;
+    }
+
+    .join-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border: 1px solid rgba(255, 0, 0, 0.35);
+        border-radius: 30px;
+        background: rgba(255, 0, 0, 0.08);
+        color: #ff4141;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+    }
+
+    .badge-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #ff0000;
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+    }
+
+    .join-header h1 {
+        margin: 0 0 12px;
+        font-family: 'Aclonica', sans-serif;
+        font-size: clamp(25px, 4vw, 42px);
+        line-height: 1.3;
+        color: #ffffff;
+    }
+
+    .join-header h1 span {
+        color: #ff2020;
+    }
+
+    .join-header p {
+        max-width: 650px;
+        margin: 0;
+        color: #92929e;
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    /* ========================================
+       MAIN GRID
+    ======================================== */
+
+    .join-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 330px;
+        gap: 24px;
+        align-items: start;
+    }
+
+    /* ========================================
+       COMMON CARD
+    ======================================== */
+
+    .join-card {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #292932;
+        border-radius: 18px;
+        background: linear-gradient(
+            145deg,
+            #14141b,
+            #0d0d12
+        );
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .join-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+            90deg,
+            #ff0000,
+            #7200ff,
+            transparent
+        );
+    }
+
+    .join-card-header {
+        padding: 25px 28px;
+        border-bottom: 1px solid #292932;
+    }
+
+    .join-card-header h2 {
+        margin: 0 0 8px;
+        font-family: 'Aclonica', sans-serif;
+        font-size: 19px;
+        color: #ffffff;
+    }
+
+    .join-card-header p {
+        margin: 0;
+        color: #858592;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .join-card-body {
+        padding: 28px;
+    }
+
+    /* ========================================
+       TOURNAMENT INFORMATION
+    ======================================== */
+
+    .tournament-info {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #272731;
+    }
+
+    .info-item:last-child {
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .info-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #92929e;
+        font-size: 12px;
+    }
+
+    .info-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border: 1px solid #363642;
+        border-radius: 8px;
+        background: #1b1b24;
+        color: #ff3535;
+        font-size: 13px;
+    }
+
+    .info-value {
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .type-value {
+        color: #b88aff;
+    }
+
+    .fee-value {
+        color: #ff3838;
+        font-size: 14px;
+    }
+
+    /* ========================================
+       DESCRIPTION
+    ======================================== */
+
+    .description-box {
+        margin-top: 25px;
+        padding: 18px;
+        border: 1px solid #2b2b38;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .description-box h3 {
+        margin: 0 0 10px;
+        color: #ffffff;
+        font-size: 13px;
+    }
+
+    .description-box p {
+        margin: 0;
+        color: #858592;
+        font-size: 12px;
+        line-height: 1.8;
+        overflow-wrap: anywhere;
+    }
+
+    /* ========================================
+       TEAM SELECTION
+    ======================================== */
+
+    .team-section-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 18px;
+    }
+
+    .team-section-title h3 {
+        margin: 0;
+        color: #ffffff;
+        font-size: 14px;
+    }
+
+    .team-count {
+        padding: 5px 10px;
+        border-radius: 20px;
+        background: #25152a;
+        color: #c28cff;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+    .team-options {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .team-option {
+        position: relative;
+        display: block;
+        cursor: pointer;
+    }
+
+    .team-option input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .team-option-content {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 17px;
+        border: 1px solid #30303b;
+        border-radius: 12px;
+        background: #111118;
+        transition:
+            border-color 0.25s ease,
+            background 0.25s ease,
+            transform 0.25s ease;
+    }
+
+    .team-option-content:hover {
+        border-color: #a50000;
+        background: #191119;
+        transform: translateY(-2px);
+    }
+
+    .team-option input:checked + .team-option-content {
+        border-color: #ff1515;
+        background: linear-gradient(
+            100deg,
+            rgba(255, 0, 0, 0.13),
+            rgba(70, 0, 90, 0.12)
+        );
+        box-shadow: 0 0 18px rgba(255, 0, 0, 0.08);
+    }
+
+    .team-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 42px;
+        height: 42px;
+        border: 1px solid #38303f;
+        border-radius: 11px;
+        background: #201724;
+        color: #ff3333;
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .team-details {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .team-name {
+        display: block;
+        margin-bottom: 4px;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    .team-subtitle {
+        display: block;
+        color: #777784;
+        font-size: 10px;
+    }
+
+    .team-radio {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 19px;
+        height: 19px;
+        border: 1px solid #555562;
+        border-radius: 50%;
+        transition: 0.25s ease;
+    }
+
+    .team-radio::after {
+        content: "";
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: transparent;
+        transition: 0.25s ease;
+    }
+
+    .team-option input:checked
+    + .team-option-content
+    .team-radio {
+        border-color: #ff1d1d;
+    }
+
+    .team-option input:checked
+    + .team-option-content
+    .team-radio::after {
+        background: #ff1d1d;
+        box-shadow: 0 0 8px rgba(255, 0, 0, 0.7);
+    }
+
+    .empty-teams {
+        padding: 28px 18px;
+        border: 1px dashed #41414c;
+        border-radius: 12px;
+        color: #858592;
+        font-size: 12px;
+        line-height: 1.8;
+        text-align: center;
+    }
+
+    /* ========================================
+       SUBMIT AREA
+    ======================================== */
+
+    .join-submit-area {
+        margin-top: 26px;
+        padding-top: 24px;
+        border-top: 1px solid #292932;
+    }
+
+    .payment-notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 18px;
+        color: #858592;
+        font-size: 11px;
+        line-height: 1.7;
+    }
+
+    .payment-notice strong {
+        color: #e0e0e8;
+    }
+
+    .notice-icon {
+        flex-shrink: 0;
+        color: #ff3939;
+        font-size: 14px;
+    }
+
+    .join-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+        padding: 16px 22px;
+        border: 1px solid #ff2020;
+        border-radius: 10px;
+        background: linear-gradient(
+            100deg,
+            #d90000,
+            #ff2525
+        );
+        box-shadow: 0 8px 25px rgba(255, 0, 0, 0.16);
+        color: #ffffff;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease,
+            background 0.25s ease;
+    }
+
+    .join-button:hover {
+        background: linear-gradient(
+            100deg,
+            #ff2020,
+            #b50000
+        );
+        box-shadow: 0 10px 35px rgba(255, 0, 0, 0.28);
+        transform: translateY(-2px);
+    }
+
+    .join-button:active {
+        transform: translateY(0);
+    }
+
+    .join-button:focus-visible {
+        outline: 2px solid #ffffff;
+        outline-offset: 4px;
+    }
+
+    .button-arrow {
+        font-size: 17px;
+        line-height: 1;
+    }
+
+    /* ========================================
+       RIGHT SIDE SUMMARY
+    ======================================== */
+
+    .summary-card {
+        position: sticky;
+        top: 25px;
+    }
+
+    .summary-top {
+        padding: 28px;
+        text-align: center;
+    }
+
+    .summary-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 75px;
+        height: 75px;
+        margin: 0 auto 18px;
+        border: 1px solid rgba(255, 0, 0, 0.45);
+        border-radius: 22px;
+        background: linear-gradient(
+            145deg,
+            #2b0c16,
+            #1a102a
+        );
+        box-shadow: 0 0 30px rgba(255, 0, 0, 0.09);
+        color: #ff2929;
+        font-size: 31px;
+    }
+
+    .summary-top h2 {
+        margin: 0 0 8px;
+        color: #ffffff;
+        font-family: 'Aclonica', sans-serif;
+        font-size: 17px;
+        line-height: 1.6;
+    }
+
+    .summary-top p {
+        margin: 0;
+        color: #777784;
+        font-size: 11px;
+        line-height: 1.7;
+    }
+
+    .summary-divider {
+        height: 1px;
+        margin: 0 28px;
+        background: #292932;
+    }
+
+    .summary-body {
+        padding: 25px 28px;
+    }
+
+    .summary-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 18px;
+    }
+
+    .summary-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .summary-row span:first-child {
+        color: #858592;
+        font-size: 11px;
+    }
+
+    .summary-row span:last-child {
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: right;
+        overflow-wrap: anywhere;
+    }
+
+    .summary-fee {
+        color: #ff3535 !important;
+    }
+
+    .summary-tip {
+        margin-top: 22px;
+        padding: 15px;
+        border: 1px solid #342b40;
+        border-radius: 10px;
+        background: rgba(100, 0, 150, 0.08);
+        color: #9b91ad;
+        font-size: 10px;
+        line-height: 1.8;
+    }
+
+    .summary-tip strong {
+        color: #c6a1ff;
+    }
+
+    /* ========================================
+       RESPONSIVE DESIGN
+    ======================================== */
+
+    @media (max-width: 900px) {
+
+        .join-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .summary-card {
+            position: static;
+        }
+
+        .summary-top {
+            text-align: left;
+        }
+
+        .summary-icon {
+            margin: 0 0 18px;
+        }
+
+    }
+
+    @media (max-width: 600px) {
+
+        .join-page {
+            padding: 25px 14px 45px;
+        }
+
+        .join-card-header,
+        .join-card-body {
+            padding: 20px;
+        }
+
+        .join-header h1 {
+            font-size: 25px;
+        }
+
+        .info-item {
+            align-items: flex-start;
+        }
+
+        .team-option-content {
+            padding: 13px;
+        }
+
+        .summary-top,
+        .summary-body {
+            padding: 22px;
+        }
+
+        .summary-divider {
+            margin: 0 22px;
+        }
+
+    }
+
+</style>
+
+
+<div class="join-page">
+
+    <div class="join-container">
+
+        <!-- ========================================
+             BREADCRUMB
+        ========================================= -->
+
+        <div class="join-breadcrumb">
+
+            <a href="{% url 'events-display' %}">
+                Tournaments
+            </a>
+
+            <span class="breadcrumb-arrow">
+                /
+            </span>
+
+            <span>
+                Join Tournament
+            </span>
+
+        </div>
+
+
+        <!-- ========================================
+             PAGE HEADER
+        ========================================= -->
+
+        <div class="join-header">
+
+            <div class="join-badge">
+
+                <span class="badge-dot"></span>
+
+                Tournament Registration
+
+            </div>
+
+            <h1>
+                Join the <span>Battle.</span>
+            </h1>
+
+            <p>
+                Register for this tournament, choose your team when
+                required, and compete against other players in X-Fight.
+            </p>
+
+        </div>
+
+
+        <!-- ========================================
+             MAIN GRID
+        ========================================= -->
+
+        <div class="join-grid">
+
+
+            <!-- ====================================
+                 LEFT COLUMN
+            ===================================== -->
+
+            <div class="join-left">
+
+
+                <!-- =================================
+                     TOURNAMENT DETAILS CARD
+                ================================== -->
+
+                <div class="join-card">
+
+                    <div class="join-card-header">
+
+                        <h2>
+                            {{ tournament.name }}
+                        </h2>
+
+                        <p>
+                            Review the tournament details before joining.
+                        </p>
+
+                    </div>
+
+
+                    <div class="join-card-body">
+
+                        <div class="tournament-info">
+
+
+                            <!-- Tournament Type -->
+
+                            <div class="info-item">
+
+                                <div class="info-label">
+
+                                    <span class="info-icon">
+                                        ⚔
+                                    </span>
+
+                                    <span>
+                                        Tournament Type
+                                    </span>
+
+                                </div>
+
+                                <div class="info-value type-value">
+
+                                    {{ tournament.get_category_display }}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Entry Fee -->
+
+                            <div class="info-item">
+
+                                <div class="info-label">
+
+                                    <span class="info-icon">
+                                        ◈
+                                    </span>
+
+                                    <span>
+                                        Entry Fee
+                                    </span>
+
+                                </div>
+
+                                <div class="info-value fee-value">
+
+                                    {{ tournament.entry_fee|default:"0" }}
+                                    Coins
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Starting Date -->
+
+                            {% if tournament.starting_time %}
+
+                                <div class="info-item">
+
+                                    <div class="info-label">
+
+                                        <span class="info-icon">
+                                            ◷
+                                        </span>
+
+                                        <span>
+                                            Starts
+                                        </span>
+
+                                    </div>
+
+                                    <div class="info-value">
+
+                                        {{ tournament.starting_time|date:"d M Y" }}
+
+                                    </div>
+
+                                </div>
+
+                            {% endif %}
+
+
+                            <!-- Ending Date -->
+
+                            {% if tournament.end_time %}
+
+                                <div class="info-item">
+
+                                    <div class="info-label">
+
+                                        <span class="info-icon">
+                                            ⌛
+                                        </span>
+
+                                        <span>
+                                            Ends
+                                        </span>
+
+                                    </div>
+
+                                    <div class="info-value">
+
+                                        {{ tournament.end_time|date:"d M Y" }}
+
+                                    </div>
+
+                                </div>
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                        <!-- Tournament Description -->
+
+                        <div class="description-box">
+
+                            <h3>
+                                About This Tournament
+                            </h3>
+
+                            <p>
+                                {{ tournament.description|default:"No tournament description has been provided." }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================
+                     REGISTRATION CARD
+                ================================== -->
+
+                <div class="join-card" style="margin-top: 24px;">
+
+                    <div class="join-card-header">
+
+                        <h2>
+                            Registration
+                        </h2>
+
+                        <p>
+                            Complete the form below to participate.
+                        </p>
+
+                    </div>
+
+
+                    <div class="join-card-body">
+
+                        <form
+                            method="POST"
+                            id="joinTournamentForm"
+                            onsubmit="return confirmJoinTournament();"
+                        >
+
+                            {% csrf_token %}
+
+
+                            <!-- =================================
+                                 TEAM TOURNAMENT
+                            ================================== -->
+
+                            {% if tournament.category == "team" %}
+
+                                <div class="team-section-title">
+
+                                    <h3>
+                                        Select Your Team
+                                    </h3>
+
+                                    <span class="team-count">
+                                        {{ teams|length }} Available
+                                    </span>
+
+                                </div>
+
+
+                                {% if teams %}
+
+                                    <div class="team-options">
+
+                                        {% for selected_team in teams %}
+
+                                            <label class="team-option">
+
+                                                <input
+                                                    type="radio"
+                                                    name="team_id"
+                                                    value="{{ selected_team.id }}"
+                                                    required
+                                                >
+
+                                                <span class="team-option-content">
+
+                                                    <span class="team-logo">
+                                                        ⚡
+                                                    </span>
+
+                                                    <span class="team-details">
+
+                                                        <span class="team-name">
+                                                            {{ selected_team.name }}
+                                                        </span>
+
+                                                        <span class="team-subtitle">
+                                                            Available team
+                                                        </span>
+
+                                                    </span>
+
+                                                    <span class="team-radio"></span>
+
+                                                </span>
+
+                                            </label>
+
+                                        {% endfor %}
+
+                                    </div>
+
+                                {% else %}
+
+                                    <div class="empty-teams">
+
+                                        You are not a member of any team.
+                                        Create or join a team before
+                                        registering for a team tournament.
+
+                                    </div>
+
+                                {% endif %}
+
+
+                            <!-- =================================
+                                 SOLO TOURNAMENT
+                            ================================== -->
+
+                            {% elif tournament.category == "solo" %}
+
+                                <div class="team-section-title">
+
+                                    <h3>
+                                        Solo Registration
+                                    </h3>
+
+                                    <span class="team-count">
+                                        1 Player
+                                    </span>
+
+                                </div>
+
+                                <div class="description-box" style="margin-top: 0;">
+
+                                    <h3>
+                                        Individual Participation
+                                    </h3>
+
+                                    <p>
+                                        You are registering as an individual
+                                        player. No team selection is required.
+                                    </p>
+
+                                </div>
+
+                            {% endif %}
+
+
+                            <!-- =================================
+                                 SUBMIT SECTION
+                            ================================== -->
+
+                            <div class="join-submit-area">
+
+                                <div class="payment-notice">
+
+                                    <span class="notice-icon">
+                                        ⓘ
+                                    </span>
+
+                                    <span>
+
+                                        By continuing, you confirm that you
+                                        want to join this tournament.
+
+                                        {% if tournament.entry_fee and tournament.entry_fee != "0" %}
+
+                                            <strong>
+                                                {{ tournament.entry_fee }}
+                                                coins will be deducted
+                                                from your account.
+                                            </strong>
+
+                                        {% else %}
+
+                                            <strong>
+                                                This tournament has no
+                                                entry fee.
+                                            </strong>
+
+                                        {% endif %}
+
+                                    </span>
+
+                                </div>
+
+
+                                {% if tournament.entry_fee and tournament.entry_fee != "0" %}
+
+                                    <button
+                                        type="submit"
+                                        class="join-button"
+                                    >
+
+                                        <span>
+                                            Pay {{ tournament.entry_fee }}
+                                            Coins and Join
+                                        </span>
+
+                                        <span class="button-arrow">
+                                            →
+                                        </span>
+
+                                    </button>
+
+                                {% else %}
+
+                                    <button
+                                        type="submit"
+                                        class="join-button"
+                                    >
+
+                                        <span>
+                                            Join Tournament
+                                        </span>
+
+                                        <span class="button-arrow">
+                                            →
+                                        </span>
+
+                                    </button>
+
+                                {% endif %}
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ====================================
+                 RIGHT COLUMN
+            ===================================== -->
+
+            <div class="join-right">
+
+                <div class="join-card summary-card">
+
+
+                    <!-- Summary Header -->
+
+                    <div class="summary-top">
+
+                        <div class="summary-icon">
+                            ⚡
+                        </div>
+
+                        <h2>
+                            Ready to Fight?
+                        </h2>
+
+                        <p>
+                            Prepare yourself and enter the arena.
+                            Every match is a new challenge.
+                        </p>
+
+                    </div>
+
+
+                    <div class="summary-divider"></div>
+
+
+                    <!-- Summary Details -->
+
+                    <div class="summary-body">
+
+                        <div class="summary-row">
+
+                            <span>
+                                Tournament
+                            </span>
+
+                            <span>
+                                {{ tournament.name }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>
+                                Category
+                            </span>
+
+                            <span>
+                                {{ tournament.get_category_display }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>
+                                Entry Fee
+                            </span>
+
+                            <span class="summary-fee">
+
+                                {{ tournament.entry_fee|default:"0" }}
+                                Coins
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>
+                                Registration
+                            </span>
+
+                            <span>
+                                Open
+                            </span>
+
+                        </div>
+
+
+                        <div class="summary-tip">
+
+                            <strong>
+                                Important:
+                            </strong>
+
+                            Make sure you have enough coins before
+                            confirming your registration. Once the
+                            payment is completed, your registration
+                            will be saved.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================
+     BACKEND ALERTS
+======================================== -->
+
+{% if error %}
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            alert("{{ error|escapejs }}");
+
+        });
+
+    </script>
+
+{% endif %}
+
+
+{% if success %}
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            alert("{{ success|escapejs }}");
+
+        });
+
+    </script>
+
+{% endif %}
+
+
+<!-- ========================================
+     CONFIRMATION POPUP
+======================================== -->
+
+<script>
+
+    function confirmJoinTournament() {
+
+        const tournamentName =
+            "{{ tournament.name|escapejs }}";
+
+        const entryFee =
+            "{{ tournament.entry_fee|default:'0'|escapejs }}";
+
+        let confirmationMessage;
+
+        if (entryFee && entryFee !== "0") {
+
+            confirmationMessage =
+                "Are you sure you want to pay "
+                + entryFee
+                + " coins and join "
+                + tournamentName
+                + "?";
+
+        } else {
+
+            confirmationMessage =
+                "Are you sure you want to join "
+                + tournamentName
+                + "?";
+
+        }
+
+        return window.confirm(confirmationMessage);
+
+    }
+
+</script>
+
+{% endblock %}

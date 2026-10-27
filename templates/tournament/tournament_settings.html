@@ -1,0 +1,1002 @@
+{% extends "layouts/base_layout.html" %}
+
+{% block title %}Event Settings{% endblock %}
+
+{% block content %}
+
+
+<section>
+
+    <section class="event-settings-page">
+
+        <div class="event-settings-layout">
+
+
+            <!-- =====================================================
+                 SIDEBAR
+            ====================================================== -->
+
+            <aside class="event-settings-sidebar">
+
+                <div class="event-sidebar-header">
+
+                    <h3>
+                        {{ event.name }}
+                    </h3>
+
+                    <span>
+                        Event Management
+                    </span>
+
+                </div>
+
+
+                <nav class="event-sidebar-nav">
+
+
+                    <!-- OVERVIEW -->
+
+                    <button type="button" class="event-nav-item active" onclick="showEventSection('overview', this)">
+
+                        <span>⌂</span>
+
+                        Overview
+
+                    </button>
+
+
+                    <!-- PARTICIPANTS -->
+
+                    <button type="button" class="event-nav-item" onclick="showEventSection('participants', this)">
+
+                        <span>♟</span>
+
+                        Participants
+
+                    </button>
+
+
+                    <!-- MATCHES -->
+
+                    <button type="button" class="event-nav-item" onclick="showEventSection('matches', this)">
+
+                        <span>⚔</span>
+
+                        Matches
+
+                    </button>
+
+
+                    <!-- ADMINS -->
+
+                    <button type="button" class="event-nav-item" onclick="showEventSection('admins', this)">
+
+                        <span>♙</span>
+
+                        Admins
+
+                    </button>
+
+
+                    <!-- SCOREBOARD -->
+
+                    <a href="{% url 'scoreboard' event.id %}" class="event-nav-item event-nav-link">
+
+                        <span>▣</span>
+
+                        Scoreboard
+
+                    </a>
+
+
+                </nav>
+
+            </aside>
+
+
+            <!-- =====================================================
+                 MAIN CONTENT
+            ====================================================== -->
+
+            <main class="event-settings-main">
+
+
+                <!-- HEADER -->
+
+                <div class="event-settings-header">
+                </div>
+
+
+                <!-- =================================================
+                     OVERVIEW
+                ================================================== -->
+
+                <div id="overview" class="event-section active">
+
+
+                    <div class="event-section-heading">
+
+                        <div>
+
+                            <h1>
+                                Event Settings
+                            </h1>
+
+                            <p>
+                                Manage your tournament and participants.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- STAT CARDS -->
+
+                    <div class="event-stat-grid">
+
+
+                        <div class="event-stat-card">
+
+                            <span class="event-stat-label">
+                                Registered Teams
+                            </span>
+
+                            <strong>
+                                {{ teams.count }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="event-stat-card">
+
+                            <span class="event-stat-label">
+                                Matches
+                            </span>
+
+                            <strong>
+                                {{ matches.count }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="event-stat-card">
+
+                            <span class="event-stat-label">
+                                Tournament Type
+                            </span>
+
+                            <strong>
+                                {{ event.category|title }}
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <!-- EVENT INFORMATION -->
+
+                    <div class="event-info-card">
+
+                        <h3>
+                            Event Information
+                        </h3>
+
+
+                        <div class="event-info-grid">
+
+
+                            <div>
+
+                                <span>
+                                    Event
+                                </span>
+
+                                <strong>
+                                    {{ event.name }}
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    Category
+                                </span>
+
+                                <strong>
+                                    {{ event.category|title }}
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    Teams
+                                </span>
+
+                                <strong>
+                                    {{ teams.count }}
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    Matches
+                                </span>
+
+                                <strong>
+                                    {{ matches.count }}
+                                </strong>
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- ==========================================
+ PARTICIPANTS
+========================================== -->
+
+                <div id="participants" class="event-section">
+
+                    <div class="event-section-heading">
+
+                        <h2>Participants</h2>
+
+                        {% if event.category == "team" %}
+
+                        <p>
+                            Teams registered for this tournament.
+                        </p>
+
+                        {% elif event.category == "solo" %}
+
+                        <p>
+                            Players registered for this tournament.
+                        </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="table-card">
+
+                        <div class="card-header">
+
+                            {% if event.category == "team" %}
+
+                            <h4>Registered Teams</h4>
+
+                            {% elif event.category == "solo" %}
+
+                            <h4>Registered Players</h4>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- TEAM PARTICIPANTS -->
+
+                        {% if event.category == "team" %}
+
+                        {% if teams %}
+
+                        <div class="table-responsive">
+
+                            <table class="table">
+
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Team</th>
+                                        <th>Players</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    {% for team in teams %}
+
+                                    <tr>
+
+                                        <td>
+                                            {{ forloop.counter }}
+                                        </td>
+
+                                        <td>
+                                            <span class="event-team-name">
+                                                {{ team.name }}
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            {{ team.user.count }}
+                                        </td>
+
+                                    </tr>
+
+                                    {% endfor %}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        {% else %}
+
+                        <div class="event-empty-state">
+
+                            <h5>No teams registered.</h5>
+
+                            <p>
+                                Teams will appear here when they join.
+                            </p>
+
+                        </div>
+
+                        {% endif %}
+
+
+                        <!-- SOLO PARTICIPANTS -->
+
+                        {% elif event.category == "solo" %}
+
+                        {% if players %}
+
+                        <div class="table-responsive">
+
+                            <table class="table">
+
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Username</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    {% for player in players %}
+
+                                    <tr>
+
+                                        <td>
+                                            {{ forloop.counter }}
+                                        </td>
+
+                                        <td>
+                                            <span class="event-team-name">
+                                                {{ player.get_full_name|default:player.username }}
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            @{{ player.username }}
+                                        </td>
+
+                                    </tr>
+
+                                    {% endfor %}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        {% else %}
+
+                        <div class="event-empty-state">
+
+                            <h5>No players registered.</h5>
+
+                            <p>
+                                Players will appear here when they join.
+                            </p>
+
+                        </div>
+
+                        {% endif %}
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <!-- =================================================
+                     MATCHES
+                ================================================== -->
+
+                <div id="matches" class="event-section">
+
+
+                    <div class="event-section-heading">
+
+                        <h2>
+                            Matches
+                        </h2>
+
+                        <p>
+                            View and manage the tournament schedule.
+                        </p>
+
+                    </div>
+
+
+                    <div class="schedule-match">
+
+                        <a href="{% url 'match-creation' event.id %}" class="small-action-btn">
+
+                            Schedule Match
+
+                        </a>
+
+                    </div>
+
+
+                    <div class="table-card">
+
+
+                        <div class="card-header">
+
+                            <h4>
+                                Match Schedule
+                            </h4>
+
+                        </div>
+
+
+
+                        {% if matches %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Match</th>
+                                        <th>Date</th>
+                                        <th>Teams</th>
+                                        <th>Participants</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for match in matches %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+
+                                        <td>{{ match.name }}</td>
+
+                                        <td>
+                                            {{ match.match_date|date:"d M Y H:i" }}
+                                        </td>
+
+                                        <td>
+                                            {{ match.teams.count }}
+                                        </td>
+
+                                        <td>
+                                            {% if event.category == "team" %}
+                                            {% for data in match.teams.all %}
+                                            <span class="event-team-badge">
+                                                {{ data.name }}
+                                            </span>
+                                            {% empty %}
+                                            <span class="event-muted">
+                                                No teams selected
+                                            </span>
+                                            {% endfor %}
+
+                                            {% elif event.category == "solo" %}
+                                            {% for data in match.match_players.all %}
+                                            <span class="event-team-badge">
+                                                {{ data.username }}
+                                            </span>
+                                            {% empty %}
+                                            <span class="event-muted">
+                                                No players selected
+                                            </span>
+                                            {% endfor %}
+
+                                            {% else %}
+                                            <span class="event-muted">
+                                                Unknown tournament category
+                                            </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            <a href="{% url 'match-room' event.id match.id %}" class="event-enter-btn">
+                                                Enter
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {% else %}
+                        <div class="event-empty-state">
+                            <h5>No matches scheduled.</h5>
+                            <p>Scheduled matches will appear here.</p>
+                        </div>
+                        {% endif %}
+
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     ADMINS
+                ================================================== -->
+
+                <div id="admins" class="event-section">
+
+
+                    <div class="event-section-heading">
+
+                        <div>
+
+                            <h2>
+                                Tournament Admins
+                            </h2>
+
+                            <p>
+                                Manage the people who can help manage this tournament.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="event-admin-card">
+
+
+                        <!-- ADMIN HEADER -->
+
+                        <div class="event-admin-heading">
+
+                            <div>
+
+                                <span class="event-admin-label">
+                                    MANAGEMENT
+                                </span>
+
+                                <h2>
+                                    Admin Management
+                                </h2>
+
+                                <p>
+                                    Add or remove tournament administrators.
+                                </p>
+
+                            </div>
+
+
+                            {% if event.owner == request.user %}
+
+                            <button type="button" class="admin-add-main-btn" onclick="openAdminPopup()">
+
+                                + Add Admin
+
+                            </button>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- ADMIN LIST -->
+
+                        <div class="event-admin-list">
+
+
+                            <!-- OWNER -->
+
+                            <div class="event-admin-user">
+
+
+                                <div class="event-admin-avatar">
+
+                                    {{ event.owner.username|first|upper }}
+
+                                </div>
+
+
+                                <div class="event-admin-user-info">
+
+                                    <strong>
+                                        {{ event.owner.username }}
+                                    </strong>
+
+                                    <span>
+                                        Tournament Owner
+                                    </span>
+
+                                </div>
+
+
+                                <span class="event-owner-badge">
+                                    OWNER
+                                </span>
+
+
+                            </div>
+
+
+                            <!-- ADMINS -->
+
+                            {% for admin in event_admins %}
+
+                            <div class="event-admin-user">
+
+
+                                <div class="event-admin-avatar">
+
+                                    {{ admin.username|first|upper }}
+
+                                </div>
+
+
+                                <div class="event-admin-user-info">
+
+                                    <strong>
+                                        {{ admin.username }}
+                                    </strong>
+
+                                    <span>
+                                        Tournament Admin
+                                    </span>
+
+                                </div>
+
+
+                                <span class="event-admin-badge">
+                                    ADMIN
+                                </span>
+
+
+                                {% if event.owner == request.user %}
+
+                                <form method="POST" action="{% url 'remove-tournament-admin' event.id %}"
+                                    class="admin-remove-form">
+
+                                    {% csrf_token %}
+
+                                    <input type="hidden" name="user_id" value="{{ admin.id }}">
+
+
+                                    <button type="submit" class="admin-remove-btn"
+                                        onclick="return confirm('Remove {{ admin.username }} as tournament admin?');">
+
+                                        Remove
+
+                                    </button>
+
+                                </form>
+
+                                {% endif %}
+
+
+                            </div>
+
+
+                            {% empty %}
+
+                            <div class="event-admin-empty">
+
+                                No additional admins yet.
+
+                            </div>
+
+                            {% endfor %}
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </main>
+
+        </div>
+
+    </section>
+
+</section>
+
+
+<!-- =========================================================
+     ADD ADMIN POPUP
+========================================================= -->
+
+<div id="adminPopup" class="admin-popup">
+
+
+    <!-- BACKDROP -->
+
+    <div class="admin-popup-backdrop" onclick="closeAdminPopup()">
+    </div>
+
+
+    <!-- POPUP BOX -->
+
+    <div class="admin-popup-box">
+
+
+        <!-- HEADER -->
+
+        <div class="admin-popup-header">
+
+
+            <div>
+
+                <span class="event-admin-label">
+                    TOURNAMENT MANAGEMENT
+                </span>
+
+                <h3>
+                    Add Tournament Admin
+                </h3>
+
+                <p>
+                    Select one of your accepted Game Mates.
+                </p>
+
+            </div>
+
+
+            <button type="button" class="admin-popup-close" onclick="closeAdminPopup()">
+
+                ×
+
+            </button>
+
+
+        </div>
+
+
+        <!-- GAME MATE LIST -->
+
+        <div class="admin-popup-list">
+
+
+            {% for mate in game_mates %}
+
+
+            <div class="admin-mate-row">
+
+
+                <!-- USER -->
+
+                <div class="admin-mate-info">
+
+
+                    <div class="admin-mate-avatar">
+
+                        {{ mate.username|first|upper }}
+
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            {{ mate.username }}
+                        </strong>
+
+                        <span>
+                            Game Mate
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- ACTION -->
+
+                {% if mate in event_admins %}
+
+
+                <span class="admin-added">
+
+                    ✓ Admin
+
+                </span>
+
+
+                {% else %}
+
+
+                <form method="POST" action="{% url 'add-tournament-admin' event.id %}">
+
+                    {% csrf_token %}
+
+
+                    <input type="hidden" name="user_id" value="{{ mate.id }}">
+
+
+                    <button type="submit" class="admin-add-btn">
+
+                        + Add
+
+                    </button>
+
+
+                </form>
+
+
+                {% endif %}
+
+
+            </div>
+
+
+            {% empty %}
+
+
+            <div class="admin-popup-empty">
+
+
+                <div class="admin-popup-empty-icon">
+                    ♟
+                </div>
+
+
+                <h4>
+                    No Game Mates
+                </h4>
+
+
+                <p>
+                    You don't have any accepted Game Mates.
+                </p>
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /* =========================================================
+       SECTION SWITCHING
+    ========================================================= */
+
+    function showEventSection(sectionId, button) {
+
+        document.querySelectorAll(".event-section").forEach(function (section) {
+
+            section.classList.remove("active");
+
+        });
+
+
+        const selectedSection =
+            document.getElementById(sectionId);
+
+
+        if (selectedSection) {
+
+            selectedSection.classList.add("active");
+
+        }
+
+
+        document.querySelectorAll(".event-nav-item").forEach(function (item) {
+
+            item.classList.remove("active");
+
+        });
+
+
+        if (button) {
+
+            button.classList.add("active");
+
+        }
+
+    }
+
+
+    /* =========================================================
+       OPEN ADMIN POPUP
+    ========================================================= */
+
+    function openAdminPopup() {
+
+        const popup =
+            document.getElementById("adminPopup");
+
+
+        if (popup) {
+
+            popup.classList.add("active");
+
+            document.body.classList.add("popup-open");
+
+        }
+
+    }
+
+
+    /* =========================================================
+       CLOSE ADMIN POPUP
+    ========================================================= */
+
+    function closeAdminPopup() {
+
+        const popup =
+            document.getElementById("adminPopup");
+
+
+        if (popup) {
+
+            popup.classList.remove("active");
+
+            document.body.classList.remove("popup-open");
+
+        }
+
+    }
+
+
+    /* =========================================================
+       ESCAPE KEY
+    ========================================================= */
+
+    document.addEventListener("keydown", function (event) {
+
+        if (event.key === "Escape") {
+
+            closeAdminPopup();
+
+        }
+
+    });
+
+</script>
+
+{% endblock %}

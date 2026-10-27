@@ -1,0 +1,70 @@
+{% if is_friendly %}
+
+{% for item in solo_players %}
+<div class="player-row" data-user-id="{{ item.user.id }}">
+    <div class="player-name">
+        {{ item.user.username }}
+    </div>
+
+    {% if item.match_player and item.match_player.ready %}
+    <span class="player-status ready">Ready</span>
+    {% else %}
+    <span class="player-status waiting">Waiting</span>
+    {% endif %}
+</div>
+{% empty %}
+<p class="text-muted">No players in this friendly match.</p>
+{% endfor %}
+
+{% elif match.tournament and match.tournament.category == "solo" %}
+
+{% for item in solo_players %}
+<div class="player-row" data-user-id="{{ item.user.id }}">
+    <div class="player-name">
+        {{ item.user.username }}
+    </div>
+
+    {% if item.match_player and item.match_player.ready %}
+    <span class="player-status ready">Ready</span>
+    {% else %}
+    <span class="player-status waiting">Waiting</span>
+    {% endif %}
+</div>
+{% empty %}
+<p class="text-muted">No players registered.</p>
+{% endfor %}
+
+{% elif match.tournament and match.tournament.category == "team" %}
+
+{% for item in team_data %}
+<div class="team-section">
+    <div class="team-header">
+        <h2>{{ item.team.name }}</h2>
+        <span>{{ item.players|length }} Players</span>
+    </div>
+
+    {% for member in item.players %}
+    <div class="player-row" data-user-id="{{ member.user.id }}">
+        <div class="player-name">
+            {{ member.user.username }}
+        </div>
+
+        {% if member.match_player and member.match_player.ready %}
+        <span class="player-status ready">Ready</span>
+        {% else %}
+        <span class="player-status waiting">Waiting</span>
+        {% endif %}
+    </div>
+    {% empty %}
+    <p class="text-muted">No players in this team.</p>
+    {% endfor %}
+</div>
+{% empty %}
+<p class="text-muted">No teams registered.</p>
+{% endfor %}
+
+{% else %}
+
+<p class="text-muted">No match participants found.</p>
+
+{% endif %}

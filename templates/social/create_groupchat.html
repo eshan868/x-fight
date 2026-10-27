@@ -1,0 +1,35 @@
+{% extends "layouts/base_layout.html" %}
+{% load static %}
+
+{% block title %}=create ChatGroup{% endblock %}
+
+{% block content %}
+
+<section class="create-group-page">
+
+    <div class="create-group-card">
+
+        <h1 class="create-group-title">
+            Create Group
+        </h1>
+
+        <p class="create-group-subtitle">
+            Give your group a name and start chatting with your GameMates.
+        </p>
+
+
+        <form method="post" class="create-group-form">
+
+            {% csrf_token %}
+
+            {{ form }}
+
+            <button type="submit" class="create-group-btn">
+                Create Group
+            </button>
+
+        </form>
+
+    </div>
+</section>
+{% endblock %}

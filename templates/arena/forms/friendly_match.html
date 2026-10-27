@@ -1,0 +1,464 @@
+{% block title %}Deploy Scrim | X-Fight{% endblock %}
+
+{% block content %}
+<section class="scrim-page">
+    <div class="scrim-container">
+
+        <a href="{% url 'dashboard' %}" class="scrim-back">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back to Dashboard</span>
+        </a>
+
+        <header class="scrim-header">
+            <p class="scrim-eyebrow">Friendly matches</p>
+            <h1>Deploy Scrim</h1>
+            <p class="scrim-description">
+                Configure your match, invite your Game Mates, and optionally
+                create a Battle Credits reward pool.
+            </p>
+        </header>
+
+        <form method="POST" id="match-creation-form" class="scrim-form">
+            {% csrf_token %}
+            {{ form.user_timezone }}
+
+            <div class="scrim-section">
+                <h2>Match details</h2>
+                <p class="scrim-section-description">
+                    Set the game and schedule for your scrim.
+                </p>
+
+                <div class="scrim-field">
+                    <label for="{{ form.name.id_for_label }}">Match name</label>
+                    {{ form.name }}
+                    {{ form.name.errors }}
+                </div>
+
+                <div class="scrim-field">
+                    <label for="{{ form.game.id_for_label }}">Game</label>
+                    {{ form.game }}
+                    {{ form.game.errors }}
+                </div>
+
+                <div class="scrim-field-grid">
+                    <div class="scrim-field">
+                        <label for="{{ form.match_start_time.id_for_label }}">
+                            Start date and time
+                        </label>
+                        {{ form.match_start_time }}
+                        {{ form.match_start_time.errors }}
+                    </div>
+
+                    <div class="scrim-field">
+                        <label for="{{ form.match_end_time.id_for_label }}">
+                            End date and time
+                        </label>
+                        {{ form.match_end_time }}
+                        {{ form.match_end_time.errors }}
+                    </div>
+                </div>
+
+                <div class="scrim-field">
+                    <label for="{{ form.duration.id_for_label }}">
+                        Match duration
+                    </label>
+                    {{ form.duration }}
+                    {{ form.duration.errors }}
+                </div>
+            </div>
+
+            <div class="scrim-section">
+                <h2>Reward pool</h2>
+                <p class="scrim-section-description">
+                    Optionally enable a Battle Credits contribution pool.
+                </p>
+
+                <label for="id_loot_enable" class="scrim-toggle">
+                    {{ form.loot_enable }}
+                    <span>
+                        <strong>Enable reward pool</strong>
+                        <small>Use Battle Credits for this match.</small>
+                    </span>
+                </label>
+                {{ form.loot_enable.errors }}
+
+                <div id="loot-amount-container" class="scrim-field" style="display: none;">
+                    <label for="id_loot">Contribution amount (BP)</label>
+                    {{ form.loot }}
+                    {{ form.loot.errors }}
+                    <p class="scrim-help">
+                        Enter the contribution amount required by your match rules.
+                    </p>
+                </div>
+            </div>
+
+        <div class="scrim-field">
+            <label>Select Game Mates</label>
+        
+            <div class="scrim-player-list" id="user-checkboxes">
+                {% for checkbox in form.match_players %}
+                <div class="scrim-player">
+                    <input type="checkbox" name="{{ checkbox.data.name }}" value="{{ checkbox.data.value }}"
+                        id="{{ checkbox.id_for_label }}" {% if checkbox.data.selected %}checked{% endif %}>
+        
+                    <label for="{{ checkbox.id_for_label }}">
+                        {{ checkbox.choice_label }}
+                    </label>
+                </div>
+                {% empty %}
+                <p class="scrim-empty">No Game Mates available.</p>
+                {% endfor %}
+            </div>
+        
+            {{ form.match_players.errors }}
+        </div>
+
+            <div class="scrim-actions">
+                <button type="submit" class="scrim-submit">
+                    <span>Deploy scrim</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<style>
+    .scrim-page {
+        --scrim-text: var(--text-primary, #18181b);
+        --scrim-muted: var(--text-secondary, #71717a);
+        --scrim-border: var(--border-color, #e4e4e7);
+        --scrim-surface: var(--card-bg, #ffffff);
+        --scrim-subtle: var(--page-bg, #fafafa);
+
+        padding: 32px 18px 48px;
+        color: var(--scrim-text);
+    }
+
+    .scrim-container {
+        width: 100%;
+        max-width: 720px;
+        margin: 0 auto;
+    }
+
+    .scrim-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 26px;
+        color: var(--scrim-muted);
+        font-size: 13px;
+        text-decoration: none;
+        transition: color .2s ease;
+    }
+
+    .scrim-back:hover {
+        color: var(--scrim-text);
+    }
+
+    .scrim-header {
+        margin-bottom: 26px;
+    }
+
+    .scrim-eyebrow {
+        margin: 0 0 7px;
+        color: var(--scrim-muted);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    .scrim-header h1 {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 36px);
+        font-weight: 650;
+        line-height: 1.2;
+        letter-spacing: -.04em;
+    }
+
+    .scrim-description {
+        max-width: 520px;
+        margin: 10px 0 0;
+        color: var(--scrim-muted);
+        font-size: 14px;
+        line-height: 1.65;
+    }
+
+    .scrim-form {
+        overflow: hidden;
+        border: 1px solid var(--scrim-border);
+        border-radius: 12px;
+        background: var(--scrim-surface);
+    }
+
+    .scrim-section {
+        padding: 24px;
+        border-bottom: 1px solid var(--scrim-border);
+    }
+
+    .scrim-section h2 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 650;
+        letter-spacing: -.02em;
+    }
+
+    .scrim-section-description {
+        margin: 6px 0 22px;
+        color: var(--scrim-muted);
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .scrim-field {
+        min-width: 0;
+        margin-bottom: 19px;
+    }
+
+    .scrim-field:last-child {
+        margin-bottom: 0;
+    }
+
+    .scrim-field-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .scrim-field>label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--scrim-text);
+        font-size: 13px;
+        font-weight: 550;
+    }
+
+    .scrim-field input:not([type="checkbox"]):not([type="hidden"]),
+    .scrim-field select,
+    .scrim-field textarea {
+        display: block;
+        width: 100%;
+        min-height: 43px;
+        box-sizing: border-box;
+        padding: 10px 12px;
+        border: 1px solid var(--scrim-border);
+        border-radius: 7px;
+        outline: none;
+        background: var(--scrim-surface);
+        color: var(--scrim-text);
+        font-family: inherit;
+        font-size: 14px;
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .scrim-field input:focus,
+    .scrim-field select:focus,
+    .scrim-field textarea:focus {
+        border-color: #71717a;
+        box-shadow: 0 0 0 3px rgb(113 113 122 / 12%);
+    }
+
+    .scrim-field input[type="datetime-local"] {
+        max-width: 100%;
+    }
+
+    .scrim-field input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+    }
+
+    .scrim-toggle {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px;
+        border: 1px solid var(--scrim-border);
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .scrim-toggle input[type="checkbox"] {
+        width: 17px;
+        height: 17px;
+        flex: 0 0 auto;
+        margin: 0;
+        accent-color: #52525b;
+        cursor: pointer;
+    }
+
+    .scrim-toggle span {
+        display: grid;
+        gap: 4px;
+    }
+
+    .scrim-toggle strong {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .scrim-toggle small {
+        color: var(--scrim-muted);
+        font-size: 12px;
+    }
+
+    #loot-amount-container {
+        margin-top: 18px;
+    }
+
+    .scrim-help {
+        margin: 7px 0 0;
+        color: var(--scrim-muted);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .scrim-player-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 8px;
+    border: 1px solid var(--scrim-border);
+    border-radius: 8px;
+}
+
+.scrim-player {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.scrim-player:hover {
+    background: var(--scrim-subtle);
+}
+
+.scrim-player input[type="checkbox"] {
+    appearance: auto !important;
+    display: inline-block !important;
+    position: static !important;
+    width: 17px !important;
+    height: 17px !important;
+    min-width: 17px;
+    margin: 0 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    accent-color: #52525b;
+    cursor: pointer;
+}
+
+.scrim-player label {
+    margin: 0;
+    font-size: 13px;
+    cursor: pointer;
+}
+    .scrim-empty {
+        margin: 0;
+        padding: 12px;
+        color: var(--scrim-muted);
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .scrim-actions {
+        display: flex;
+        justify-content: flex-end;
+        padding: 18px 24px;
+    }
+
+    .scrim-submit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-height: 43px;
+        padding: 11px 17px;
+        border: 1px solid #18181b;
+        border-radius: 7px;
+        background: #18181b;
+        color: #fff;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 550;
+        cursor: pointer;
+        transition: background .2s ease;
+    }
+
+    .scrim-submit:hover {
+        background: #3f3f46;
+    }
+
+    .scrim-form .errorlist {
+        margin: 7px 0 0;
+        padding-left: 17px;
+        color: #dc2626;
+        font-size: 12px;
+    }
+
+    @media (max-width: 600px) {
+        .scrim-page {
+            padding: 22px 12px 32px;
+        }
+
+        .scrim-back {
+            margin-bottom: 22px;
+        }
+
+        .scrim-section {
+            padding: 19px 15px;
+        }
+
+        .scrim-field-grid {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+
+        .scrim-actions {
+            padding: 15px;
+        }
+
+        .scrim-submit {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("match-creation-form");
+        const timezoneField = document.querySelector(
+            'input[name="user_timezone"]'
+        );
+
+        function setTimezone() {
+            if (timezoneField) {
+                timezoneField.value =
+                    Intl.DateTimeFormat().resolvedOptions().timeZone;
+            }
+        }
+
+        setTimezone();
+
+        if (form) {
+            form.addEventListener("submit", setTimezone);
+        }
+
+        const lootCheckbox = document.getElementById("id_loot_enable");
+        const lootContainer = document.getElementById("loot-amount-container");
+
+        if (!lootCheckbox || !lootContainer) {
+            return;
+        }
+
+        function toggleLootAmount() {
+            lootContainer.style.display =
+                lootCheckbox.checked ? "block" : "none";
+        }
+
+        lootCheckbox.addEventListener("change", toggleLootAmount);
+        toggleLootAmount();
+    });
+</script>
+{% endblock %}

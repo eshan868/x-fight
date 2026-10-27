@@ -1,0 +1,529 @@
+{% extends "layouts/base_layout.html" %}
+
+{% block title %}
+Schedule Team Meeting | X-Fight
+{% endblock %}
+
+
+{% block content %}
+
+<style>
+
+.meeting-page {
+
+    min-height: calc(100vh - 80px);
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: flex-start;
+
+    padding: 50px 25px;
+
+}
+
+
+.meeting-container {
+
+    width: 100%;
+
+    max-width: 650px;
+
+}
+
+
+.meeting-card {
+
+    background: #14141A;
+
+    border: 1px solid #292933;
+
+    border-radius: 18px;
+
+    padding: 35px;
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.4);
+
+}
+
+
+.meeting-heading {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+    margin-bottom: 30px;
+
+}
+
+
+.meeting-heading-icon {
+
+    width: 55px;
+
+    height: 55px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: rgba(255, 0, 0, 0.08);
+
+    border: 1px solid rgba(255, 0, 0, 0.35);
+
+    border-radius: 14px;
+
+    color: #ff0000;
+
+    font-size: 24px;
+
+}
+
+
+.meeting-heading h2 {
+
+    margin: 0;
+
+    color: #ffffff;
+
+    font-family: "Aclonica", sans-serif;
+
+    font-size: 22px;
+
+}
+
+
+.meeting-heading p {
+
+    margin: 6px 0 0;
+
+    color: #777784;
+
+    font-size: 12px;
+
+}
+
+
+.schedule-form p {
+
+    margin: 0 0 22px;
+
+}
+
+
+.schedule-form p label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #d7d7e0;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+}
+
+
+.schedule-form p input,
+.schedule-form p textarea,
+.schedule-form p select {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 13px 14px;
+
+    background: #1E1E26;
+
+    border: 1px solid #30303A;
+
+    border-radius: 10px;
+
+    color: #ffffff;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 13px;
+
+    outline: none;
+
+    transition: .2s;
+
+}
+
+
+.schedule-form p input:focus,
+.schedule-form p textarea:focus,
+.schedule-form p select:focus {
+
+    border-color: #ff0000;
+
+    box-shadow:
+        0 0 0 3px rgba(255, 0, 0, 0.08);
+
+}
+
+
+.schedule-form p input::placeholder,
+.schedule-form p textarea::placeholder {
+
+    color: #656570;
+
+}
+
+
+.schedule-form p textarea {
+
+    min-height: 110px;
+
+    resize: vertical;
+
+}
+
+
+.schedule-form p input[type="datetime-local"] {
+
+    cursor: pointer;
+
+    color-scheme: dark;
+
+}
+
+
+.schedule-form p
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+
+    cursor: pointer;
+
+    filter: invert(1);
+
+    opacity: .8;
+
+    width: 20px;
+
+    height: 20px;
+
+}
+
+
+.schedule-form p input[type="checkbox"] {
+
+    width: 18px;
+
+    height: 18px;
+
+    accent-color: #ff0000;
+
+    cursor: pointer;
+
+}
+
+
+.schedule-form p:has(
+    input[type="checkbox"]
+) {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+}
+
+
+.schedule-form p:has(
+    input[type="checkbox"]
+) label {
+
+    margin: 0;
+
+    order: 2;
+
+}
+
+
+.schedule-form p:has(
+    input[type="checkbox"]
+) input {
+
+    order: 1;
+
+}
+
+
+.schedule-form .helptext {
+
+    display: block;
+
+    margin-top: 5px;
+
+    color: #656570;
+
+    font-size: 10px;
+
+}
+
+
+.schedule-form .errorlist {
+
+    list-style: none;
+
+    padding: 0;
+
+    margin: 7px 0 0;
+
+    color: #ff4d4d;
+
+    font-size: 11px;
+
+}
+
+
+.form-error {
+
+    margin-bottom: 20px;
+
+    padding: 12px 14px;
+
+    border-radius: 9px;
+
+    background: rgba(255, 0, 0, 0.08);
+
+    border: 1px solid rgba(255, 0, 0, 0.25);
+
+    color: #ff5b5b;
+
+    font-size: 12px;
+
+}
+
+
+.schedule-btn {
+
+    width: 100%;
+
+    margin-top: 5px;
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #ff0000;
+
+    color: #ffffff;
+
+    font-family: "Aclonica", sans-serif;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition: .2s;
+
+}
+
+
+.schedule-btn:hover {
+
+    background: #d90000;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 8px 25px rgba(255, 0, 0, 0.2);
+
+}
+
+
+@media(max-width: 600px) {
+
+    .meeting-page {
+
+        padding: 30px 15px;
+
+    }
+
+
+    .meeting-card {
+
+        padding: 25px 20px;
+
+    }
+
+
+    .meeting-heading h2 {
+
+        font-size: 18px;
+
+    }
+
+}
+
+</style>
+
+
+<div class="meeting-page">
+
+    <div class="meeting-container">
+
+        <div class="meeting-card">
+
+
+            <div class="meeting-heading">
+
+                <div class="meeting-heading-icon">
+
+                    <i class="fa-solid fa-calendar-days"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h2>
+                        Schedule Team Meeting
+                    </h2>
+
+                    <p>
+                        Create a meeting for your team members.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            {% if form.non_field_errors %}
+
+                <div class="form-error">
+
+                    {{ form.non_field_errors }}
+
+                </div>
+
+            {% endif %}
+
+
+            <form
+                method="POST"
+                class="schedule-form"
+            >
+
+                {% csrf_token %}
+                <input type="hidden" name="user_timezone" id="id_user_timezone">
+
+                {{ form.as_p }}
+
+
+                <button
+                    type="submit"
+                    class="schedule-btn"
+                >
+
+                    <i class="fa-solid fa-calendar-check"></i>
+
+                    Schedule Meeting
+
+                </button>
+
+            </form>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        const startInput =
+            document.querySelector(
+                "input[name='start_time']"
+            );
+
+        const endInput =
+            document.querySelector(
+                "input[name='end_time']"
+            );
+
+
+        if (!startInput || !endInput) {
+
+            return;
+
+        }
+
+
+        const now =
+            new Date();
+
+
+        const local =
+            new Date(
+                now.getTime()
+                -
+                now.getTimezoneOffset()
+                * 60000
+            );
+
+
+        const minimum =
+            local
+                .toISOString()
+                .slice(0, 16);
+
+
+        startInput.min =
+            minimum;
+
+
+        endInput.min =
+            minimum;
+
+
+        startInput.addEventListener(
+            "change",
+            function() {
+
+                endInput.min =
+                    startInput.value;
+
+                if (
+                    endInput.value &&
+                    endInput.value <= startInput.value
+                ) {
+
+                    endInput.value = "";
+
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

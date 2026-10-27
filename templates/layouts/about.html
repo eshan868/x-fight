@@ -1,0 +1,413 @@
+<escape>{% extends "layouts/base_layout.html" %}
+    {% load static %}
+
+    {% block title %}About Us | X-Fight{% endblock %}
+
+    {% block content %}
+
+    <style>
+    
+        .about-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .about-hero {
+            position: relative;
+            padding: 80px 35px;
+            text-align: center;
+            border: 1px solid rgba(255, 0, 0, 0.25);
+            border-radius: 20px;
+            background:
+                radial-gradient(ellipse at top, rgba(43, 0, 83, 0.55), transparent 65%),
+                linear-gradient(145deg, #14141A, #09090B);
+            overflow: hidden;
+        }
+
+        .about-label {
+            display: inline-block;
+            color: #ff3333;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .about-hero h1 {
+            font-family: 'Aclonica', sans-serif;
+            font-size: clamp(2.2rem, 6vw, 4.5rem);
+            line-height: 1.2;
+            margin: 0 0 22px;
+            color: #ffffff;
+        }
+
+        .about-hero h1 span {
+            color: #ff2222;
+        }
+
+        .about-hero p {
+            max-width: 720px;
+            margin: 0 auto;
+            color: #B8B8C5;
+            line-height: 1.9;
+            font-size: 1rem;
+        }
+
+        .about-section {
+            margin-top: 65px;
+        }
+
+        .about-section-heading {
+            margin-bottom: 25px;
+        }
+
+        .about-section-heading h2 {
+            font-family: 'Aclonica', sans-serif;
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .about-section-heading p {
+            color: #B8B8C5;
+            line-height: 1.8;
+            max-width: 760px;
+            margin: 0;
+        }
+
+        .about-accent {
+            width: 65px;
+            height: 3px;
+            background: #ff0000;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .about-mission {
+            padding: 30px;
+            background: #14141A;
+            border: 1px solid #29212F;
+            border-left: 3px solid #ff0000;
+            border-radius: 12px;
+        }
+
+        .about-mission p {
+            margin: 0;
+            color: #B8B8C5;
+            font-size: 1rem;
+            line-height: 1.9;
+        }
+
+        .about-features {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .about-feature-card {
+            padding: 27px 24px;
+            min-height: 200px;
+            background: linear-gradient(145deg, #17171E, #101014);
+            border: 1px solid #29212F;
+            border-radius: 14px;
+            transition: transform 0.25s ease, border-color 0.25s ease;
+        }
+
+        .about-feature-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff0000;
+        }
+
+        .about-feature-number {
+            display: block;
+            color: #ff3333;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 18px;
+        }
+
+        .about-feature-card h3 {
+            color: #ffffff;
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .about-feature-card p {
+            color: #B8B8C5;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .about-vision {
+            padding: 35px;
+            border-radius: 16px;
+            background: linear-gradient(120deg,
+                    rgba(43, 0, 83, 0.5),
+                    rgba(20, 20, 26, 0.95));
+            border: 1px solid rgba(126, 54, 190, 0.35);
+        }
+
+        .about-vision p {
+            color: #C4C4D0;
+            line-height: 1.9;
+            margin: 0;
+        }
+
+        .about-cta {
+            margin-top: 65px;
+            padding: 55px 25px;
+            text-align: center;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 18px;
+            background: radial-gradient(ellipse at center,
+                    rgba(43, 0, 83, 0.4),
+                    #101014 75%);
+        }
+
+        .about-cta h2 {
+            font-family: 'Aclonica', sans-serif;
+            font-size: clamp(1.5rem, 4vw, 2.4rem);
+            margin-bottom: 18px;
+        }
+
+        .about-cta p {
+            color: #B8B8C5;
+            line-height: 1.8;
+            max-width: 650px;
+            margin: 0 auto 28px;
+        }
+
+        .about-cta-link {
+            display: inline-block;
+            padding: 14px 28px;
+            border-radius: 8px;
+            background: #ff0000;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .about-cta-link:hover {
+            background: #cc0000;
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .about-tagline {
+            margin-top: 28px;
+            color: #ffffff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 900px) {
+            .about-features {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .about-page {
+                padding: 25px 14px 50px;
+            }
+
+            .about-hero {
+                padding: 55px 20px;
+            }
+
+            .about-features {
+                grid-template-columns: 1fr;
+            }
+
+            .about-feature-card {
+                min-height: auto;
+            }
+
+            .about-mission,
+            .about-vision {
+                padding: 24px;
+            }
+
+            .about-section {
+                margin-top: 45px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .about-feature-card,
+            .about-cta-link {
+                transition: none;
+            }
+
+            .about-feature-card:hover,
+            .about-cta-link:hover {
+                transform: none;
+            }
+        }
+    </style>
+
+    <main class="about-page">
+        <div class="about-container">
+
+            <!-- Hero Section -->
+            <section class="about-hero">
+                <span class="about-label">Discover GameArena</span>
+
+                <h1>About <span>X-Fight</span></h1>
+
+                <p>
+                    Where gamers connect, compete, and conquer.
+                    X-Fight — GameArena is a gaming community built for players
+                    who want more than just playing games. Connect with other
+                    gamers, compete in tournaments, build teams, and create
+                    your own gaming journey.
+                </p>
+            </section>
+
+            <!-- Mission Section -->
+            <section class="about-section">
+                <div class="about-section-heading">
+                    <div class="about-accent"></div>
+                    <h2>Our Mission</h2>
+                </div>
+
+                <div class="about-mission">
+                    <p>
+                        Our mission is to create a connected gaming environment
+                        where players can discover teammates, participate in
+                        competitions, track their progress, and celebrate their
+                        achievements. We believe gaming is about more than
+                        winning. It is about teamwork, strategy, dedication,
+                        and the community we build along the way.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="about-section">
+                <div class="about-section-heading">
+                    <div class="about-accent"></div>
+                    <h2>What You Can Do on GameArena</h2>
+                    <p>
+                        Everything you need to connect with players and make
+                        your gaming experience more competitive and social.
+                    </p>
+                </div>
+
+                <div class="about-features">
+
+                    <article class="about-feature-card">
+                        <span class="about-feature-number">01 / COMPETE</span>
+                        <h3>Gaming Tournaments</h3>
+                        <p>
+                            Join tournaments, challenge other players, and
+                            test your skills in competitive matches.
+                        </p>
+                    </article>
+
+                    <article class="about-feature-card">
+                        <span class="about-feature-number">02 / CONNECT</span>
+                        <h3>GameMates and Friends</h3>
+                        <p>
+                            Discover fellow gamers, add GameMates, and organize
+                            friendly matches with your connections.
+                        </p>
+                    </article>
+
+                    <article class="about-feature-card">
+                        <span class="about-feature-number">03 / TEAM UP</span>
+                        <h3>Team Collaboration</h3>
+                        <p>
+                            Bring players together, coordinate with your squad,
+                            and prepare for your next challenge.
+                        </p>
+                    </article>
+
+                    <article class="about-feature-card">
+                        <span class="about-feature-number">04 / COMMUNICATE</span>
+                        <h3>Chat and Meetings</h3>
+                        <p>
+                            Stay connected with your gaming community through
+                            messaging and team communication features.
+                        </p>
+                    </article>
+
+                    <article class="about-feature-card">
+                        <span class="about-feature-number">05 / PROGRESS</span>
+                        <h3>Player Progress</h3>
+                        <p>
+                            Build your player profile, earn XP, and follow
+                            your journey as you develop your skills.
+                        </p>
+                    </article>
+
+                    <article class="about-feature-card">
+                        <span class="about-feature-number">06 / CREATE</span>
+                        <h3>Friendly Matches</h3>
+                        <p>
+                            Set up friendly matches, challenge your connections,
+                            and bring your own gaming ideas to life.
+                        </p>
+                    </article>
+
+                </div>
+            </section>
+
+            <!-- Vision Section -->
+            <section class="about-section">
+                <div class="about-section-heading">
+                    <div class="about-accent"></div>
+                    <h2>Our Vision</h2>
+                </div>
+
+                <div class="about-vision">
+                    <p>
+                        We envision a gaming platform where every player has
+                        the opportunity to improve, connect, compete, and become
+                        part of something bigger. GameArena aims to make
+                        competitive gaming more accessible, social, and exciting
+                        by bringing players and their gaming communities together.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Call to Action -->
+            <section class="about-cta">
+                <span class="about-label">Your Next Match Starts Here</span>
+
+                <h2>Join the Arena</h2>
+
+                <p>
+                    Find your teammates, enter the competition, and make your
+                    mark. Build connections, improve your skills, and take the
+                    next step in your gaming journey with X-Fight.
+                </p>
+
+                {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="about-cta-link">
+                    Enter GameArena
+                </a>
+                {% else %}
+                <a href="{% url 'signup' %}" class="about-cta-link">
+                    Join GameArena
+                </a>
+                {% endif %}
+
+                <div class="about-tagline">
+                    X-FIGHT / GAMEARENA — PLAY YOUR GAME. OWN YOUR ARENA.
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    {% endblock %}
+</escape>

@@ -1,0 +1,1677 @@
+
+{% extends "layouts/base_layout.html" %}
+{% load static %}
+
+{% block title %}
+{{ team.name }} | X-Fight
+{% endblock %}
+
+{% block content %}
+
+<style>
+/* =========================================================
+   DASHBOARD BASE — FOOTER-SAFE LAYOUT
+========================================================= */
+
+.team-dashboard,
+.team-dashboard * {
+    box-sizing: border-box;
+}
+
+.team-dashboard {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    margin: 0;
+    background: #08090b;
+    color: #fff;
+    font-family: Poppins, sans-serif;
+    position: relative;
+    isolation: isolate;
+}
+
+.team-sidebar {
+    flex: 0 0 245px;
+    width: 245px;
+    min-width: 0;
+    align-self: stretch;
+    padding: 25px 18px;
+    background: #0a0b0e;
+    border-right: 1px solid #202126;
+}
+
+.team-brand {
+    padding: 10px 10px 25px;
+    border-bottom: 1px solid #202126;
+    margin-bottom: 20px;
+}
+
+.team-brand-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #26080c;
+    border: 1px solid #6e1018;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff2635;
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+.team-brand h2 {
+    font-size: 17px;
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.team-brand p {
+    margin: 4px 0 0;
+    color: #777b85;
+    font-size: 11px;
+}
+
+.team-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.team-nav-title {
+    color: #555963;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    margin: 18px 10px 7px;
+}
+
+.team-nav-button {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: #92959d;
+    padding: 12px 13px;
+    border-radius: 8px;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background .2s, color .2s;
+}
+
+.team-nav-button:hover {
+    background: #17181d;
+    color: #fff;
+}
+
+.team-nav-button.active {
+    background: #280a0e;
+    color: #fff;
+    border-left: 2px solid #ff1d2e;
+}
+
+.team-nav-icon {
+    width: 21px;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+/* =========================================================
+   SIDEBAR BOTTOM
+========================================================= */
+
+.team-sidebar-bottom {
+    margin-top: 35px;
+    padding: 15px 10px;
+    border-top: 1px solid #202126;
+}
+
+.member-limit {
+    color: #777b85;
+    font-size: 11px;
+    margin-bottom: 8px;
+}
+
+.member-limit strong {
+    color: #fff;
+}
+
+.member-progress {
+    width: 100%;
+    height: 4px;
+    background: #25262b;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.member-progress span {
+    display: block;
+    height: 100%;
+    background: #ff2635;
+}
+
+.leave-team-button {
+    width: 100%;
+    margin-top: 18px;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid #382126;
+    color: #c66b72;
+    border-radius: 7px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+}
+
+.leave-team-button:hover {
+    background: #180b0e;
+}
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+.team-main {
+    flex: 1 1 0;
+    width: 0;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    padding: 35px;
+    overflow-wrap: anywhere;
+}
+
+.team-content {
+    width: 100%;
+    max-width: 1150px;
+    min-width: 0;
+    margin: 0 auto;
+}
+
+.team-section {
+    display: none;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+}
+
+.team-section.active {
+    display: block;
+    animation: fadeIn .2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 28px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 29px;
+    overflow-wrap: anywhere;
+}
+
+.page-header p {
+    margin: 7px 0 0;
+    color: #737780;
+    font-size: 13px;
+}
+
+.captain-label {
+    padding: 7px 11px;
+    background: #21190b;
+    color: #d9ad4d;
+    border: 1px solid #493715;
+    border-radius: 20px;
+    font-size: 11px;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.primary-button {
+    border: 0;
+    background: #ff2635;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.primary-button:hover {
+    background: #dc1422;
+}
+
+.enter-meeting-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 8px;
+    background: #27282d;
+    color: #fff;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+a.enter-meeting-button {
+    background: #ff2635;
+    color: #fff;
+    cursor: pointer;
+}
+
+a.enter-meeting-button:hover {
+    background: #dc1422;
+}
+
+button.enter-meeting-button:disabled {
+    background: #27282d;
+    color: #858991;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    min-width: 0;
+    background: #0d0e12;
+    border: 1px solid #202126;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.stat-card-label {
+    color: #6e727b;
+    font-size: 11px;
+    margin-bottom: 10px;
+}
+
+.stat-card-value {
+    font-size: 25px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.stat-card-sub {
+    color: #777b85;
+    font-size: 10px;
+    margin-top: 4px;
+}
+
+/* =========================================================
+   CARDS AND OVERVIEW
+========================================================= */
+
+.overview-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 18px;
+}
+
+.dashboard-card {
+    min-width: 0;
+    max-width: 100%;
+    background: #0d0e12;
+    border: 1px solid #202126;
+    border-radius: 13px;
+    overflow: hidden;
+}
+
+.dashboard-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 18px 20px;
+    border-bottom: 1px solid #202126;
+}
+
+.dashboard-card-header h2 {
+    font-size: 15px;
+    margin: 0;
+}
+
+.dashboard-card-body {
+    min-width: 0;
+    padding: 15px;
+}
+
+/* =========================================================
+   MATCHES
+========================================================= */
+
+.match-row {
+    padding: 15px;
+    background: #0a0b0e;
+    border: 1px solid #1d1e23;
+    border-radius: 9px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.match-info {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.match-info strong {
+    display: block;
+    font-size: 13px;
+}
+
+.match-info span {
+    display: block;
+    color: #858991;
+    font-size: 10px;
+    margin-top: 4px;
+}
+
+.match-status {
+    color: #d0d2d7;
+    font-size: 10px;
+    border: 1px solid #2b2d33;
+    border-radius: 20px;
+    padding: 5px 9px;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   TOURNAMENTS
+========================================================= */
+
+.tournament-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-bottom: 1px solid #1b1c20;
+}
+
+.tournament-row:last-child {
+    border-bottom: 0;
+}
+
+.tournament-icon {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    border-radius: 9px;
+    background: #21090d;
+    border: 1px solid #451117;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff3341;
+}
+
+.tournament-info {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.tournament-info strong {
+    display: block;
+    font-size: 12px;
+}
+
+.tournament-info span {
+    color: #858991;
+    font-size: 10px;
+}
+
+/* =========================================================
+   MEMBERS
+========================================================= */
+
+.members-card {
+    margin-top: 18px;
+}
+
+.member-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+}
+
+.member-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-width: 0;
+    padding: 11px;
+    background: #0a0b0e;
+    border: 1px solid #1d1e23;
+    border-radius: 9px;
+}
+
+.avatar {
+    width: 37px;
+    height: 37px;
+    flex: 0 0 37px;
+    border-radius: 50%;
+    background: #211116;
+    border: 1px solid #42141c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff5964;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.member-name {
+    flex: 1 1 80px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.member-name strong {
+    display: block;
+    font-size: 12px;
+}
+
+.member-name span {
+    display: block;
+    margin-top: 3px;
+    color: #858991;
+    font-size: 9px;
+}
+
+.captain-mini {
+    color: #d9ad4d;
+    font-size: 8px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.popup-remove {
+    background: transparent;
+    border: 1px solid #482027;
+    color: #d66b74;
+    border-radius: 6px;
+    padding: 6px 9px;
+    font-size: 9px;
+    cursor: pointer;
+}
+
+.popup-remove:hover {
+    background: #260b10;
+}
+
+/* =========================================================
+   MEETING LIST
+========================================================= */
+
+.meeting-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.meeting-card {
+    min-width: 0;
+    background: #0d0e12;
+    border: 1px solid #202126;
+    border-radius: 13px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    transition: border-color .2s;
+}
+
+.meeting-card:hover {
+    border-color: #35373e;
+}
+
+.meeting-icon {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    border-radius: 12px;
+    background: #21090d;
+    border: 1px solid #451117;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff2635;
+    font-size: 21px;
+}
+
+.meeting-info {
+    min-width: 0;
+    flex: 1 1 180px;
+    overflow-wrap: anywhere;
+}
+
+.meeting-info h3 {
+    margin: 0;
+    font-size: 14px;
+}
+
+.meeting-info p {
+    margin: 5px 0 9px;
+    color: #858991;
+    font-size: 10px;
+}
+
+.meeting-time {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 15px;
+    color: #858991;
+    font-size: 10px;
+}
+
+.meeting-time span {
+    white-space: normal;
+}
+
+.meeting-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.meeting-status {
+    padding: 6px 9px;
+    border: 1px solid #292b31;
+    border-radius: 20px;
+    color: #858991;
+    font-size: 9px;
+    white-space: nowrap;
+}
+
+.status-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #777b83;
+    margin-right: 5px;
+}
+
+.live-status {
+    color: #ff5661;
+    border-color: #4a1d23;
+}
+
+.status-dot.live {
+    background: #ff2635;
+}
+
+.ended-status {
+    color: #858991;
+}
+
+/* =========================================================
+   ACTIVE MEETING
+========================================================= */
+
+.active-meeting {
+    background: #08090b;
+    border: 1px solid #202126;
+    border-radius: 13px;
+    overflow: hidden;
+    margin-top: 15px;
+}
+
+.active-meeting-header {
+    min-height: 70px;
+    padding: 14px 18px;
+    background: #0d0e12;
+    border-bottom: 1px solid #202126;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.live-label {
+    color: #ff4653;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.active-meeting-header h2 {
+    margin: 5px 0 0;
+    font-size: 16px;
+}
+
+.meeting-controls-top {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.meeting-top-button,
+.meeting-leave-button {
+    padding: 9px 13px;
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.meeting-top-button {
+    background: #17181c;
+    border: 1px solid #2a2c32;
+    color: #b7bac0;
+}
+
+.meeting-leave-button {
+    background: transparent;
+    border: 1px solid #4b2026;
+    color: #dc6c75;
+}
+
+.zego-meeting-container {
+    width: 100%;
+    height: 650px;
+    min-height: 450px;
+    background: #050607;
+}
+
+/* Fullscreen intentionally overlays the screen only when enabled. */
+
+.active-meeting.fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    border-radius: 0;
+    margin: 0;
+}
+
+.active-meeting.fullscreen .zego-meeting-container {
+    height: calc(100vh - 70px);
+    height: calc(100dvh - 70px);
+}
+
+/* =========================================================
+   POPUPS
+========================================================= */
+
+.team-popup {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.team-popup.active {
+    display: flex;
+}
+
+.popup-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, .78);
+    backdrop-filter: blur(5px);
+}
+
+.popup-box {
+    position: relative;
+    z-index: 2;
+    width: 450px;
+    max-width: 100%;
+    max-height: calc(100dvh - 30px);
+    overflow-y: auto;
+    background: #0d0e12;
+    border: 1px solid #2b2d33;
+    border-radius: 15px;
+    padding: 23px;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, .7);
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.popup-header h2 {
+    margin: 0;
+    font-size: 19px;
+}
+
+.popup-header p {
+    margin: 5px 0 0;
+    color: #858991;
+    font-size: 11px;
+}
+
+.popup-close {
+    flex: 0 0 auto;
+    border: 0;
+    background: transparent;
+    color: #777b84;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+/* =========================================================
+   SCHEDULE FORM
+========================================================= */
+
+.schedule-form p {
+    margin: 0 0 17px;
+}
+
+.schedule-form p label {
+    display: block;
+    color: #9a9da5;
+    font-size: 10px;
+    margin-bottom: 7px;
+}
+
+.schedule-form p input,
+.schedule-form p textarea,
+.schedule-form p select {
+    width: 100%;
+    min-width: 0;
+    padding: 11px 12px;
+    background: #08090b;
+    border: 1px solid #292b31;
+    color: #fff;
+    border-radius: 8px;
+    outline: none;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.schedule-form p input:focus,
+.schedule-form p textarea:focus,
+.schedule-form p select:focus {
+    border-color: #ff2635;
+    box-shadow: 0 0 0 2px rgba(255, 38, 53, .08);
+}
+
+.schedule-form p textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.schedule-form p input[type="datetime-local"] {
+    cursor: pointer;
+}
+
+.schedule-form p input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(1);
+    opacity: .8;
+}
+
+.schedule-form p input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #ff2635;
+    cursor: pointer;
+}
+
+.schedule-form p:has(input[type="checkbox"]) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.schedule-form p:has(input[type="checkbox"]) label {
+    margin: 0;
+}
+
+.schedule-form .helptext {
+    display: block;
+    margin-top: 5px;
+    color: #858991;
+    font-size: 9px;
+}
+
+.schedule-form .errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 6px 0 0;
+    color: #ff5964;
+    font-size: 10px;
+}
+
+.form-errors {
+    color: #ff5964;
+    font-size: 10px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(255, 38, 53, .06);
+    border: 1px solid rgba(255, 38, 53, .15);
+    border-radius: 8px;
+}
+
+.form-submit {
+    width: 100%;
+    padding: 12px;
+    background: #ff2635;
+    border: 0;
+    color: white;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.form-submit:hover {
+    background: #dc1422;
+}
+
+/* =========================================================
+   EMPTY STATES
+========================================================= */
+
+.empty {
+    text-align: center;
+    padding: 35px 15px;
+    color: #858991;
+    font-size: 11px;
+}
+
+.no-meetings {
+    text-align: center;
+    padding: 45px 20px;
+    background: #0d0e12;
+    border: 1px solid #202126;
+    border-radius: 13px;
+}
+
+.no-meetings p {
+    color: #858991;
+    font-size: 11px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+    .team-sidebar {
+        flex-basis: 220px;
+        width: 220px;
+    }
+
+    .team-main {
+        padding: 25px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .overview-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 800px) {
+    .meeting-card {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .meeting-info {
+        flex: 1 1 180px;
+    }
+
+    .meeting-actions {
+        flex: 1 1 100%;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 650px) {
+    .team-dashboard {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .team-sidebar {
+        flex: 0 0 auto;
+        width: 100%;
+        min-height: 0;
+        padding: 18px;
+        border-right: 0;
+        border-bottom: 1px solid #202126;
+    }
+
+    .team-brand {
+        padding-bottom: 16px;
+    }
+
+    .team-nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 5px;
+    }
+
+    .team-nav-title {
+        grid-column: 1 / -1;
+    }
+
+    .team-nav-button {
+        min-width: 0;
+        padding: 10px;
+        font-size: 11px;
+    }
+
+    .team-sidebar-bottom {
+        display: none;
+    }
+
+    .team-main {
+        width: 100%;
+        padding: 18px;
+    }
+
+    .page-header h1 {
+        font-size: 24px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .stat-card-value {
+        font-size: 21px;
+    }
+
+    .member-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .meeting-time {
+        gap: 7px;
+    }
+
+    .active-meeting-header {
+        align-items: flex-start;
+    }
+
+    .meeting-controls-top {
+        width: 100%;
+    }
+
+    .meeting-top-button,
+    .meeting-leave-button {
+        flex: 1;
+    }
+
+    .zego-meeting-container {
+        height: 550px;
+        min-height: 400px;
+    }
+
+    .popup-box {
+        padding: 18px;
+    }
+}
+
+@media (max-width: 380px) {
+    .team-main {
+        padding: 12px;
+    }
+
+    .stats-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .team-nav {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .page-header {
+        flex-direction: column;
+    }
+
+    .dashboard-card-header {
+        padding: 14px;
+    }
+
+    .dashboard-card-body {
+        padding: 10px;
+    }
+}
+</style>
+
+<script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js"></script>
+
+<div class="team-dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="team-sidebar">
+
+        <div class="team-brand">
+            <div class="team-brand-icon">⚔</div>
+            <h2>{{ team.name }}</h2>
+            <p>Team Management</p>
+        </div>
+
+        <nav class="team-nav">
+            <div class="team-nav-title">TEAM</div>
+
+            <button type="button"
+                    class="team-nav-button active"
+                    onclick="showTeamSection('overview', this)">
+                <span class="team-nav-icon">◈</span>
+                Overview
+            </button>
+
+            <button type="button"
+                    class="team-nav-button"
+                    onclick="showTeamSection('election', this)">
+                <span class="team-nav-icon">♛</span>
+                Election Room
+            </button>
+
+            <button type="button"
+                    class="team-nav-button"
+                    onclick="openMeetingRoom(this)">
+                <span class="team-nav-icon">◉</span>
+                Meeting Room
+            </button>
+
+            <button type="button"
+                    class="team-nav-button"
+                    onclick="openTeamChat(this)">
+                <span class="team-nav-icon">◇</span>
+                Team Chat
+            </button>
+        </nav>
+
+        <div class="team-sidebar-bottom">
+            <div class="member-limit">
+                Members <strong>{{ total_members }}</strong> / {{ team.max_players }}
+            </div>
+
+            <div class="member-progress">
+                <span style="width: {% widthratio total_members team.max_players 100 %}%;"></span>
+            </div>
+
+            {% if not is_captain %}
+            <form method="POST" action="{% url 'leave-team' team.id %}">
+                {% csrf_token %}
+                <button type="submit" class="leave-team-button">Leave Team</button>
+            </form>
+            {% endif %}
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="team-main">
+        <div class="team-content">
+
+            <!-- OVERVIEW -->
+            <section id="overview" class="team-section active">
+
+                <div class="page-header">
+                    <div>
+                        <h1>Team Overview</h1>
+                        <p>Everything happening with {{ team.name }}.</p>
+                    </div>
+
+                    {% if team.captain %}
+                    <div class="captain-label">
+                        ♛ Captain: {{ team.captain.username }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+                        <div class="stat-card-label">TEAM MEMBERS</div>
+                        <div class="stat-card-value">{{ total_members }}</div>
+                        <div class="stat-card-sub">/ {{ team.max_players }}</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-label">TOURNAMENTS</div>
+                        <div class="stat-card-value">{{ tournaments.count }}</div>
+                        <div class="stat-card-sub">Joined</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-label">UPCOMING MATCHES</div>
+                        <div class="stat-card-value">{{ upcoming_matches.count }}</div>
+                        <div class="stat-card-sub">Scheduled</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-label">CAPTAIN</div>
+                        <div class="stat-card-value">
+                            {% if team.captain %}
+                                {{ team.captain.username }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </div>
+                        <div class="stat-card-sub">Current captain</div>
+                    </div>
+
+                </div>
+
+                <div class="overview-grid">
+
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h2>Upcoming Matches</h2>
+                        </div>
+
+                        <div class="dashboard-card-body">
+                            {% for match in upcoming_matches|slice:":5" %}
+                            <div class="match-row">
+                                <div class="match-info">
+                                    <strong>{{ match.name }}</strong>
+                                    <span>
+                                        {{ match.game }} •
+                                        {{ match.match_start_time|date:"M d, Y H:i" }}
+                                    </span>
+                                </div>
+                                <div class="match-status">{{ match.status|title }}</div>
+                            </div>
+                            {% empty %}
+                            <div class="empty">No upcoming matches.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h2>Joined Tournaments</h2>
+                        </div>
+
+                        <div class="dashboard-card-body">
+                            {% for tournament in tournaments|slice:":5" %}
+                            <div class="tournament-row">
+                                <div class="tournament-icon">⚔</div>
+                                <div class="tournament-info">
+                                    <strong>{{ tournament.name }}</strong>
+                                    <span>{{ tournament.category|title }}</span>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="empty">No tournaments joined.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- TEAM MEMBERS -->
+                <div class="dashboard-card members-card">
+                    <div class="dashboard-card-header">
+                        <h2>Team Members</h2>
+
+                        {% if is_captain %}
+                        <button type="button"
+                                class="primary-button"
+                                onclick="openPopup('addMemberPopup')">
+                            + Add Member
+                        </button>
+                        {% endif %}
+                    </div>
+
+                    <div class="dashboard-card-body">
+                        <div class="member-grid">
+
+                            {% for member in members %}
+                            <div class="member-item">
+
+                                <div class="avatar">{{ member.username|first|upper }}</div>
+
+                                <div class="member-name">
+                                    <strong>{{ member.username }}</strong>
+                                    <span>
+                                        {% if member == team.captain %}
+                                            Team Captain
+                                        {% else %}
+                                            Team Member
+                                        {% endif %}
+                                    </span>
+                                </div>
+
+                                {% if member == team.captain %}
+                                <span class="captain-mini">♛ CAPTAIN</span>
+                                {% endif %}
+
+                                {% if is_captain and member != team.captain %}
+                                <form method="POST" action="{% url 'remove-team-member' team.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="user_id" value="{{ member.id }}">
+                                    <button type="submit" class="popup-remove">Remove</button>
+                                </form>
+                                {% endif %}
+
+                            </div>
+                            {% empty %}
+                            <div class="empty">No team members.</div>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ELECTION -->
+            <section id="election" class="team-section">
+
+                <div class="page-header">
+                    <div>
+                        <h1>Election Room</h1>
+                        <p>Vote for your team captain.</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-body">
+                        <div class="empty">
+                            Captain election system.
+                            <br><br>
+
+                            {% if has_voted %}
+                            <span style="color:#858991;">You have already voted.</span>
+                            {% else %}
+                            <button type="button"
+                                    class="primary-button"
+                                    onclick="openPopup('votePopup')">
+                                Vote for Captain
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- MEETING ROOM -->
+            <section id="meeting" class="team-section">
+
+                <div class="page-header">
+                    <div>
+                        <h1>Meeting Room</h1>
+                        <p>All meetings scheduled for {{ team.name }}.</p>
+                    </div>
+
+                    {% if is_captain %}
+                    <button type="button"
+                            class="primary-button"
+                            onclick="openPopup('scheduleMeetingPopup')">
+                        + Schedule Meeting
+                    </button>
+                    {% endif %}
+                </div>
+
+                <div class="meeting-list">
+
+                    {% for meeting in meetings %}
+                    <div class="meeting-card">
+
+                        <div class="meeting-icon">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+
+                        <div class="meeting-info">
+                            <h3>{{ meeting.name }}</h3>
+
+                            {% if meeting.description %}
+                            <p>{{ meeting.description }}</p>
+                            {% endif %}
+
+                            <div class="meeting-time">
+                                <span>
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                    {{ meeting.start_time|date:"M d, Y" }}
+                                </span>
+
+                                <span>
+                                    <i class="fa-solid fa-clock"></i>
+                                    {{ meeting.start_time|date:"h:i A" }}
+                                </span>
+
+                                {% if meeting.end_time %}
+                                <span>
+                                    <i class="fa-solid fa-clock"></i>
+                                    Ends {{ meeting.end_time|date:"h:i A" }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="meeting-actions">
+                            {% if meeting.status == "active" %}
+                            <a class="enter-meeting-button"
+                               href="{% url 'team-meeting-room' team.id meeting.id %}">
+                                Open Meeting
+                            </a>
+                            {% elif meeting.status == "finished" %}
+                            <button type="button" class="enter-meeting-button" disabled>
+                                Finished
+                            </button>
+                            {% else %}
+                            <button type="button" class="enter-meeting-button" disabled>
+                                Not started
+                            </button>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                    {% empty %}
+                    <div class="no-meetings">
+                        <p>No meetings scheduled yet.</p>
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+            </section>
+
+            <!-- TEAM CHAT -->
+            <section id="chat" class="team-section">
+
+                <div class="page-header">
+                    <div>
+                        <h1>Team Chat</h1>
+                        <p>Chat with your team members in real time.</p>
+                    </div>
+                </div>
+
+                <a class="enter-meeting-button"
+                   href="{% url 'chatroom' team_chat.group_name %}">
+                    Enter team chat arena
+                </a>
+
+            </section>
+
+        </div>
+    </main>
+
+</div>
+
+<!-- =========================================================
+     SCHEDULE MEETING POPUP
+========================================================= -->
+
+<div id="scheduleMeetingPopup" class="team-popup" aria-hidden="true">
+    <div class="popup-overlay" onclick="closePopup('scheduleMeetingPopup')"></div>
+
+    <div class="popup-box" role="dialog" aria-modal="true" aria-labelledby="scheduleMeetingTitle">
+        <div class="popup-header">
+            <div>
+                <h2 id="scheduleMeetingTitle">Schedule Meeting</h2>
+                <p>Create a team meeting.</p>
+            </div>
+            <button type="button" class="popup-close"
+                    aria-label="Close"
+                    onclick="closePopup('scheduleMeetingPopup')">×</button>
+        </div>
+
+        <form method="POST"
+              action="{% url 'schedule-team-meeting' team.id %}"
+              class="schedule-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="form-errors">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            {{ form.as_p }}
+
+            <button type="submit" class="form-submit">
+                <i class="fa-solid fa-calendar-check"></i>
+                Schedule Meeting
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- =========================================================
+     ADD MEMBER POPUP
+========================================================= -->
+
+<div id="addMemberPopup" class="team-popup" aria-hidden="true">
+    <div class="popup-overlay" onclick="closePopup('addMemberPopup')"></div>
+
+    <div class="popup-box" role="dialog" aria-modal="true" aria-labelledby="addMemberTitle">
+        <div class="popup-header">
+            <div>
+                <h2 id="addMemberTitle">Add Team Member</h2>
+                <p>Choose an accepted Game Mate.</p>
+            </div>
+            <button type="button" class="popup-close"
+                    aria-label="Close"
+                    onclick="closePopup('addMemberPopup')">×</button>
+        </div>
+
+        {% for mate in game_mates %}
+        <div class="member-item">
+            <div class="avatar">{{ mate.username|first|upper }}</div>
+
+            <div class="member-name">
+                <strong>{{ mate.username }}</strong>
+                <span>Game Mate</span>
+            </div>
+
+            <form method="POST" action="{% url 'add-team-member' team.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="user_id" value="{{ mate.id }}">
+                <button type="submit" class="primary-button">Add</button>
+            </form>
+        </div>
+        {% empty %}
+        <div class="empty">No accepted Game Mates available.</div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- =========================================================
+     VOTE POPUP
+========================================================= -->
+
+<div id="votePopup" class="team-popup" aria-hidden="true">
+    <div class="popup-overlay" onclick="closePopup('votePopup')"></div>
+
+    <div class="popup-box" role="dialog" aria-modal="true" aria-labelledby="votePopupTitle">
+        <div class="popup-header">
+            <div>
+                <h2 id="votePopupTitle">Elect Captain</h2>
+                <p>Choose a team member.</p>
+            </div>
+            <button type="button" class="popup-close"
+                    aria-label="Close"
+                    onclick="closePopup('votePopup')">×</button>
+        </div>
+
+        <form method="POST" action="{% url 'vote-team-captain' team.id %}">
+            {% csrf_token %}
+
+            {% for member in members %}
+                {% if member != request.user %}
+                <label style="
+                    display:flex;
+                    align-items:center;
+                    gap:10px;
+                    padding:11px;
+                    background:#0a0b0e;
+                    border:1px solid #202126;
+                    border-radius:8px;
+                    margin-bottom:7px;
+                    cursor:pointer;
+                ">
+                    <input type="radio"
+                           name="candidate_id"
+                           value="{{ member.id }}"
+                           required>
+
+                    <span class="avatar">{{ member.username|first|upper }}</span>
+
+                    <strong style="font-size:11px;">
+                        {{ member.username }}
+                    </strong>
+                </label>
+                {% endif %}
+            {% empty %}
+                <div class="empty">No team members available to vote for.</div>
+            {% endfor %}
+
+            <button type="submit" class="form-submit">Submit Vote</button>
+        </form>
+    </div>
+</div>
+
+<script>
+/* =========================================================
+   TEAM SECTION NAVIGATION
+========================================================= */
+
+function showTeamSection(sectionId, button) {
+    const dashboard = document.querySelector(".team-dashboard");
+    if (!dashboard) return;
+
+    const target = dashboard.querySelector("#" + sectionId);
+    if (!target) return;
+
+    dashboard.querySelectorAll(".team-section").forEach(function (section) {
+        section.classList.toggle("active", section === target);
+    });
+
+    dashboard.querySelectorAll(".team-nav-button").forEach(function (navButton) {
+        navButton.classList.toggle("active", navButton === button);
+    });
+}
+
+function openMeetingRoom(button) {
+    showTeamSection("meeting", button);
+}
+
+function openTeamChat(button) {
+    showTeamSection("chat", button);
+}
+
+/* =========================================================
+   POPUP HANDLING
+========================================================= */
+
+function openPopup(id) {
+    const popup = document.getElementById(id);
+    if (!popup) return;
+
+    popup.classList.add("active");
+    popup.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+
+    const firstInput = popup.querySelector(
+        'input:not([type="hidden"]), select, textarea, button'
+    );
+
+    if (firstInput) {
+        firstInput.focus({ preventScroll: true });
+    }
+}
+
+function closePopup(id) {
+    const popup = document.getElementById(id);
+    if (!popup) return;
+
+    popup.classList.remove("active");
+    popup.setAttribute("aria-hidden", "true");
+
+    if (!document.querySelector(".team-popup.active")) {
+        document.body.style.overflow = "";
+    }
+}
+
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+        document.querySelectorAll(".team-popup.active").forEach(function (popup) {
+            popup.classList.remove("active");
+            popup.setAttribute("aria-hidden", "true");
+        });
+
+        document.body.style.overflow = "";
+    }
+});
+
+/* Restore the body's scrolling if the page is unloaded. */
+window.addEventListener("pagehide", function () {
+    document.body.style.overflow = "";
+});
+</script>
+
+{% endblock %}

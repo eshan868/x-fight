@@ -1,0 +1,159 @@
+:root {
+    --bg: #000000;
+    --surface: #000000;
+    --surface-2: #050505;
+
+    --text: #ffffff;
+    --text-muted: #f2f2f2;
+    --placeholder: rgba(255, 255, 255, 0.82);
+
+    --neon: #ff1a1a;
+    --neon-soft: rgba(255, 26, 26, 0.4);
+    --neon-glow: 0 0 8px rgba(255, 26, 26, 0.28);
+
+    --border: var(--neon);
+    --border-muted: rgba(255, 26, 26, 0.35);
+
+    --radius: 16px;
+    --transition: 0.25s ease;
+    --shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+
+    --navbar-h: 88px;
+    --space-1: 8px;
+    --space-2: 12px;
+    --space-3: 16px;
+    --space-4: 24px;
+    --space-5: 40px;
+
+    /* aliases used by older sheets */
+    --primary: var(--neon);
+    --background: var(--bg);
+    --surface-1: var(--bg);
+    --text-light: var(--text);
+    --text-color: var(--text);
+    --primary-color: var(--neon);
+    --border-color: var(--neon);
+    --dark-color: var(--bg);
+    --dark-light-color: var(--bg);
+    --input-bg: var(--bg);
+    --success: #22c55e;
+    --warning: #facc15;
+    --danger: var(--neon);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: "Poppins", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+img,
+video,
+svg,
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Aclonica", sans-serif;
+    letter-spacing: 0.5px;
+    color: var(--text);
+    overflow-wrap: anywhere;
+}
+
+p,
+span,
+li,
+label,
+small,
+td,
+th {
+    color: var(--text);
+}
+
+a {
+    color: var(--text);
+}
+
+a:hover {
+    color: var(--text);
+}
+
+section {
+    padding: 48px 0;
+}
+
+main.site-main {
+    min-height: calc(100vh - 80px);
+    padding-top: var(--navbar-h);
+}
+
+.container {
+    max-width: 1200px;
+    width: 100%;
+}
+
+.text-muted,
+.text-secondary,
+.text-light-emphasis,
+.text-body-secondary {
+    color: var(--text-muted) !important;
+}
+
+.row > * {
+    min-width: 0;
+}
+
+.table-responsive,
+.leaderboard-card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+@media (max-width: 991px) {
+    :root {
+        --navbar-h: 76px;
+        --space-5: 28px;
+    }
+
+    section {
+        padding: 64px 0;
+    }
+}
+
+@media (max-width: 576px) {
+    section {
+        padding: 48px 0;
+    }
+
+    .display-4 {
+        font-size: clamp(2rem, 8vw, 2.6rem);
+        line-height: 1.15;
+    }
+
+    .lead {
+        font-size: 1rem;
+    }
+}

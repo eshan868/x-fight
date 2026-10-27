@@ -1,0 +1,2359 @@
+
+/* ==========================================
+       CREATE GROUP PAGE
+    ========================================== */
+
+.create-group-page {
+    min-height: 75vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10vh;
+
+    padding: 30px 15px;
+}
+
+
+.gamearena-call-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.gamearena-call-btn {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 1px solid #ff1a1a;
+    border-radius: 50%;
+    background: #14141a;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 18px;
+    transition: 0.2s ease;
+}
+
+.gamearena-call-btn:hover {
+    background: #000000;
+    transform: translateY(-2px);
+}
+
+.voice-call-btn:hover {
+    border-color: #16803c;
+}
+
+.video-call-btn:hover {
+    border-color: #ff0000;
+}
+
+/* ==========================================
+       CREATE GROUP CARD
+    ========================================== */
+
+.create-group-card {
+    width: 100%;
+    max-width: 480px;
+
+    padding: 32px;
+
+    background: var(--surface-1);
+
+    border: 1px solid var(--border);
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, .35);
+}
+
+
+/* ==========================================
+       TITLE
+    ========================================== */
+
+.create-group-title {
+    margin: 0;
+
+    color: white;
+
+    font-size: 24px;
+
+    font-weight: 700;
+
+    letter-spacing: .5px;
+}
+
+
+.create-group-subtitle {
+    margin: 7px 0 25px;
+
+    color: var(--text-light);
+
+    font-size: 13px;
+}
+
+
+/* ==========================================
+       FORM
+    ========================================== */
+
+.create-group-form {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+}
+
+
+.create-group-form p {
+    margin: 0;
+}
+
+
+.create-group-form label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: var(--text-light);
+
+    font-size: 13px;
+}
+
+
+/* ==========================================
+       GROUP NAME INPUT
+    ========================================== */
+
+.group-name-input-field {
+    width: 100%;
+
+    padding: 13px 15px;
+
+    background: var(--surface-2);
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    color: white;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition: .25s ease;
+}
+
+
+.group-name-input-field::placeholder {
+    color: var(--text-light);
+
+    opacity: .7;
+}
+
+
+.group-name-input-field:focus {
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 2px rgba(255, 0, 0, .08);
+}
+
+
+/* ==========================================
+       CREATE BUTTON
+    ========================================== */
+
+.create-group-btn {
+    position: relative;
+
+    width: 100%;
+
+    padding: 13px 20px;
+
+    margin-top: 4px;
+
+    border: 1px solid var(--primary);
+
+    border-radius: 10px;
+
+    background: #09090B;
+
+    color: white;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    overflow: hidden;
+
+    transition: .25s ease;
+
+    z-index: 1;
+}
+
+
+.create-group-btn::before {
+    content: "";
+
+    position: absolute;
+
+    width: 250%;
+    height: 250%;
+
+    top: -75%;
+    left: -75%;
+
+    background: conic-gradient(transparent 0deg,
+            transparent 250deg,
+            var(--primary) 300deg,
+            var(--primary) 360deg);
+
+    opacity: 0;
+
+    animation: groupButtonBorder 2s linear infinite;
+
+    z-index: -2;
+}
+
+
+.create-group-btn::after {
+    content: "";
+
+    position: absolute;
+
+    inset: 2px;
+
+    background: #09090B;
+
+    border-radius: 8px;
+
+    z-index: -1;
+}
+
+
+.create-group-btn:hover {
+    border-color: transparent;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 0 15px rgba(255, 0, 0, .12);
+}
+
+
+.create-group-btn:hover::before {
+    opacity: 1;
+}
+
+
+.create-group-btn:active {
+    transform: translateY(0);
+}
+
+
+@keyframes groupButtonBorder {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+/* ==========================================
+       ERROR MESSAGE
+    ========================================== */
+
+.create-group-form .errorlist {
+    margin: 5px 0 0;
+
+    padding: 0;
+
+    list-style: none;
+
+    color: #ff7070;
+
+    font-size: 12px;
+}
+
+
+/* ==========================================
+       MOBILE
+    ========================================== */
+
+@media (max-width: 576px) {
+
+    .create-group-page {
+        padding: 20px 12px;
+    }
+
+
+    .create-group-card {
+        padding: 25px 20px;
+
+        border-radius: 15px;
+    }
+
+
+    .create-group-title {
+        font-size: 21px;
+    }
+
+}
+
+/* ==========================================
+       CREATE SQUAD PAGE
+    ========================================== */
+
+.create-squad-page {
+    min-height: 75vh;
+    margin-top: 13vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px 15px;
+}
+
+
+/* ==========================================
+       CARD
+    ========================================== */
+
+.create-squad-card {
+    width: 100%;
+    max-width: 520px;
+
+    padding: 32px;
+
+    background: var(--surface-1);
+
+    border: 1px solid var(--border);
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, .35);
+}
+
+
+/* ==========================================
+       TITLE
+    ========================================== */
+
+.create-squad-title {
+    margin: 0;
+
+    color: white;
+
+    font-size: 24px;
+
+    font-weight: 700;
+
+    letter-spacing: .5px;
+}
+
+
+.create-squad-subtitle {
+    margin: 7px 0 25px;
+
+    color: var(--text-light);
+
+    font-size: 13px;
+}
+
+
+/* ==========================================
+       FORM
+    ========================================== */
+
+.create-squad-form {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 16px;
+}
+
+
+.create-squad-form p {
+    margin: 0;
+}
+
+
+/* ==========================================
+       LABELS
+    ========================================== */
+
+.create-squad-form label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: var(--text-light);
+
+    font-size: 13px;
+
+    font-weight: 500;
+}
+
+
+/* ==========================================
+       INPUTS
+    ========================================== */
+
+.create-squad-form .form-control,
+.create-squad-form select,
+.create-squad-form textarea {
+
+    width: 100%;
+
+    padding: 12px 14px;
+
+    background: var(--surface-2);
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    color: white;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition: .25s ease;
+}
+
+
+/* ==========================================
+       PLACEHOLDER
+    ========================================== */
+
+.create-squad-form .form-control::placeholder,
+.create-squad-form textarea::placeholder {
+
+    color: var(--text-light);
+
+    opacity: .7;
+}
+
+
+/* ==========================================
+       INPUT FOCUS
+    ========================================== */
+
+.create-squad-form .form-control:focus,
+.create-squad-form select:focus,
+.create-squad-form textarea:focus {
+
+    background: var(--surface-2);
+
+    color: white;
+
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 2px rgba(255, 0, 0, .08);
+}
+
+
+/* ==========================================
+       SELECT
+    ========================================== */
+
+.create-squad-form select {
+
+    cursor: pointer;
+}
+
+
+.create-squad-form select option {
+
+    background: var(--surface-1);
+
+    color: white;
+}
+
+
+/* ==========================================
+       FILE INPUT
+    ========================================== */
+
+.create-squad-form input[type="file"] {
+
+    padding: 10px;
+
+    cursor: pointer;
+
+    color: var(--text-light);
+}
+
+
+.create-squad-form input[type="file"]::file-selector-button {
+
+    margin-right: 10px;
+
+    padding: 7px 12px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 7px;
+
+    background: var(--surface-1);
+
+    color: var(--text-light);
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+
+.create-squad-form input[type="file"]::file-selector-button:hover {
+
+    border-color: var(--primary);
+
+    color: var(--primary);
+}
+
+
+/* ==========================================
+       CHECKBOX
+    ========================================== */
+
+.create-squad-form input[type="checkbox"] {
+
+    accent-color: var(--primary);
+
+    width: 16px;
+    height: 16px;
+
+    cursor: pointer;
+}
+
+
+/* ==========================================
+       ERROR
+    ========================================== */
+
+.create-squad-form .errorlist {
+
+    margin: 5px 0 0;
+
+    padding: 0;
+
+    list-style: none;
+
+    color: #ff7070;
+
+    font-size: 12px;
+}
+
+
+/* ==========================================
+       CREATE BUTTON
+    ========================================== */
+
+.create-squad-submit {
+
+    position: relative;
+
+    width: 100%;
+
+    padding: 13px 20px;
+
+    margin-top: 5px;
+
+    border: 1px solid var(--primary);
+
+    border-radius: 10px;
+
+    background: #09090B;
+
+    color: white;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    overflow: hidden;
+
+    transition: .25s ease;
+
+    z-index: 1;
+}
+
+
+/* ==========================================
+       MOVING BORDER
+    ========================================== */
+
+.create-squad-submit::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 250%;
+    height: 250%;
+
+    top: -75%;
+    left: -75%;
+
+    background: conic-gradient(transparent 0deg,
+            transparent 250deg,
+            var(--primary) 300deg,
+            var(--primary) 360deg);
+
+    opacity: 0;
+
+    animation: squadButtonBorder 2s linear infinite;
+
+    z-index: -2;
+}
+
+
+.create-squad-submit::after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 2px;
+
+    background: #09090B;
+
+    border-radius: 8px;
+
+    z-index: -1;
+}
+
+
+/* ==========================================
+       BUTTON HOVER
+    ========================================== */
+
+.create-squad-submit:hover {
+
+    border-color: transparent;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 0 15px rgba(255, 0, 0, .12);
+}
+
+
+.create-squad-submit:hover::before {
+
+    opacity: 1;
+}
+
+
+.create-squad-submit:active {
+
+    transform: translateY(0);
+}
+
+
+/* ==========================================
+       BUTTON ANIMATION
+    ========================================== */
+
+@keyframes squadButtonBorder {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+/* ==========================================
+       MOBILE
+    ========================================== */
+
+@media (max-width: 576px) {
+
+    .create-squad-page {
+
+        padding: 20px 12px;
+    }
+
+
+    .create-squad-card {
+
+        padding: 25px 20px;
+
+        border-radius: 15px;
+    }
+
+
+    .create-squad-title {
+
+        font-size: 21px;
+    }
+
+}
+
+/* ==========================================
+   SQUAD FORM
+========================================== */
+
+.create-squad-form {
+    max-width: 650px;
+    margin: 40px auto;
+    padding: 30px;
+
+    background: var(--surface-1);
+
+    border: 1px solid var(--border);
+    border-radius: 18px;
+}
+
+
+/* FORM LABEL */
+
+.create-squad-form label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: var(--text-light);
+
+    font-size: 13px;
+}
+
+
+/* INPUT + DROPDOWN */
+
+.create-squad-form input,
+.create-squad-form select,
+.create-squad-form textarea {
+    width: 100%;
+
+    padding: 11px 13px;
+
+    background: var(--surface-2);
+
+    border: 1px solid var(--border);
+    border-radius: 9px;
+
+    color: white;
+
+    outline: none;
+
+    transition: .2s ease;
+}
+
+
+/* FOCUS */
+
+.create-squad-form input:focus,
+.create-squad-form select:focus,
+.create-squad-form textarea:focus {
+    border-color: var(--primary);
+
+    box-shadow: 0 0 0 2px rgba(255, 0, 0, .08);
+}
+
+
+/* DROPDOWN OPTIONS */
+
+.create-squad-form select option {
+    background: var(--surface-2);
+    color: white;
+}
+
+
+/* BUTTON */
+
+.create-squad-btn {
+    margin-top: 15px;
+
+    padding: 11px 25px;
+
+    background: var(--primary);
+
+    border: none;
+    border-radius: 9px;
+
+    color: white;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+.create-squad-btn:hover {
+    transform: translateY(-1px);
+
+    box-shadow: 0 0 15px rgba(255, 0, 0, .2);
+}
+
+/* ==========================================
+   MATCH SCOREBOARD
+========================================== */
+
+.match-scoreboard-page {
+    width: 100%;
+    padding: 30px 20px;
+}
+
+
+/* ==========================================
+   TITLE
+========================================== */
+
+.match-scoreboard-title {
+    color: white;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+}
+
+
+.match-scoreboard-subtitle {
+    color: var(--text-light);
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+
+/* ==========================================
+   SCOREBOARD CARD
+========================================== */
+
+.scoreboard-card {
+    width: 100%;
+
+    background: var(--surface-1);
+
+    border: 1px solid var(--border);
+
+    border-radius: 16px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, .25);
+}
+
+
+/* ==========================================
+   TABLE
+========================================== */
+
+.scoreboard-table {
+    width: 100%;
+
+    margin: 0;
+
+    border-collapse: collapse;
+
+    color: white;
+}
+
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.scoreboard-table thead {
+    background: var(--surface-2);
+}
+
+
+.scoreboard-table th {
+    padding: 16px 18px;
+
+    color: var(--text-light);
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    text-transform: uppercase;
+
+    letter-spacing: .8px;
+
+    text-align: left;
+
+    border-bottom: 1px solid var(--border);
+}
+
+
+/* ==========================================
+   ROWS
+========================================== */
+
+.scoreboard-table tbody tr {
+    background: transparent;
+
+    border-bottom: 1px solid var(--border);
+
+    transition: .25s ease;
+}
+
+
+.scoreboard-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+
+.scoreboard-table tbody tr:hover {
+    background: var(--surface-2);
+
+    transform: scale(1.005);
+}
+
+
+/* ==========================================
+   CELLS
+========================================== */
+
+.scoreboard-table td {
+    padding: 17px 18px;
+
+    font-size: 14px;
+
+    color: white;
+
+    vertical-align: middle;
+}
+
+
+/* ==========================================
+   MATCH NAME
+========================================== */
+
+.match-name {
+    color: white;
+
+    font-weight: 600;
+
+    letter-spacing: .2px;
+}
+
+
+/* ==========================================
+   TEAMS
+========================================== */
+
+.match-teams {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.match-team {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: var(--text-light);
+
+    font-size: 13px;
+}
+
+
+
+
+/* ==========================================
+   WINNER
+========================================== */
+
+.match-winner {
+    color: var(--primary);
+
+    font-weight: 600;
+}
+
+
+.no-winner {
+    color: var(--text-light);
+
+    font-size: 13px;
+
+    opacity: .7;
+}
+
+
+/* ==========================================
+   GAME
+========================================== */
+
+.match-game {
+    color: var(--text-light);
+
+    font-size: 13px;
+}
+
+
+/* ==========================================
+   EMPTY
+========================================== */
+
+.scoreboard-empty {
+    padding: 45px 20px;
+
+    text-align: center;
+
+    color: var(--text-light);
+
+    font-size: 14px;
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 768px) {
+
+    .match-scoreboard-page {
+        padding: 20px 10px;
+    }
+
+
+    .match-scoreboard-title {
+        font-size: 22px;
+    }
+
+
+    .scoreboard-card {
+        overflow-x: auto;
+    }
+
+
+    .scoreboard-table {
+        min-width: 650px;
+    }
+
+
+    .scoreboard-table th,
+    .scoreboard-table td {
+        padding: 13px 12px;
+    }
+
+}
+
+/* ==========================================
+   ORGANIZE EVENT PAGE
+========================================== */
+
+.organize-event-page {
+    width: 100%;
+
+    min-height: 80vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    padding: 40px 20px;
+}
+
+
+/* ==========================================
+   EVENT CARD
+========================================== */
+
+.organize-event-card {
+    width: 100%;
+    max-width: 750px;
+
+    padding: 35px;
+
+    background: var(--surface-1);
+
+    border: 1px solid var(--border);
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, .35);
+}
+
+
+/* ==========================================
+   TITLE
+========================================== */
+
+.organize-event-title {
+    margin-bottom: 8px;
+
+    color: white;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+}
+
+
+.organize-event-subtitle {
+    margin-bottom: 30px;
+
+    color: var(--text-light);
+
+    font-size: 14px;
+}
+
+
+/* ==========================================
+   FORM
+========================================== */
+
+.organize-event-form {
+    width: 100%;
+}
+
+
+.organize-event-form p {
+    margin-bottom: 20px;
+}
+
+
+.organize-event-form label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--text-light);
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    letter-spacing: .4px;
+}
+
+
+/* ==========================================
+   TEXT / NUMBER / DATE / SELECT
+========================================== */
+
+.organize-event-form input[type="text"],
+.organize-event-form input[type="number"],
+.organize-event-form input[type="datetime-local"],
+.organize-event-form input[type="date"],
+.organize-event-form input[type="time"],
+.organize-event-form input[type="email"],
+.organize-event-form input[type="file"],
+.organize-event-form textarea,
+.organize-event-form select {
+
+    width: 100%;
+
+    padding: 12px 14px;
+
+    background: #09090b;
+
+    color: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    outline: none;
+
+    transition:
+        border-color .25s ease,
+        box-shadow .25s ease;
+
+    font-family: inherit;
+
+    box-sizing: border-box;
+}
+
+
+/* ==========================================
+   DATE / TIME INPUT
+========================================== */
+
+.organize-event-form input[type="datetime-local"] {
+    color-scheme: dark;
+
+    cursor: pointer;
+}
+
+
+/* Chrome / Edge calendar icon */
+
+.organize-event-form input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.organize-event-form input[type="date"]::-webkit-calendar-picker-indicator,
+.organize-event-form input[type="time"]::-webkit-calendar-picker-indicator {
+
+    filter: invert(1);
+
+    opacity: .75;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+
+.organize-event-form input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+.organize-event-form input[type="date"]::-webkit-calendar-picker-indicator:hover,
+.organize-event-form input[type="time"]::-webkit-calendar-picker-indicator:hover {
+
+    opacity: 1;
+
+    filter:
+        invert(20%) sepia(100%) saturate(5000%) hue-rotate(355deg);
+}
+
+
+/* ==========================================
+   FOCUS
+========================================== */
+
+.organize-event-form input:focus,
+.organize-event-form textarea:focus,
+.organize-event-form select:focus {
+
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 2px rgba(255, 0, 0, .08);
+}
+
+
+/* ==========================================
+   SELECT
+========================================== */
+
+.organize-event-form select {
+
+    cursor: pointer;
+
+    color-scheme: dark;
+}
+
+
+/* ==========================================
+   TEXTAREA
+========================================== */
+
+.organize-event-form textarea {
+
+    min-height: 120px;
+
+    resize: vertical;
+}
+
+
+/* ==========================================
+   FILE INPUT
+========================================== */
+
+.organize-event-form input[type="file"] {
+
+    padding: 10px;
+
+    cursor: pointer;
+}
+
+
+/* ==========================================
+   CHECKBOX / RADIO
+========================================== */
+
+.organize-event-form input[type="checkbox"],
+.organize-event-form input[type="radio"] {
+
+    accent-color: var(--primary);
+
+    cursor: pointer;
+}
+
+
+/* ==========================================
+   HELP TEXT
+========================================== */
+
+.organize-event-form .helptext {
+
+    display: block;
+
+    margin-top: 6px;
+
+    color: #777;
+
+    font-size: 11px;
+}
+
+
+/* ==========================================
+   ERROR
+========================================== */
+
+.organize-event-form .errorlist {
+
+    margin: 6px 0;
+
+    padding: 0;
+
+    list-style: none;
+
+    color: #ff5c5c;
+
+    font-size: 12px;
+}
+
+
+/* ==========================================
+   CUSTOM DATETIME FIELD
+========================================== */
+
+.datetime-field {
+
+    width: 100%;
+
+    margin-top: 20px;
+}
+
+
+.datetime-field label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--text-light);
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    letter-spacing: .4px;
+}
+
+
+/* ==========================================
+   DATETIME INPUT WRAPPER
+========================================== */
+
+.datetime-input-wrapper {
+
+    position: relative;
+
+    width: 100%;
+}
+
+
+/* ==========================================
+   DATETIME INPUT
+========================================== */
+
+.datetime-input-wrapper input[type="datetime-local"] {
+
+    width: 100%;
+
+    height: 46px;
+
+    padding: 12px 50px 12px 14px;
+
+    background: #09090b;
+
+    color: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    outline: none;
+
+    font-family: inherit;
+
+    box-sizing: border-box;
+
+    color-scheme: dark;
+
+    transition:
+        border-color .25s ease,
+        box-shadow .25s ease;
+}
+
+
+.datetime-input-wrapper input[type="datetime-local"]:focus {
+
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 2px rgba(255, 0, 0, .08);
+}
+
+
+/* ==========================================
+   CALENDAR BUTTON
+========================================== */
+
+.datetime-picker-btn {
+
+    position: absolute;
+
+    top: 50%;
+
+    right: 7px;
+
+    transform: translateY(-50%);
+
+    width: 36px;
+
+    height: 36px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: white;
+
+    font-size: 17px;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        transform .2s ease;
+
+    z-index: 2;
+}
+
+
+/* ==========================================
+   CALENDAR BUTTON HOVER
+========================================== */
+
+.datetime-picker-btn:hover {
+
+    background: rgba(255, 0, 0, .10);
+
+    color: var(--primary);
+
+    text-shadow:
+        0 0 8px rgba(255, 0, 0, .6);
+}
+
+
+/* ==========================================
+   CALENDAR BUTTON ACTIVE
+========================================== */
+
+.datetime-picker-btn:active {
+
+    transform:
+        translateY(-50%) scale(.92);
+}
+
+
+/* ==========================================
+   CREATE BUTTON
+========================================== */
+
+.event-create-btn {
+
+    position: relative;
+
+    width: 100%;
+
+    margin-top: 10px;
+
+    padding: 13px 25px;
+
+    border: 1px solid var(--primary);
+
+    border-radius: 12px;
+
+    background: #09090b;
+
+    color: white;
+
+    font-family: 'Aclonica', sans-serif;
+
+    letter-spacing: .5px;
+
+    cursor: pointer;
+
+    overflow: hidden;
+
+    transition: .25s ease;
+
+    z-index: 1;
+}
+
+
+/* ==========================================
+   ANIMATED BORDER
+========================================== */
+
+.event-create-btn::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 250%;
+
+    height: 250%;
+
+    top: -75%;
+
+    left: -75%;
+
+    background: conic-gradient(transparent 0deg,
+            transparent 250deg,
+            var(--primary) 300deg,
+            var(--primary) 360deg);
+
+    opacity: 0;
+
+    animation:
+        eventBorderLoop 2s linear infinite;
+
+    z-index: -2;
+}
+
+
+.event-create-btn::after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 2px;
+
+    background: #09090b;
+
+    border-radius: 10px;
+
+    z-index: -1;
+}
+
+
+/* ==========================================
+   BUTTON HOVER
+========================================== */
+
+.event-create-btn:hover {
+
+    border-color: transparent;
+
+    box-shadow:
+        0 0 18px rgba(255, 0, 0, .15);
+}
+
+
+.event-create-btn:hover::before {
+
+    opacity: 1;
+}
+
+
+/* ==========================================
+   BUTTON ACTIVE
+========================================== */
+
+.event-create-btn:active {
+
+    transform: scale(.99);
+}
+
+
+/* ==========================================
+   BUTTON FOCUS
+========================================== */
+
+.event-create-btn:focus,
+.event-create-btn:focus-visible {
+
+    outline: none;
+
+    box-shadow:
+        0 0 18px rgba(255, 0, 0, .15);
+}
+
+/* ==========================================
+   DATETIME PICKER BUTTON
+========================================== */
+
+.datetime-picker-btn {
+    position: absolute;
+
+    top: 50%;
+    right: 7px;
+
+    transform: translateY(-50%);
+
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    transition:
+        color .2s ease,
+        background .2s ease,
+        transform .2s ease;
+
+    z-index: 5;
+}
+
+
+/* ICON */
+
+.datetime-picker-btn svg {
+    display: block;
+
+    width: 19px;
+    height: 19px;
+
+    pointer-events: none;
+
+    transition:
+        transform .2s ease,
+        filter .2s ease;
+}
+
+
+/* HOVER */
+
+.datetime-picker-btn:hover {
+    color: var(--primary);
+
+    background: rgba(255, 0, 0, .10);
+}
+
+
+.datetime-picker-btn:hover svg {
+    filter:
+        drop-shadow(0 0 5px var(--primary));
+
+    transform: scale(1.08);
+}
+
+
+/* ACTIVE */
+
+.datetime-picker-btn:active {
+    transform:
+        translateY(-50%) scale(.92);
+}
+
+/* ==========================================
+   BORDER ANIMATION
+========================================== */
+
+@keyframes eventBorderLoop {
+
+    from {
+
+        transform: rotate(0deg);
+
+    }
+
+    to {
+
+        transform: rotate(360deg);
+
+    }
+
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 768px) {
+
+    .organize-event-page {
+
+        padding: 25px 15px;
+
+    }
+
+
+    .organize-event-card {
+
+        padding: 25px 20px;
+
+    }
+
+
+    .organize-event-title {
+
+        font-size: 24px;
+
+    }
+
+
+    .organize-event-subtitle {
+
+        margin-bottom: 25px;
+
+    }
+
+
+    .datetime-field {
+
+        margin-top: 15px;
+
+    }
+
+}
+
+/* =========================================================
+       MATCH ROOM
+    ========================================================= */
+
+.match-room {
+    min-height: 100vh;
+    background: #000;
+    color: #fff;
+    padding: 10px 0 20px;
+}
+
+
+.match-room .container {
+
+    margin-left: 1%;
+    margin-right: 1%;
+}
+
+
+/* =========================================================
+       COMMON
+    ========================================================= */
+
+.match-card {
+    background: #09090b;
+    border: 1px solid #1c1c1c;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+
+.match-card-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid #1c1c1c;
+}
+
+
+.match-card-header h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+
+.muted {
+    color: #777;
+}
+
+
+/* =========================================================
+       MATCH HEADER
+    ========================================================= */
+
+.match-header {
+    background: #09090b;
+    border: 1px solid #8f0000;
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+}
+
+
+.match-header-left h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: .3px;
+}
+
+
+.match-game {
+    margin-top: 6px;
+    color: #888;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+
+.match-header-right {
+    text-align: right;
+}
+
+
+.live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255, 0, 0, .08);
+    border: 1px solid #8f0000;
+    color: #ff3030;
+    padding: 6px 11px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+.live-dot {
+    width: 7px;
+    height: 7px;
+    background: #ff2020;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(255, 0, 0, .7);
+}
+
+
+.round-text {
+    margin-top: 8px;
+    color: #aaa;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+       MATCH INFORMATION
+    ========================================================= */
+
+.match-info {
+    margin-bottom: 24px;
+}
+
+
+.info-box {
+    height: 100%;
+    background: #09090b;
+    border: 1px solid #1c1c1c;
+    border-radius: 12px;
+    padding: 20px 15px;
+    text-align: center;
+    transition: .2s ease;
+}
+
+
+.info-box:hover {
+    border-color: #333;
+}
+
+
+.info-label {
+    color: #777;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 7px;
+}
+
+
+.info-value {
+    color: #fff;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+
+#match-status {
+    color: #ff3030 !important;
+}
+
+
+/* =========================================================
+       TEAMS
+    ========================================================= */
+
+.teams-card {
+    background: #09090b;
+    border: 1px solid #1c1c1c;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+
+.teams-container {
+    padding: 20px;
+}
+
+
+/* Individual team */
+
+.team-section {
+    margin-bottom: 24px;
+}
+
+
+.team-section:last-child {
+    margin-bottom: 0;
+}
+
+
+/* Team name above players */
+
+.team-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: #09090b;
+
+    padding: 14px 17px;
+
+    border-left: 3px solid #e00000;
+    border-bottom: 1px solid #1c1c1c;
+
+    margin-bottom: 8px;
+}
+
+
+.team-header h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+
+.team-player-count {
+    color: #777;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+
+/* =========================================================
+       PLAYER ROW
+    ========================================================= */
+
+.player-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: 48px;
+
+    padding: 10px 14px;
+
+    background: #09090b;
+
+    border-bottom: 1px solid #111;
+
+    transition: background .2s ease;
+}
+
+
+.player-row:hover {
+    background: #0b0b0b;
+}
+
+
+.player-row:last-child {
+    border-bottom: none;
+}
+
+
+.player-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: #eee;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+
+.player-name::before {
+    content: "";
+
+    width: 7px;
+    height: 7px;
+
+    background: #444;
+
+    border-radius: 50%;
+}
+
+
+/* =========================================================
+       PLAYER STATUS
+    ========================================================= */
+
+.ready,
+.waiting {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 9px;
+
+    border-radius: 5px;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+
+.ready {
+    color: #55e66b;
+    background: rgba(50, 220, 80, .08);
+    border: 1px solid rgba(50, 220, 80, .25);
+}
+
+
+.waiting {
+    color: #888;
+    background: #09090b;
+    border: 1px solid #222;
+}
+
+
+/* =========================================================
+       EMPTY TEAM
+    ========================================================= */
+
+.empty-message {
+    padding: 18px;
+    color: #666;
+    font-size: 13px;
+    text-align: center;
+}
+
+
+/* =========================================================
+       VOICE CARD
+    ========================================================= */
+
+.voice-card {
+    background: #09090b;
+    border: 1px solid #1c1c1c;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    height: 59vh;
+}
+
+
+.voice-status-wrapper {
+    padding: 18px 20px 0;
+}
+
+
+#voice-status {
+    display: inline-block;
+
+    margin: 0;
+
+    color: #777 !important;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: .7px;
+}
+
+
+.voice-content {
+    padding: 28px 20px 24px;
+    text-align: center;
+}
+
+
+.voice-icon {
+    width: 58px;
+    height: 58px;
+
+    margin: 0 auto 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #222;
+    border-radius: 50%;
+
+    color: #fff;
+
+    font-size: 22px;
+}
+
+
+.voice-content h5 {
+    margin-bottom: 6px;
+
+    color: #fff;
+
+    font-size: 16px;
+    font-weight: 600;
+}
+
+
+.voice-description {
+    color: #666;
+    font-size: 12px;
+    margin-bottom: 20px;
+}
+
+
+/* =========================================================
+       READY BUTTON AREA
+    ========================================================= */
+
+.ready-area {
+    display: flex;
+    justify-content: center;
+
+    padding-top: 5px;
+}
+
+
+.ready-area form {
+    margin: 0;
+}
+
+
+.ready-area button {
+    min-width: 150px;
+
+    border-radius: 7px;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .5px;
+
+    padding: 10px 18px;
+
+    transition: .2s ease;
+}
+
+
+.ready-area button:hover {
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+       VOICE MEMBERS
+    ========================================================= */
+
+.members-card {
+    background: #09090b;
+    border: 1px solid #1c1c1c;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+
+.members-body {
+    padding: 15px;
+}
+
+
+#members-list {
+    margin: 0;
+    padding: 0;
+
+    background: transparent;
+}
+
+
+#members-list li {
+    background: #080808 !important;
+    color: #ddd !important;
+
+    border: 1px solid #161616 !important;
+
+    margin-bottom: 6px;
+
+    border-radius: 6px;
+}
+
+
+/* =========================================================
+       BOTTOM ACTIONS
+    ========================================================= */
+
+.bottom-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: 24px;
+
+    padding: 18px 20px;
+
+    background: #09090b;
+
+    border: 1px solid #1c1c1c;
+    border-radius: 6px;
+
+}
+
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 38px;
+
+    padding: 8px 17px;
+
+    border-radius: 7px;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    text-transform: uppercase;
+    letter-spacing: .5px;
+
+    transition: .2s ease;
+}
+
+
+.leave-btn {
+    background: transparent;
+    border: 1px solid #333;
+    color: #aaa;
+}
+
+
+.leave-btn:hover {
+    color: #fff;
+    border-color: #777;
+}
+
+
+.report-btn {
+    background: var(--bg);
+    border: 1px solid var(--neon);
+    color: var(--text);
+}
+
+
+.report-btn:hover {
+    background: var(--bg);
+    border-color: var(--neon);
+    color: var(--text);
+    box-shadow: var(--neon-glow);
+}
+
+
+/* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+@media (max-width: 767px) {
+
+    .match-room {
+        padding: 25px 0 50px;
+    }
+
+
+    .match-header {
+        padding: 20px;
+    }
+
+
+    .match-header-left h2 {
+        font-size: 22px;
+    }
+
+
+    .match-header-right {
+        margin-top: 15px;
+        text-align: left;
+    }
+
+
+    .match-header .d-flex {
+        align-items: flex-start !important;
+        flex-direction: column;
+    }
+
+
+    .info-box {
+        padding: 15px 10px;
+    }
+
+
+    .info-value {
+        font-size: 18px;
+    }
+
+
+    .bottom-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+
+    .action-btn {
+        width: 100%;
+    }
+
+}

@@ -1,0 +1,388 @@
+{% load static %}
+
+<div class="team-chat">
+
+    <style>
+
+        .team-chat {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: #09090b;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        .team-chat-header {
+            min-height: 68px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #14141a;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+
+
+        .team-chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+
+        .team-chat-avatar {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ff1712;
+            border-radius: 11px;
+            color: #ffffff;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+
+        .team-chat-title h2 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+
+        .team-chat-title p {
+            margin: 3px 0 0;
+            color: #777b84;
+            font-size: 9px;
+        }
+
+
+        /* =====================================================
+           MESSAGES
+        ===================================================== */
+
+        .team-chat-messages {
+            flex: 1;
+            min-height: 0;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+            background:
+                radial-gradient(
+                    circle at top,
+                    rgba(43,0,83,.12),
+                    transparent 45%
+                ),
+                #09090b;
+        }
+
+
+        .team-chat-empty {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555960;
+            font-size: 10px;
+            text-align: center;
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        .team-chat-footer {
+            padding: 11px;
+            background: #14141a;
+            border-top: 1px solid rgba(255,255,255,.08);
+        }
+
+
+        .team-chat-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+
+        .team-chat-input {
+            flex: 1;
+            min-width: 0;
+        }
+
+
+        .team-chat-input input,
+        .team-chat-input textarea {
+            width: 100%;
+            height: 44px;
+            padding: 10px 13px;
+            background: #1e1e26;
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 12px;
+            outline: none;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 10px;
+            resize: none;
+        }
+
+
+        .team-chat-input input:focus,
+        .team-chat-input textarea:focus {
+            border-color: #ff1712;
+        }
+
+
+        .team-chat-input input::placeholder,
+        .team-chat-input textarea::placeholder {
+            color: #656870;
+        }
+
+
+        .team-chat-send {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ff1712;
+            border: 0;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+
+        .team-chat-send:hover {
+            background: #df0d09;
+        }
+
+
+        /* =====================================================
+           SCROLLBAR
+        ===================================================== */
+
+        .team-chat-messages::-webkit-scrollbar {
+            width: 5px;
+        }
+
+
+        .team-chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+
+        .team-chat-messages::-webkit-scrollbar-thumb {
+            background: #292b31;
+            border-radius: 10px;
+        }
+
+
+        @media(max-width:650px) {
+
+            .team-chat-header {
+                padding: 10px 12px;
+            }
+
+
+            .team-chat-messages {
+                padding: 12px;
+            }
+
+
+            .team-chat-footer {
+                padding: 9px;
+            }
+
+        }
+
+    </style>
+
+
+    <!-- =====================================================
+         CHAT HEADER
+    ===================================================== -->
+
+    <div class="team-chat-header">
+
+        <div class="team-chat-header-left">
+
+            <div class="team-chat-avatar">
+                ⚔
+            </div>
+
+
+            <div class="team-chat-title">
+
+                <h2>
+                    {{ team_chat.groupchat_name }}
+                </h2>
+
+                <p>
+                    {{ team_chat.members.count }} members
+                    · Team Chat
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         MESSAGES
+    ===================================================== -->
+
+    <div
+        class="team-chat-messages"
+        id="team-chat-messages"
+    >
+
+        {% for chat_message in team_chat_messages %}
+
+            {% include "social/group_chat_messages.html" %}
+
+        {% empty %}
+
+            <div
+                class="team-chat-empty"
+                id="teamChatEmpty"
+            >
+                No messages yet.
+                Start the conversation.
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+
+
+    <!-- =====================================================
+         MESSAGE INPUT
+    ===================================================== -->
+
+    <div class="team-chat-footer">
+
+        <form
+            class="team-chat-form"
+            method="POST"
+            enctype="multipart/form-data"
+
+            hx-ext="ws"
+
+            ws-connect="/ws/chatroom/{{ team_chat.group_name }}/"
+
+            ws-send
+
+            _="on htmx:wsAfterSend reset me"
+        >
+
+            {% csrf_token %}
+
+
+            <div class="team-chat-input">
+
+                {{ chat_form.body }}
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="team-chat-send"
+                aria-label="Send message"
+            >
+                ➤
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   TEAM CHAT AUTO SCROLL
+========================================================= */
+
+(function() {
+
+    function scrollTeamChatToBottom() {
+
+        const messages =
+            document.getElementById(
+                "team-chat-messages"
+            );
+
+        if (!messages) return;
+
+        messages.scrollTop =
+            messages.scrollHeight;
+
+    }
+
+
+    window.addEventListener(
+        "load",
+        scrollTeamChatToBottom
+    );
+
+
+    document.body.addEventListener(
+        "htmx:wsAfterMessage",
+        function() {
+
+            setTimeout(
+                scrollTeamChatToBottom,
+                50
+            );
+
+            const empty =
+                document.getElementById(
+                    "teamChatEmpty"
+                );
+
+            if (empty) {
+                empty.remove();
+            }
+
+        }
+    );
+
+
+    document.body.addEventListener(
+        "htmx:oobAfterSwap",
+        function() {
+
+            setTimeout(
+                scrollTeamChatToBottom,
+                50
+            );
+
+        }
+    );
+
+})();
+
+</script>

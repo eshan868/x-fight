@@ -1,0 +1,298 @@
+{% extends "layouts/base_layout.html" %}
+{% block title %}Create Tournament Match | X-Fight{% endblock %}
+
+{% block content %}
+<section class="page-shell">
+    <div class="container" style="max-width: 720px;">
+
+        <div style="margin-bottom: 24px;">
+            <a href="javascript:history.back()" class="dashboard-chip-btn" style="margin-bottom: 16px;">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back</span>
+            </a>
+
+            <div class="page-heading" style="text-align: left; margin-bottom: 0;">
+                <span class="section-label">CHAMPIONSHIP FIXTURE</span>
+                <h1 style="font-size: clamp(1.8rem, 4vw, 2.4rem); font-family: 'Aclonica', sans-serif; margin: 6px 0;">
+                    Create Tournament Match
+                </h1>
+                <p style="color: #ffffff; font-size: 0.85rem;">
+                    Schedule a combat encounter for tournament contenders.
+                </p>
+            </div>
+        </div>
+
+        <div class="xf-panel">
+            <form method="POST" id="match-creation-form">
+                            {% csrf_token %}
+
+                            {{ form.user_timezone }}
+
+                            <div class="mb-3">
+                                <label class="form-label">Match Name</label>
+                                {{ form.name }}
+                                {{ form.name.errors }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Game</label>
+                                {{ form.game }}
+                                {{ form.game.errors }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Match Start Date</label>
+                                {{ form.match_start_time }}
+                                {{ form.match_start_time.errors }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Match End Date</label>
+                                {{ form.match_end_time }}
+                                {{ form.match_end_time.errors }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Duration</label>
+                                {{ form.duration }}
+                                {{ form.duration.errors }}
+                            </div>
+
+                            {% if tournament.category == "team" %}
+                                <div class="mb-3">
+                                    <label class="form-label">Maximum Teams</label>
+                                    {{ form.max_teams }}
+                                    {{ form.max_teams.errors }}
+                                </div>
+                            {% endif %}
+
+                            {% if tournament.category == "team" %}
+
+                                <div class="mb-3">
+                                    <label class="form-label">Select Teams</label>
+
+                                    <div class="border rounded p-3" id="team-checkboxes">
+                                        {% for checkbox in form.teams %}
+                                            <div class="form-check mb-2">
+                                                {{ checkbox.tag }}
+                                                <label
+                                                    class="form-check-label"
+                                                    for="{{ checkbox.id_for_label }}"
+                                                >
+                                                    {{ checkbox.choice_label }}
+                                                </label>
+                                            </div>
+                                        {% empty %}
+                                            <p class="text-muted mb-0">
+                                                No teams available.
+                                            </p>
+                                        {% endfor %}
+                                    </div>
+
+                                    {{ form.teams.errors }}
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-secondary mt-2 w-100"
+                                        id="random-btn"
+                                    >
+                                        🎲 Random Teams
+                                    </button>
+                                </div>
+
+                                <div
+                                    id="selected-container"
+                                    class="mb-3"
+                                    style="display: none;"
+                                >
+                                    <label class="form-label">Selected Teams</label>
+                                    <ul class="list-group" id="team-names"></ul>
+                                </div>
+
+                            {% elif tournament.category == "solo" %}
+
+                                <div class="mb-3">
+                                    <label class="form-label">Select Participants</label>
+
+                                    <div class="border rounded p-3" id="user-checkboxes">
+                                        {% for checkbox in form.match_players %}
+                                            <div class="form-check mb-2">
+                                                {{ checkbox.tag }}
+                                                <label
+                                                    class="form-check-label"
+                                                    for="{{ checkbox.id_for_label }}"
+                                                >
+                                                    {{ checkbox.choice_label }}
+                                                </label>
+                                            </div>
+                                        {% empty %}
+                                            <p class="text-muted mb-0">
+                                                No participants available.
+                                            </p>
+                                        {% endfor %}
+                                    </div>
+
+                                    {{ form.match_players.errors }}
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-secondary mt-2 w-100"
+                                        id="random-players-btn"
+                                    >
+                                        🎲 Random Participants
+                                    </button>
+
+                                    <div
+                                        id="selected-players-container"
+                                        class="mt-3"
+                                        style="display: none;"
+                                    >
+                                        <label class="form-label">Selected Participants</label>
+                                        <ul class="list-group" id="selected-player-names"></ul>
+                                    </div>
+                                </div>
+
+                            {% endif %}
+
+                            <div class="mt-4">
+                                <button type="submit" class="dashboard-primary-btn w-100" style="padding: 14px; font-size: 0.95rem; cursor: pointer;">
+                                    <i class="fa-solid fa-crosshairs me-2"></i>
+                                    Create Championship Match
+                                </button>
+                            </div>
+                        </form>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("match-creation-form");
+    const timezoneField = document.querySelector('input[name="user_timezone"]');
+
+    function setTimezone() {
+        if (timezoneField) {
+            timezoneField.value =
+                Intl.DateTimeFormat().resolvedOptions().timeZone;
+        }
+    }
+
+    setTimezone();
+
+    if (form) {
+        form.addEventListener("submit", setTimezone);
+    }
+
+    function selectRandomItems(options, count, listElement, containerElement) {
+        if (!options.length) {
+            alert("No options available to select.");
+            return;
+        }
+
+        if (!Number.isInteger(count) || count <= 0) {
+            alert("Enter a valid maximum number first.");
+            return;
+        }
+
+        if (count > options.length) {
+            alert("The requested number exceeds the available options.");
+            return;
+        }
+
+        options.forEach(function (checkbox) {
+            checkbox.checked = false;
+        });
+
+        const shuffled = [...options];
+
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+
+        listElement.innerHTML = "";
+
+        shuffled.slice(0, count).forEach(function (checkbox) {
+            checkbox.checked = true;
+
+            const label = checkbox.closest(".form-check")
+                .querySelector("label");
+
+            const item = document.createElement("li");
+            item.className = "list-group-item";
+            item.textContent = label
+                ? label.textContent.trim()
+                : checkbox.value;
+
+            listElement.appendChild(item);
+        });
+
+        containerElement.style.display = "block";
+    }
+
+    const randomTeamsButton = document.getElementById("random-btn");
+
+    if (randomTeamsButton) {
+        randomTeamsButton.addEventListener("click", function () {
+            const maxTeamsField = document.getElementById("id_max_teams");
+            const maxTeams = parseInt(maxTeamsField?.value, 10);
+
+            const checkboxes = Array.from(
+                document.querySelectorAll(
+                    '#team-checkboxes input[type="checkbox"]'
+                )
+            );
+
+            selectRandomItems(
+                checkboxes,
+                maxTeams,
+                document.getElementById("team-names"),
+                document.getElementById("selected-container")
+            );
+        });
+    }
+
+    const randomPlayersButton =
+        document.getElementById("random-players-btn");
+
+    if (randomPlayersButton) {
+        randomPlayersButton.addEventListener("click", function () {
+            const checkboxes = Array.from(
+                document.querySelectorAll(
+                    '#user-checkboxes input[type="checkbox"]'
+                )
+            );
+
+            if (!checkboxes.length) {
+                alert("No participants available.");
+                return;
+            }
+
+            const rawCount = prompt(
+                "How many participants do you want to select?",
+                String(checkboxes.length)
+            );
+
+            if (rawCount === null || rawCount.trim() === "") {
+                return;
+            }
+
+            const count = Number(rawCount);
+
+            if (!Number.isInteger(count)) {
+                alert("Enter a whole number.");
+                return;
+            }
+
+            selectRandomItems(
+                checkboxes,
+                count,
+                document.getElementById("selected-player-names"),
+                document.getElementById("selected-players-container")
+            );
+        });
+    }
+});
+</script>
+{% endblock %}
+                                         

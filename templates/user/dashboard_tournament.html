@@ -1,0 +1,36 @@
+{% load static %}
+
+<header class="xf-head">
+    <div>
+        <p class="xf-kicker">Tournaments</p>
+        <h1>Active tournaments</h1>
+    </div>
+    <a href="{% url 'tournament-creation' %}" class="xf-btn">Organize</a>
+</header>
+
+<div class="tournament-grid">
+    {% for events in tournament %}
+    <article class="xf-panel tournament-card">
+        <div class="xf-panel-head">
+            <h2>{{ events.name }}</h2>
+            <span class="xf-tag">Live</span>
+        </div>
+        <p class="tournament-meta">
+            {{ events.team.count }} squads
+            {% if events.price %} · ₹{{ events.price }}{% endif %}
+            {% if events.category %} · {{ events.category }}{% endif %}
+        </p>
+        <div class="xf-row">
+            <a href="{% url 'tournament-dashboard' events.id %}" class="xf-btn xf-btn-sm">Open</a>
+            {% if events.owner == request.user %}
+            <a href="{% url 'event-management' events.id %}" class="xf-link">Settings</a>
+            {% endif %}
+        </div>
+    </article>
+    {% empty %}
+    <div class="xf-panel" style="grid-column: 1 / -1;">
+        <p class="xf-empty">No tournaments yet.</p>
+        <a href="{% url 'events-display' %}" class="xf-btn">Browse tournaments</a>
+    </div>
+    {% endfor %}
+</div>

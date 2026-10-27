@@ -1,0 +1,45 @@
+{% if player %}
+
+    {% if match.status == "open" or match.status == "countdown" %}
+
+        <form ws-send>
+
+            {% csrf_token %}
+
+            {% if player.ready %}
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="not-ready"
+                >
+
+                <button
+                    type="submit"
+                    class="btn btn-danger"
+                >
+                    Not Ready
+                </button>
+
+            {% else %}
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="ready"
+                >
+
+                <button
+                    type="submit"
+                    class="btn btn-success"
+                >
+                    Ready
+                </button>
+
+            {% endif %}
+
+        </form>
+
+    {% endif %}
+
+{% endif %}

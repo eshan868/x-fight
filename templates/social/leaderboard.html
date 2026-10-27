@@ -1,0 +1,140 @@
+{% extends "layouts/base_layout.html" %}
+{% load static %}
+
+{% block title %}Leaderboard | X-Fight{% endblock %}
+
+{% block content %}
+
+
+<section class="page-shell">
+    <div class="container">
+        <div class="page-heading mb-4">
+            <h1 class="leaderboard-title">
+                <i class="bi bi-trophy"></i> Leaderboard
+            </h1>
+            <p class="leaderboard-subtitle">
+                Top contenders ranked by Battle Credits & Combat Score
+            </p>
+        </div>
+
+        <div class="controls-bar">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" id="leaderboardSearch" placeholder="Search player name...">
+            </div>
+        </div>
+
+        {% if profile %}
+        <!-- Top 3 Podium Highlights -->
+        <div class="podium-container">
+            {% for player in profile|slice:":3" %}
+            <div class="podium-card rank-{{ forloop.counter }}">
+                <div class="podium-badge">#{{ forloop.counter }}</div>
+                <div class="player-avatar podium-avatar">
+                    {{ player.user.username|first|upper }}
+                </div>
+                <div class="podium-details">
+                    <div class="podium-name">{{ player.user.username }}</div>
+                    <span class="xp-badge" data-xp="{{ player.stats }}">
+                        <span class="xp-number">0</span> BP
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Leaderboard Table -->
+        <div class="leaderboard-card table-responsive">
+            <table class="table leaderboard-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th class="text-end">Battle Points (BP)</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                    {% for player in profile %}
+                    <tr class="leaderboard-row">
+                        <td class="leaderboard-rank">
+                            {% if forloop.counter == 1 %}1
+                            {% elif forloop.counter == 2 %}2
+                            {% elif forloop.counter == 3 %}3
+                            {% else %}{{ forloop.counter }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="player-avatar">
+                                    {{ player.user.username|first|upper }}
+                                </div>
+                                <h6 class="mb-0 leaderboard-player-name">
+                                    {{ player.user.username }}
+                                </h6>
+                            </div>
+                        </td>
+                        <td class="text-end">
+                            <span class="xp-badge" data-xp="{{ player.stats }}">
+                                <span class="xp-number">0</span> XP
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr id="emptyRow">
+                        <td colspan="3" class="text-center py-5">
+                            No players found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Live Search Filter for Django rendered rows
+    const searchInput = document.getElementById('leaderboardSearch');
+    const tableRows = document.querySelectorAll('.leaderboard-row');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function (e) {
+            const query = e.target.value.toLowerCase().trim();
+
+            tableRows.forEach(row => {
+                const usernameEl = row.querySelector('.leaderboard-player-name');
+                if (usernameEl) {
+                    const username = usernameEl.textContent.toLowerCase();
+                    row.style.display = username.includes(query) ? '' : 'none';
+                }
+            });
+        });
+    }
+
+    // Animated Count-Up for Backend XP Data
+    const xpBadges = document.querySelectorAll('.xp-badge[data-xp]');
+    xpBadges.forEach(badge => {
+        const targetXP = parseInt(badge.getAttribute('data-xp'), 10) || 0;
+        const numberSpan = badge.querySelector('.xp-number');
+        if (!numberSpan) return;
+
+        let currentXP = 0;
+        const duration = 1000;
+        const stepTime = 20;
+        const totalSteps = duration / stepTime;
+        const increment = Math.ceil(targetXP / totalSteps);
+
+        const timer = setInterval(() => {
+            currentXP += increment;
+            if (currentXP >= targetXP) {
+                currentXP = targetXP;
+                clearInterval(timer);
+            }
+            numberSpan.textContent = currentXP.toLocaleString();
+        }, stepTime);
+    });
+});
+</script>
+{% endblock %}

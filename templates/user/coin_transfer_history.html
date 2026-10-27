@@ -1,0 +1,50 @@
+{% load static %}
+
+<header class="xf-head">
+    <div>
+        <p class="xf-kicker">Credits</p>
+        <h1>Credit history</h1>
+    </div>
+    <a href="{% url 'coin-transfer' %}" class="xf-btn">Send credits</a>
+</header>
+
+<section class="xf-stats">
+    <article class="xf-stat">
+        <span>Sent</span>
+        <strong>{{ sent_coins|default:"0" }}</strong>
+    </article>
+    <article class="xf-stat">
+        <span>Received</span>
+        <strong>{{ received_coins|default:"0" }}</strong>
+    </article>
+    <article class="xf-stat">
+        <span>Balance</span>
+        <strong>{{ profile.xp|default:"0" }}</strong>
+    </article>
+    <article class="xf-stat">
+        <span>Transfers</span>
+        <strong>{{ transfers.count|default:"0" }}</strong>
+    </article>
+</section>
+
+<div class="xf-panel">
+    {% for transfer in transfers %}
+    <div class="xf-row">
+        {% if transfer.sender_id == request.user.id %}
+        <div>
+            <strong>Sent to {{ transfer.receiver.user.username|default:transfer.receiver.username }}</strong>
+            <small>{{ transfer.created_at|date:"M d, Y · g:i A" }}</small>
+        </div>
+        <strong>-{{ transfer.amount }}</strong>
+        {% else %}
+        <div>
+            <strong>Received from {{ transfer.sender.user.username|default:transfer.sender.username }}</strong>
+            <small>{{ transfer.created_at|date:"M d, Y · g:i A" }}</small>
+        </div>
+        <strong>+{{ transfer.amount }}</strong>
+        {% endif %}
+    </div>
+    {% empty %}
+    <p class="xf-empty">No transfers yet.</p>
+    {% endfor %}
+</div>

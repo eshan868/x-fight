@@ -1,0 +1,1130 @@
+{% extends "layouts/base_layout.html" %}
+
+{% load static %}
+
+{% block title %}
+{{ meeting.name }} | X-Fight
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .meeting-page {
+        width: 100%;
+        min-height: calc(100vh - 80px);
+        padding: 25px;
+        background: var(--background, #09090B);
+    }
+
+    .meeting-wrapper {
+        width: 100%;
+        min-height: calc(100vh - 130px);
+        border: 1px solid var(--surface-2, #1E1E26);
+        border-radius: 18px;
+        overflow: hidden;
+        background: var(--surface, #14141A);
+        position: relative;
+    }
+
+    /* ==============================
+       TOP BAR
+    ============================== */
+
+    .meeting-topbar {
+        height: 70px;
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--surface-2, #1E1E26);
+        background: var(--surface, #14141A);
+    }
+
+    .meeting-title-area {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .meeting-logo {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--primary, #ff0000);
+        color: white;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .meeting-title-area h2 {
+        margin: 0;
+        color: var(--text-light, #B8B8C5);
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .meeting-title-area p {
+        margin: 3px 0 0;
+        color: #777783;
+        font-size: 11px;
+    }
+
+    .meeting-user {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-light, #B8B8C5);
+        font-size: 12px;
+    }
+
+    .meeting-user-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--primary-light, #2b0053);
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* ==============================
+       JOIN SCREEN
+    ============================== */
+
+    .meeting-join-screen {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+    }
+
+    .join-layout {
+        width: min(1050px, 100%);
+        display: grid;
+        grid-template-columns: 1.4fr 0.8fr;
+        gap: 25px;
+    }
+
+    /* ==============================
+       PREVIEW
+    ============================== */
+
+    .preview-card {
+        min-height: 520px;
+        border-radius: 18px;
+        border: 1px solid var(--surface-2, #1E1E26);
+        background: #09090B;
+        overflow: hidden;
+        position: relative;
+    }
+
+    #camera-preview {
+        width: 100%;
+        height: 100%;
+        min-height: 520px;
+        object-fit: cover;
+        background: #080808;
+        display: block;
+    }
+
+    .preview-placeholder {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #777783;
+        pointer-events: none;
+    }
+
+    .preview-avatar {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: var(--primary-light, #2b0053);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 30px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .preview-placeholder p {
+        margin: 0;
+        font-size: 12px;
+    }
+
+    .preview-name {
+        position: absolute;
+        left: 18px;
+        bottom: 18px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.65);
+        color: white;
+        font-size: 12px;
+    }
+
+    /* ==============================
+       JOIN PANEL
+    ============================== */
+
+    .join-panel {
+        border: 1px solid var(--surface-2, #1E1E26);
+        border-radius: 18px;
+        background: var(--surface, #14141A);
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .join-panel-label {
+        color: var(--primary, #ff0000);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .join-panel h1 {
+        margin: 0;
+        color: var(--text-light, #B8B8C5);
+        font-size: 25px;
+        line-height: 1.3;
+    }
+
+    .join-panel-description {
+        margin: 12px 0 25px;
+        color: #777783;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .meeting-details {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+
+    .meeting-detail {
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: var(--surface-2, #1E1E26);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .meeting-detail-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: var(--primary-light, #2b0053);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 12px;
+    }
+
+    .meeting-detail-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .meeting-detail-text span:first-child {
+        color: #777783;
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+
+    .meeting-detail-text span:last-child {
+        color: var(--text-light, #B8B8C5);
+        font-size: 11px;
+    }
+
+    /* ==============================
+       DEVICE CONTROLS
+    ============================== */
+
+    .device-controls {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .device-button {
+        flex: 1;
+        height: 44px;
+        border: 1px solid var(--surface-2, #1E1E26);
+        border-radius: 9px;
+        background: var(--surface-2, #1E1E26);
+        color: var(--text-light, #B8B8C5);
+        cursor: pointer;
+        font-size: 11px;
+        transition: 0.2s;
+    }
+
+    .device-button:hover {
+        border-color: var(--primary, #ff0000);
+    }
+
+    .device-button.active {
+        background: var(--primary-light, #2b0053);
+        border-color: var(--primary, #ff0000);
+        color: white;
+    }
+
+    /* ==============================
+       JOIN BUTTON
+    ============================== */
+
+    .join-button {
+        width: 100%;
+        height: 48px;
+        border: none;
+        border-radius: 10px;
+        background: var(--primary, #ff0000);
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .join-button:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+
+    .join-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* ==============================
+       ZEGO ROOM
+    ============================== */
+
+    #meeting-room {
+        display: none;
+        width: 100%;
+        height: calc(100vh - 200px);
+        min-height: 600px;
+        background: #050607;
+    }
+
+    #meeting-room.active {
+        display: block;
+    }
+
+    /* ==============================
+       ERROR
+    ============================== */
+
+    .meeting-error {
+        display: none;
+        padding: 20px;
+        margin-top: 15px;
+        border-radius: 10px;
+        background: rgba(255, 0, 0, 0.08);
+        border: 1px solid rgba(255, 0, 0, 0.25);
+        color: #ff5964;
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+    /* ==============================
+       RESPONSIVE
+    ============================== */
+
+    @media (max-width: 850px) {
+
+        .meeting-page {
+            padding: 12px;
+        }
+
+        .join-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .preview-card {
+            min-height: 350px;
+        }
+
+        #camera-preview {
+            min-height: 350px;
+        }
+
+        .join-panel {
+            padding: 22px;
+        }
+
+    }
+</style>
+
+
+<div class="meeting-page">
+
+    <div class="meeting-wrapper">
+
+        <!-- =========================================
+             TOP BAR
+        ========================================== -->
+
+        <div class="meeting-topbar">
+
+            <div class="meeting-title-area">
+
+                <div class="meeting-logo">
+                    X
+                </div>
+
+                <div>
+
+                    <h2>
+                        {{ meeting.name }}
+                    </h2>
+
+                    <p>
+                        {{ team.name }} · Team Meeting
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="meeting-user">
+
+                <div class="meeting-user-avatar">
+
+                    {{ request.user.username|first|upper }}
+
+                </div>
+
+                <span>
+                    {{ request.user.username }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             CUSTOM JOIN SCREEN
+        ========================================== -->
+
+        <div id="join-screen" class="meeting-join-screen">
+
+            <div class="join-layout">
+
+
+                <!-- =================================
+                     CAMERA PREVIEW
+                ================================== -->
+
+                <div class="preview-card">
+
+                    <video id="camera-preview" autoplay muted playsinline></video>
+
+
+                    <div id="preview-placeholder" class="preview-placeholder">
+
+                        <div class="preview-avatar">
+
+                            {{ request.user.username|first|upper }}
+
+                        </div>
+
+                        <p>
+                            Camera is off
+                        </p>
+
+                    </div>
+
+
+                    <div class="preview-name">
+
+                        {{ request.user.username }}
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================
+                     JOIN PANEL
+                ================================== -->
+
+                <div class="join-panel">
+
+                    <div class="join-panel-label">
+                        X-FIGHT MEETING
+                    </div>
+
+                    <h1>
+                        Ready to join?
+                    </h1>
+
+
+                    {% if meeting.description %}
+
+                    <p class="join-panel-description">
+
+                        {{ meeting.description }}
+
+                    </p>
+
+                    {% else %}
+
+                    <p class="join-panel-description">
+
+                        You are about to join the team meeting.
+                        Check your camera and microphone before entering.
+
+                    </p>
+
+                    {% endif %}
+
+
+                    <div class="meeting-details">
+
+                        <div class="meeting-detail">
+
+                            <div class="meeting-detail-icon">
+                                ◷
+                            </div>
+
+                            <div class="meeting-detail-text">
+
+                                <span>
+                                    START
+                                </span>
+
+                                <span>
+                                    {{ meeting.start_time|date:"M d, Y · h:i A" }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        {% if meeting.end_time %}
+
+                        <div class="meeting-detail">
+
+                            <div class="meeting-detail-icon">
+                                ◷
+                            </div>
+
+                            <div class="meeting-detail-text">
+
+                                <span>
+                                    END
+                                </span>
+
+                                <span>
+                                    {{ meeting.end_time|date:"M d, Y · h:i A" }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- DEVICE BUTTONS -->
+
+                    <div class="device-controls">
+
+                        <button type="button" id="mic-button" class="device-button" onclick="toggleMicrophone()">
+                            🎤 Microphone
+                        </button>
+
+
+                        <button type="button" id="camera-button" class="device-button" onclick="toggleCamera()">
+                            📹 Camera
+                        </button>
+
+                    </div>
+
+
+                    <!-- JOIN -->
+
+                    <button type="button" id="join-button" class="join-button" onclick="joinMeeting()">
+                        JOIN MEETING
+                    </button>
+
+
+                    <div id="meeting-error" class="meeting-error"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             ZEGO MEETING
+        ========================================== -->
+
+        <div id="meeting-room"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =============================================
+     ZEGOCLOUD
+============================================= -->
+
+<script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js"></script>
+
+
+
+<script>
+
+
+    const userID =
+        "{{ request.user.id|escapejs }}";
+
+    const userName =
+        "{{ request.user.username|escapejs }}";
+
+
+    const teamID =
+        "{{ team.id|escapejs }}";
+
+    const meetingID =
+        "{{ meeting.id|escapejs }}";
+
+
+    const roomID =
+        "x_fight_team_" +
+        teamID +
+        "_meeting_" +
+        meetingID;
+
+
+    let microphoneEnabled = false;
+
+    let cameraEnabled = false;
+
+    let localStream = null;
+
+    let zp = null;
+
+    function showMeetingError(message) {
+
+        const errorBox =
+            document.getElementById(
+                "meeting-error"
+            );
+
+        errorBox.textContent = message;
+
+        errorBox.style.display = "block";
+
+    }
+
+
+
+
+    async function getZegoToken() {
+
+        const response = await fetch(
+            "{% url 'zego-token' %}",
+            {
+                method: "GET",
+                credentials: "same-origin"
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "Unable to get meeting token."
+            );
+
+        }
+
+        if (
+            !data.app_id ||
+            !data.user_id ||
+            !data.token
+        ) {
+
+            throw new Error(
+                "Invalid meeting credentials received."
+            );
+
+        }
+
+        return data;
+
+    }
+
+
+    /* =========================================
+       CAMERA PREVIEW
+    ========================================= */
+
+    async function startCameraPreview() {
+
+        try {
+
+            localStream =
+                await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: false
+                });
+
+            const video =
+                document.getElementById(
+                    "camera-preview"
+                );
+
+            video.srcObject =
+                localStream;
+
+            document
+                .getElementById(
+                    "preview-placeholder"
+                )
+                .style.display = "none";
+
+            cameraEnabled = true;
+
+            document
+                .getElementById(
+                    "camera-button"
+                )
+                .classList.add("active");
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Camera error:",
+                error
+            );
+
+            showMeetingError(
+                "Camera permission was not granted."
+            );
+
+        }
+
+    }
+
+
+    /* =========================================
+       CAMERA TOGGLE
+    ========================================= */
+
+    async function toggleCamera() {
+
+        if (!cameraEnabled) {
+
+            await startCameraPreview();
+
+            return;
+
+        }
+
+
+        if (localStream) {
+
+            localStream
+                .getVideoTracks()
+                .forEach(
+                    track => {
+                        track.enabled = false;
+                    }
+                );
+
+        }
+
+        cameraEnabled = false;
+
+
+        document
+            .getElementById(
+                "preview-placeholder"
+            )
+            .style.display = "flex";
+
+
+        document
+            .getElementById(
+                "camera-button"
+            )
+            .classList.remove("active");
+
+    }
+
+
+    async function toggleMicrophone() {
+
+        if (!localStream) {
+
+            try {
+
+                localStream =
+                    await navigator.mediaDevices.getUserMedia({
+                        video: false,
+                        audio: true
+                    });
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Microphone error:",
+                    error
+                );
+
+                showMeetingError(
+                    "Microphone permission was not granted."
+                );
+
+                return;
+
+            }
+
+        }
+
+
+        const audioTracks =
+            localStream.getAudioTracks();
+
+
+        if (!audioTracks.length) {
+
+            try {
+
+                const audioStream =
+                    await navigator.mediaDevices.getUserMedia({
+                        audio: true
+                    });
+
+                audioStream
+                    .getAudioTracks()
+                    .forEach(
+                        track => {
+                            localStream.addTrack(track);
+                        }
+                    );
+
+            }
+
+            catch (error) {
+
+                showMeetingError(
+                    "Unable to access microphone."
+                );
+
+                return;
+
+            }
+
+        }
+
+
+        const tracks =
+            localStream.getAudioTracks();
+
+
+        microphoneEnabled =
+            !microphoneEnabled;
+
+
+        tracks.forEach(
+            track => {
+                track.enabled =
+                    microphoneEnabled;
+            }
+        );
+
+
+        document
+            .getElementById(
+                "mic-button"
+            )
+            .classList.toggle(
+                "active",
+                microphoneEnabled
+            );
+
+    }
+
+
+
+    async function joinMeeting() {
+
+        const joinButton =
+            document.getElementById(
+                "join-button"
+            );
+
+
+        joinButton.disabled = true;
+
+        joinButton.textContent =
+            "CONNECTING...";
+
+
+        if (
+            typeof ZegoUIKitPrebuilt ===
+            "undefined"
+        ) {
+
+            showMeetingError(
+                "ZEGOCLOUD failed to load."
+            );
+
+            joinButton.disabled = false;
+
+            joinButton.textContent =
+                "JOIN MEETING";
+
+            return;
+
+        }
+
+
+        if (!userID) {
+
+            showMeetingError(
+                "You must be logged in."
+            );
+
+            joinButton.disabled = false;
+
+            joinButton.textContent =
+                "JOIN MEETING";
+
+            return;
+
+        }
+
+
+        if (!teamID || !meetingID) {
+
+            showMeetingError(
+                "Meeting information is missing."
+            );
+
+            joinButton.disabled = false;
+
+            joinButton.textContent =
+                "JOIN MEETING";
+
+            return;
+
+        }
+
+
+        let kitToken;
+
+
+        /* =========================================
+           FETCH APP ID + USER ID + TOKEN
+           FROM DJANGO BACKEND
+        ========================================= */
+
+        try {
+
+            const credentials =
+                await getZegoToken();
+
+
+            kitToken =
+                ZegoUIKitPrebuilt.generateKitTokenForProduction(
+
+                    credentials.app_id,
+
+                    credentials.token,
+
+                    roomID,
+
+                    credentials.user_id,
+
+                    userName
+
+                );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Token error:",
+                error
+            );
+
+            showMeetingError(
+                "Unable to create meeting token."
+            );
+
+            joinButton.disabled = false;
+
+            joinButton.textContent =
+                "JOIN MEETING";
+
+            return;
+
+        }
+
+
+        try {
+
+            zp =
+                ZegoUIKitPrebuilt.create(
+                    kitToken
+                );
+
+
+            document
+                .getElementById(
+                    "join-screen"
+                )
+                .style.display = "none";
+
+
+            const meetingRoom =
+                document.getElementById(
+                    "meeting-room"
+                );
+
+
+            meetingRoom.classList.add(
+                "active"
+            );
+
+
+            zp.joinRoom({
+
+                container:
+                    meetingRoom,
+
+                scenario: {
+
+                    mode:
+                        ZegoUIKitPrebuilt.VideoConference
+
+                },
+
+                showPreJoinView:
+                    false,
+
+                showScreenSharingButton:
+                    true,
+
+                showUserList:
+                    true,
+
+                showLeavingView:
+                    false,
+
+                turnOnMicrophoneWhenJoining:
+                    microphoneEnabled,
+
+                turnOnCameraWhenJoining:
+                    cameraEnabled,
+
+                showLayoutButton:
+                    true,
+
+                showTextChat:
+                    true,
+
+
+                /* =====================================
+                   WHEN USER LEAVES MEETING
+                ===================================== */
+
+                onLeaveRoom: function () {
+
+                    window.location.href =
+                        "{% url 'team-dashboard' team.id %}";
+
+                }
+
+            });
+
+
+            console.log(
+                "Attempting to join:",
+                roomID
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "ZEGOCLOUD error:",
+                error
+            );
+
+            document
+                .getElementById(
+                    "join-screen"
+                )
+                .style.display = "flex";
+
+            document
+                .getElementById(
+                    "meeting-room"
+                )
+                .classList.remove(
+                    "active"
+                );
+
+            showMeetingError(
+                "Unable to join the meeting."
+            );
+
+            joinButton.disabled = false;
+
+            joinButton.textContent =
+                "JOIN MEETING";
+
+        }
+
+    }
+
+</script>
+
+
+{% endblock %}

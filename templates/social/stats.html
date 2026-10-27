@@ -1,0 +1,512 @@
+{% extends "layouts/base_layout.html" %}
+{% load static %}
+
+{% block title %}Stats | X-Fight{% endblock %}
+
+{% block content %}
+
+<style>
+    .stats-shop {
+        color: #fff;
+        padding: 24px 0;
+    }
+
+    .stats-heading {
+        font-family: 'Aclonica', sans-serif;
+        color: #fff;
+        margin-bottom: 10px;
+    }
+
+    .stats-subtitle {
+        color: #B8B8C5;
+        margin-bottom: 30px;
+    }
+
+    .stats-card {
+        background: #14141A;
+        border: 1px solid #2b0053;
+        border-radius: 16px;
+        height: 100%;
+        overflow: hidden;
+        transition: transform .2s ease, border-color .2s ease;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        border-color: #ff0000;
+    }
+
+    .stats-card .card-body {
+        padding: 26px;
+    }
+
+    .stats-icon {
+        font-size: 35px;
+        margin-bottom: 16px;
+    }
+
+    .stats-card h5 {
+        color: #fff;
+        font-weight: 700;
+    }
+
+    .stats-description {
+        color: #B8B8C5;
+        min-height: 44px;
+    }
+
+    .stats-amount {
+        font-size: 32px;
+        font-weight: 800;
+        color: #fff;
+        margin: 18px 0 4px;
+    }
+
+    .stats-price {
+        color: #ff5252;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .stats-buy-btn {
+        width: 100%;
+        background: #ff0000;
+        color: #fff;
+        border: none;
+        border-radius: 9px;
+        padding: 11px;
+        font-weight: 700;
+        transition: background .2s;
+    }
+
+    .stats-buy-btn:hover {
+        background: #cc0000;
+        color: #fff;
+    }
+
+    .custom-stats-card {
+        background: linear-gradient(135deg, #2b0053, #14141A 75%);
+        border: 1px solid #6a21a8;
+        border-radius: 16px;
+        padding: 25px;
+        margin-top: 30px;
+    }
+
+    .custom-stats-btn {
+        background: transparent;
+        color: #fff;
+        border: 1px solid #ff0000;
+        border-radius: 9px;
+        padding: 11px 22px;
+        font-weight: 700;
+    }
+
+    .custom-stats-btn:hover {
+        background: #ff0000;
+        color: #fff;
+    }
+
+    .stats-modal .modal-content {
+        background: #14141A;
+        color: #fff;
+        border: 1px solid #2b0053;
+        border-radius: 16px;
+    }
+
+    .stats-modal .modal-header,
+    .stats-modal .modal-footer {
+        border-color: #2b0053;
+    }
+
+    .stats-modal .form-control {
+        background: #09090B;
+        color: #fff;
+        border: 1px solid #2b0053;
+        border-radius: 8px;
+    }
+
+    .stats-modal .form-control:focus {
+        border-color: #ff0000;
+        box-shadow: 0 0 0 2px rgba(255, 0, 0, .15);
+    }
+
+    .stats-modal .form-control::placeholder {
+        color: #777783;
+    }
+
+    .stats-modal .form-text {
+        color: #B8B8C5;
+    }
+
+    .stats-modal .btn-close {
+        filter: invert(1);
+    }
+
+    .stats-modal .stats-preview {
+        background: #09090B;
+        border: 1px solid #2b0053;
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 16px;
+    }
+
+    .stats-preview strong {
+        color: #ff5252;
+    }
+</style>
+
+<div class="container stats-shop">
+
+    <div class="text-center">
+        <h2 class="stats-heading">STATS SHOP</h2>
+        <p class="stats-subtitle">
+            Upgrade your profile with XP coins and show your progress.
+        </p>
+    </div>
+
+    <!-- Predefined packages -->
+    <div class="row g-4">
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="stats-icon">📊</div>
+                    <h5>Starter Stats</h5>
+                    <p class="stats-description">
+                        A small boost to your player statistics.
+                    </p>
+                    <div class="stats-amount">80</div>
+                    <div class="stats-price">🪙 100 Coins</div>
+
+                    <form method="post" action="{% url 'stats-purchase' %}" class="stats-buy-form">
+                        {% csrf_token %}
+
+                        <input type="hidden" name="action" value="package">
+                        <input type="hidden" name="package" value="starter">
+
+                        <button type="submit" class="stats-buy-btn">
+                            Buy Package
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="stats-icon">⚡</div>
+                    <h5>Pro Stats</h5>
+                    <p class="stats-description">
+                        A stronger upgrade for competitive players.
+                    </p>
+                    <div class="stats-amount">200</div>
+                    <div class="stats-price">🪙 250 Coins</div>
+
+                    <form method="post" action="{% url 'stats-purchase' %}" class="stats-buy-form">
+                        {% csrf_token %}
+
+                        <input type="hidden" name="action" value="package">
+                        <input type="hidden" name="package" value="pro">
+
+                        <button type="submit" class="stats-buy-btn">
+                            Buy Package
+                        </button>
+                    </form>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="stats-icon">👑</div>
+                    <h5>Elite Stats</h5>
+                    <p class="stats-description">
+                        A premium stats upgrade for dedicated gamers.
+                    </p>
+                    <div class="stats-amount">450</div>
+                    <div class="stats-price">🪙 500 Coins</div>
+
+                    <form method="post" action="{% url 'stats-purchase' %}" class="stats-buy-form">
+                        {% csrf_token %}
+                    
+                        <input type="hidden" name="action" value="package">
+                        <input type="hidden" name="package" value="elite">
+                    
+                        <button type="submit" class="stats-buy-btn">
+                            Buy Package
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Custom package -->
+    <div class="custom-stats-card">
+        <div class="row align-items-center g-3">
+            <div class="col-md">
+                <h4 class="mb-2">🎯 Custom Stats</h4>
+                <p class="mb-0" style="color:#B8B8C5;">
+                    Choose how many coins to spend and calculate your stats
+                    before confirming your purchase.
+                </p>
+            </div>
+            <div class="col-md-auto">
+                <button type="button" class="custom-stats-btn" data-bs-toggle="modal"
+                    data-bs-target="#customStatsModal">
+                    Customize Purchase
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Custom stats modal -->
+<div class="modal fade stats-modal" id="customStatsModal" tabindex="-1" aria-labelledby="customStatsModalLabel"
+    aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="customStatsModalLabel">
+                    Customize Your Stats
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form method="post" action="{% url 'stats-purchase' %}" id="customStatsForm">
+                
+                {% csrf_token %}
+                <input type="hidden" name="action" value="custom">
+                <div class="modal-body">
+                    <label for="customCoins" class="form-label">
+                        Coins to spend
+                    </label>
+                    <input type="number" class="form-control" id="customCoins" name="coins" min="1" step="1"
+                        placeholder="Enter coin amount" required>
+                    <div class="form-text">
+                        Rate: 1 stat = 5 coins. Change this rate in the
+                        JavaScript if required.
+                    </div>
+                    <div class="stats-preview">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Coins</span>
+                            <strong id="previewCoins">0</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Stats you'll receive</span>
+                            <strong id="previewStats">0</strong>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="stats-buy-btn" style="width:auto;padding:10px 20px;">
+                        Confirm & Buy
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        "use strict";
+
+        const COINS_PER_STAT = 5;
+
+        // Send the form to the correct Django endpoint.
+        async function sendPurchaseRequest(form) {
+            const url = form.getAttribute("action");
+
+            if (!url || url.includes("[object HTMLInputElement]")) {
+                console.error("Invalid purchase URL:", url);
+                alert("Invalid purchase URL. Check the form's action attribute.");
+                return;
+            }
+
+            console.log("Purchase URL:", url);
+
+            const response = await fetch(url, {
+                method: "POST",
+                body: new FormData(form),
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                credentials: "same-origin"
+            });
+
+            const responseText = await response.text();
+
+            console.log("Purchase HTTP status:", response.status);
+            console.log("Purchase response:", responseText);
+
+            let data;
+
+            try {
+                data = JSON.parse(responseText);
+            } catch (error) {
+                console.error("Invalid JSON response:", error);
+
+                alert(
+                    "The server returned an unexpected response.\n\n" +
+                    "HTTP status: " + response.status +
+                    "\nURL: " + response.url +
+                    "\nCheck the Django URL configuration and terminal."
+                );
+                return;
+            }
+
+            alert(
+                data.message ||
+                (response.ok
+                    ? "Request completed."
+                    : "The purchase request failed.")
+            );
+
+            if (response.ok && data.success === true) {
+                window.location.reload();
+            }
+        }
+
+        // Disable the button while the request is processing.
+        async function handlePurchase(form, button) {
+            if (button.disabled) return;
+
+            button.disabled = true;
+
+            try {
+                await sendPurchaseRequest(form);
+            } catch (error) {
+                console.error("Purchase request failed:", error);
+
+                alert(
+                    "Unable to complete the purchase request.\n\n" +
+                    "Check the browser console and Django terminal."
+                );
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        // Handle predefined package purchases.
+        document.querySelectorAll(".stats-buy-form").forEach(function (form) {
+            form.addEventListener("submit", async function (event) {
+                event.preventDefault();
+
+                const packageInput = form.querySelector(
+                    'input[name="package"]'
+                );
+                const button = form.querySelector(
+                    'button[type="submit"]'
+                );
+
+                if (!packageInput || !button) {
+                    console.error("Package input or button is missing.");
+                    alert("The package form is incorrectly configured.");
+                    return;
+                }
+
+                const packageName = packageInput.value;
+
+                if (!window.confirm(
+                    "Are you sure you want to purchase the " +
+                    packageName.toUpperCase() +
+                    " stats package?"
+                )) {
+                    return;
+                }
+
+                await handlePurchase(form, button);
+            });
+        });
+
+        // Custom purchase elements.
+        const coinsInput = document.getElementById("customCoins");
+        const previewCoins = document.getElementById("previewCoins");
+        const previewStats = document.getElementById("previewStats");
+        const customForm = document.getElementById("customStatsForm");
+
+        // Update the custom stats preview.
+        if (coinsInput && previewCoins && previewStats) {
+            coinsInput.addEventListener("input", function () {
+                const rawValue = coinsInput.value.trim();
+                const coins = Number(rawValue);
+
+                const valid =
+                    rawValue !== "" &&
+                    Number.isSafeInteger(coins) &&
+                    coins > 0;
+
+                previewCoins.textContent = valid
+                    ? coins.toLocaleString()
+                    : "0";
+
+                previewStats.textContent = valid
+                    ? Math.floor(coins / COINS_PER_STAT).toLocaleString()
+                    : "0";
+            });
+        } else {
+            console.warn("Custom preview elements are missing.");
+        }
+
+        // Handle custom stats purchases.
+        if (customForm && coinsInput) {
+            customForm.addEventListener("submit", async function (event) {
+                event.preventDefault();
+
+                const rawValue = coinsInput.value.trim();
+                const coins = Number(rawValue);
+
+                if (
+                    rawValue === "" ||
+                    !Number.isSafeInteger(coins) ||
+                    coins < COINS_PER_STAT
+                ) {
+                    alert("Enter a valid amount of at least 5 coins.");
+                    coinsInput.focus();
+                    return;
+                }
+
+                const stats = Math.floor(coins / COINS_PER_STAT);
+
+                if (!window.confirm(
+                    "Confirm your custom stats purchase?\n\n" +
+                    "Coins to spend: " + coins.toLocaleString() + "\n" +
+                    "Stats to receive: " + stats.toLocaleString() + "\n\n" +
+                    "Press OK to continue."
+                )) {
+                    return;
+                }
+
+                const button = customForm.querySelector(
+                    'button[type="submit"]'
+                );
+
+                if (!button) {
+                    console.error("Custom purchase button is missing.");
+                    alert("The custom purchase form is incorrectly configured.");
+                    return;
+                }
+
+                await handlePurchase(customForm, button);
+            });
+        } else {
+            console.warn("Custom purchase form or coin input is missing.");
+        }
+    });
+</script>
+
+{% endblock %}

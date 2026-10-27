@@ -1,0 +1,358 @@
+.xf-dash {
+    background: #000;
+    color: #fff;
+    min-height: calc(100vh - var(--navbar-h));
+    padding: 16px 0 40px;
+}
+
+.xf-dash .xf-shell {
+    width: min(1180px, calc(100% - 24px));
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 16px;
+}
+
+.xf-dash .dashboard-sidebar {
+    position: sticky;
+    top: calc(var(--navbar-h) + 12px);
+    height: calc(100vh - var(--navbar-h) - 32px);
+    background: #000 !important;
+    border: 1px solid var(--neon) !important;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: none !important;
+}
+
+.xf-dash .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 14px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--neon);
+}
+
+.xf-dash .sidebar-brand-icon {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--neon);
+    border-radius: 8px;
+    background: #000 !important;
+}
+
+.xf-dash .sidebar-brand small {
+    color: #fff !important;
+    font-size: 0.7rem;
+}
+
+.xf-dash .dashboard-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.xf-dash .dashboard-nav-item,
+.xf-dash .dashboard-action-btn,
+.xf-dash .add-gamemate-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: #000 !important;
+    color: #fff !important;
+    border: 1px solid transparent !important;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.86rem;
+    box-shadow: none !important;
+}
+
+.xf-dash .dashboard-nav-item.active,
+.xf-dash .dashboard-nav-item:hover,
+.xf-dash .dashboard-action-btn,
+.xf-dash .add-gamemate-btn {
+    border-color: var(--neon) !important;
+}
+
+.xf-dash .sidebar-bottom {
+    margin-top: auto;
+    border-top: 1px solid var(--neon);
+    padding-top: 12px;
+}
+
+.xf-dash .dashboard-main {
+    min-width: 0;
+    padding: 0 !important;
+}
+
+.xf-dash .dashboard-view { display: none; }
+.xf-dash .dashboard-view.active-view { display: block; }
+
+.xf-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 16px;
+}
+
+.xf-kicker {
+    margin: 0 0 4px;
+    font-size: 0.72rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.xf-head h1 {
+    margin: 0;
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+}
+
+.xf-head-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.xf-btn,
+.xf-dash .dashboard-primary-btn,
+.xf-dash .small-action-btn,
+.xf-dash .card-action,
+.xf-dash .event-enter-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #000 !important;
+    color: #fff !important;
+    border: 1px solid var(--neon) !important;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.82rem;
+    box-shadow: none !important;
+}
+
+.xf-btn-sm { padding: 6px 10px; font-size: 0.78rem; }
+
+.xf-link {
+    background: none;
+    border: 0;
+    color: #fff;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.82rem;
+    padding: 0;
+}
+
+.xf-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.xf-stat {
+    border: 1px solid var(--neon);
+    border-radius: 10px;
+    padding: 14px;
+    background: #000;
+}
+
+.xf-stat span,
+.xf-stat a {
+    display: block;
+    font-size: 0.75rem;
+    color: #fff;
+}
+
+.xf-stat strong {
+    display: block;
+    font-size: 1.4rem;
+    margin: 4px 0;
+}
+
+.xf-split {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 12px;
+}
+
+.xf-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.xf-panel,
+.xf-dash .xf-panel,
+.xf-dash .tournament-card,
+.xf-dash .matches-card,
+.xf-dash .empty-card,
+.xf-dash .stat-card,
+.xf-dash .dashboard-chart-card {
+    background: #000 !important;
+    color: #fff !important;
+    border: 1px solid var(--neon) !important;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: none !important;
+}
+
+.xf-panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.xf-panel-head h2,
+.xf-dash .section-heading h2 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.xf-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-top: 1px solid rgba(255, 26, 26, 0.35);
+}
+
+.xf-row:first-of-type { border-top: 0; }
+
+.xf-row strong,
+.xf-row small {
+    display: block;
+}
+
+.xf-row small,
+.xf-empty {
+    color: #fff;
+    font-size: 0.78rem;
+}
+
+.xf-row-link {
+    text-decoration: none;
+    color: #fff;
+}
+
+.xf-tag {
+    border: 1px solid var(--neon);
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 0.7rem;
+}
+
+.xf-alerts { margin-bottom: 12px; }
+
+.xf-alert {
+    border: 1px solid var(--neon);
+    padding: 10px 12px;
+    border-radius: 8px;
+}
+
+.xf-dash .section-heading {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.xf-dash .section-label,
+.xf-dash .tournament-meta,
+.xf-dash .section-heading p {
+    color: #fff !important;
+}
+
+.xf-dash .tournament-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.xf-dash .dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+@media (max-width: 991px) {
+    .xf-dash .xf-shell {
+        display: block;
+        width: 100%;
+        padding: 0 12px;
+        box-sizing: border-box;
+    }
+
+    .xf-dash .mobile-sidebar-toggle {
+        display: flex !important;
+        position: fixed;
+        top: calc(var(--navbar-h) + 10px);
+        left: 12px;
+        z-index: 10002;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #000;
+        color: #fff;
+        border: 1px solid var(--neon);
+        align-items: center;
+        justify-content: center;
+    }
+
+    .xf-dash .dashboard-sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: min(260px, 86vw) !important;
+        height: 100vh !important;
+        z-index: 10001;
+        transform: translateX(-110%);
+        transition: transform .25s ease;
+        border-radius: 0 12px 12px 0;
+    }
+
+    .xf-dash .dashboard-sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .xf-stats,
+    .xf-dash .dashboard-stats,
+    .xf-split {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .xf-stats,
+    .xf-dash .dashboard-stats,
+    .xf-split,
+    .xf-cards,
+    .xf-dash .tournament-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .xf-head-actions,
+    .xf-btn,
+    .xf-dash .dashboard-primary-btn {
+        width: 100%;
+    }
+
+    .xf-row {
+        flex-wrap: wrap;
+    }
+}

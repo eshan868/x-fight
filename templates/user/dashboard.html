@@ -1,0 +1,266 @@
+{% extends "layouts/base_layout.html" %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/dashboard-ui.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="xf-dash">
+    {% include "user/game_mate_search.html" %}
+
+    {% if messages %}
+    <div class="xf-alerts">
+        {% for message in messages %}
+        <div class="xf-alert">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="dashboard-container xf-shell">
+        <button type="button" id="mobileSidebarToggle" class="mobile-sidebar-toggle" aria-label="Open menu" aria-expanded="false">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay"></div>
+
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-brand">
+                <span class="sidebar-brand-icon"><i class="fa-solid fa-gamepad"></i></span>
+                <div>
+                    <strong>X-Fight</strong>
+                    <small>My Space</small>
+                </div>
+            </div>
+
+            <nav class="dashboard-nav">
+                <a href="#" class="dashboard-nav-item active" id="dashboardLink">
+                    <i class="fa-solid fa-house"></i><span>Overview</span>
+                </a>
+                <a href="#" class="dashboard-nav-item" id="tournamentLink">
+                    <i class="fa-solid fa-trophy"></i><span>Tournaments</span>
+                </a>
+                <a href="#" class="dashboard-nav-item" id="matchesLink">
+                    <i class="fa-solid fa-gamepad"></i><span>Matches</span>
+                </a>
+                <a href="#" class="dashboard-nav-item" id="chatsLink">
+                    <i class="fa-solid fa-comments"></i><span>Chats</span>
+                </a>
+                <a href="#" class="dashboard-nav-item" id="teamsLink">
+                    <i class="fa-solid fa-users"></i><span>Teams</span>
+                </a>
+                <a href="{% url 'coin-transfer' %}" class="dashboard-nav-item" id="coinTransferLink">
+                    <i class="fa-solid fa-coins"></i><span>Send credits</span>
+                </a>
+                <a href="#" class="dashboard-nav-item" id="coinTransferHistoryLink">
+                    <i class="fa-solid fa-clock-rotate-left"></i><span>Credit history</span>
+                </a>
+                <a href="{% url 'friendly-match-creation' %}" class="dashboard-action-btn">
+                    <i class="fa-solid fa-plus"></i><span>Friendly match</span>
+                </a>
+                <button type="button" class="add-gamemate-btn" onclick="openGameMateSearch()">
+                    <i class="fa-solid fa-user-plus"></i><span>Add game mate</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <a href="{% url 'logout' %}" class="dashboard-nav-item logout-link">
+                    <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <div class="dashboard-main">
+
+            <div id="dashboardContent" class="dashboard-view active-view">
+                <header class="xf-head">
+                    <div>
+                        <p class="xf-kicker">Overview</p>
+                        <h1>Hi, {{ user.username }}</h1>
+                    </div>
+                    <div class="xf-head-actions">
+                        <a href="{% url 'events-display' %}" class="xf-btn">Tournaments</a>
+                        <a href="{% url 'friendly-match-creation' %}" class="xf-btn">New match</a>
+                    </div>
+                </header>
+
+                <section class="xf-stats">
+                    <article class="xf-stat">
+                        <span>Credits</span>
+                        <strong>{{ profile.xp }}</strong>
+                        <a href="{% url 'coin-transfer' %}">Transfer</a>
+                    </article>
+                    <article class="xf-stat">
+                        <span>Tournaments</span>
+                        <strong>{{ tournament.count|default:"0" }}</strong>
+                    </article>
+                    <article class="xf-stat">
+                        <span>Matches</span>
+                        <strong>{{ matches.count|default:"0" }}</strong>
+                    </article>
+                    <article class="xf-stat">
+                        <span>Game mates</span>
+                        <strong>{{ game_mates.count|default:"0" }}</strong>
+                    </article>
+                </section>
+
+                <section class="xf-split">
+                    <div class="xf-panel">
+                        <div class="xf-panel-head">
+                            <h2>Upcoming matches</h2>
+                            <a href="{% url 'friendly-match-creation' %}" class="xf-link">Create</a>
+                        </div>
+                        {% for match in matches|slice:":4" %}
+                        <div class="xf-row">
+                            <div>
+                                <strong>{{ match.name }}</strong>
+                                <small>{{ match.game|title }} · {{ match.match_start_time|date:"M d, g:i A" }}</small>
+                            </div>
+                            <a href="{% url 'match-room' match.id %}" class="xf-btn xf-btn-sm">Enter</a>
+                        </div>
+                        {% empty %}
+                        <p class="xf-empty">No matches yet. Create a friendly match.</p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="xf-panel">
+                        <div class="xf-panel-head">
+                            <h2>Game mates</h2>
+                            <button type="button" class="xf-link" onclick="openGameMateSearch()">Add</button>
+                        </div>
+                        {% for gm in game_mates|slice:":5" %}
+                        <div class="xf-row">
+                            <div>
+                                {% if gm.user == request.user %}
+                                <strong>{{ gm.mate.username }}</strong>
+                                <a href="{% url 'start-chat' gm.mate.username %}" class="xf-link">Chat</a>
+                                {% else %}
+                                <strong>{{ gm.user.username }}</strong>
+                                <a href="{% url 'start-chat' gm.user.username %}" class="xf-link">Chat</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="xf-empty">No game mates yet.</p>
+                        {% endfor %}
+                    </div>
+                </section>
+            </div>
+
+            <div id="tournamentsSection" class="dashboard-view">
+                {% include 'user/dashboard_tournament.html' %}
+            </div>
+
+            <div id="matchesSection" class="dashboard-view">
+                <header class="xf-head">
+                    <div>
+                        <p class="xf-kicker">Matches</p>
+                        <h1>Upcoming matches</h1>
+                    </div>
+                    <a href="{% url 'friendly-match-creation' %}" class="xf-btn">Create match</a>
+                </header>
+                <div class="xf-panel">
+                    {% for match in matches %}
+                    <div class="xf-row">
+                        <div>
+                            <strong>{{ match.name }}</strong>
+                            <small>{{ match.game|title }} · {{ match.match_start_time|date:"M d, Y · g:i A" }}</small>
+                        </div>
+                        <a href="{% url 'match-room' match.id %}" class="xf-btn xf-btn-sm">Enter</a>
+                    </div>
+                    {% empty %}
+                    <p class="xf-empty">No friendly matches yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div id="chatsSection" class="dashboard-view">
+                <header class="xf-head">
+                    <div>
+                        <p class="xf-kicker">Social</p>
+                        <h1>Chats</h1>
+                    </div>
+                    <a href="{% url 'new-groupchat' %}" class="xf-btn">New group</a>
+                </header>
+
+                <section class="xf-split">
+                    <div class="xf-panel">
+                        <div class="xf-panel-head">
+                            <h2>Game mates</h2>
+                            <button type="button" class="xf-link" onclick="openGameMateSearch()">Add</button>
+                        </div>
+                        {% for gm in game_mates %}
+                        <div class="xf-row">
+                            <div>
+                                {% if gm.user == request.user %}
+                                <strong>{{ gm.mate.username }}</strong>
+                                <a href="{% url 'start-chat' gm.mate.username %}" class="xf-link">Chat</a>
+                                {% else %}
+                                <strong>{{ gm.user.username }}</strong>
+                                <a href="{% url 'start-chat' gm.user.username %}" class="xf-link">Chat</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="xf-empty">No game mates yet.</p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="xf-panel">
+                        <div class="xf-panel-head">
+                            <h2>Groups</h2>
+                        </div>
+                        {% for group in joined_groups %}
+                        <a href="{% url 'chatroom' group.group_name %}" class="xf-row xf-row-link">
+                            <div>
+                                <strong>{% if group.groupchat_name %}{{ group.groupchat_name }}{% else %}{{ group.group_name }}{% endif %}</strong>
+                                <small>Open chat</small>
+                            </div>
+                        </a>
+                        {% empty %}
+                        <p class="xf-empty">No groups yet.</p>
+                        {% endfor %}
+                    </div>
+                </section>
+            </div>
+
+            <div id="teamsSection" class="dashboard-view">
+                <header class="xf-head">
+                    <div>
+                        <p class="xf-kicker">Squads</p>
+                        <h1>My teams</h1>
+                    </div>
+                    <a href="{% url 'team-creation' %}" class="xf-btn">Create squad</a>
+                </header>
+                <div class="xf-cards">
+                    {% for team in teams %}
+                    <article class="xf-panel">
+                        <div class="xf-panel-head">
+                            <h2>{{ team.name }}</h2>
+                            {% if team.captain == request.user %}<span class="xf-tag">Captain</span>{% endif %}
+                        </div>
+                        <p>{{ team.description|default:"No description." }}</p>
+                        <div class="xf-row">
+                            <small>{{ team.members.count }} members</small>
+                            <a href="{% url 'team-dashboard' team.id %}" class="xf-btn xf-btn-sm">Team room</a>
+                        </div>
+                    </article>
+                    {% empty %}
+                    <p class="xf-empty">No teams yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div id="coinTransferHistory" class="dashboard-view">
+                {% include 'user/coin_transfer_history.html' %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/components.js' %}"></script>
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

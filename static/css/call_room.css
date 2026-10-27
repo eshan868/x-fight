@@ -1,0 +1,734 @@
+/* =========================================================
+   X-FIGHT CALL ROOM
+   ========================================================= */
+
+.xf-call-room {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    display: none;
+
+    background: #09090B;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   ACTIVE
+   ========================================================= */
+
+.xf-call-room.active {
+    display: block;
+}
+
+
+/* =========================================================
+   VIDEO CONTAINER
+   ========================================================= */
+
+.xf-video-container {
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #111111 0%,
+            #050505 40%,
+            #000000 100%
+        );
+}
+
+
+/* =========================================================
+   REMOTE VIDEO
+   ========================================================= */
+
+.xf-remote-video {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    display: none;
+
+    background: #09090B;
+}
+
+
+/* =========================================================
+   LOCAL VIDEO
+   ========================================================= */
+
+.xf-local-video {
+    position: absolute;
+
+    right: 30px;
+    top: 90px;
+
+    width: 180px;
+    height: 120px;
+
+    object-fit: cover;
+
+    border-radius: 18px;
+
+    border: 2px solid rgba(255, 0, 0, 0.7);
+
+    background: #14141A;
+
+    display: none;
+
+    z-index: 5;
+}
+
+
+/* =========================================================
+   VOICE AVATAR
+   ========================================================= */
+
+.xf-voice-avatar {
+    position: absolute;
+
+    left: 50%;
+    top: 43%;
+
+    transform: translate(
+        -50%,
+        -50%
+    );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* =========================================================
+   AVATAR
+   ========================================================= */
+
+.xf-avatar-ring {
+    position: relative;
+
+    width: 170px;
+    height: 170px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.xf-avatar {
+    width: 110px;
+    height: 110px;
+
+    border-radius: 50%;
+
+    background: #14141A;
+
+    border: 2px solid #ff0000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #ff0000;
+
+    font-size: 42px;
+
+    position: relative;
+    z-index: 4;
+}
+
+
+.xf-ring {
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(
+        255,
+        0,
+        0,
+        0.35
+    );
+
+    animation:
+        xfRingPulse 2.5s infinite;
+}
+
+
+.ring-two {
+    inset: 15px;
+
+    animation-delay: 0.5s;
+}
+
+
+.ring-three {
+    inset: 30px;
+
+    animation-delay: 1s;
+}
+
+
+@keyframes xfRingPulse {
+
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1.25);
+        opacity: 0;
+    }
+
+}
+
+
+/* =========================================================
+   OVERLAY
+   ========================================================= */
+
+.xf-room-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 10;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   TOP
+   ========================================================= */
+
+.xf-room-top {
+    position: absolute;
+
+    left: 30px;
+    right: 30px;
+    top: 25px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.xf-room-brand {
+    font-family: Aclonica, sans-serif;
+
+    color: white;
+
+    font-size: 18px;
+
+    letter-spacing: 2px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+.xf-brand-dot {
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: #000;
+    border: 1px solid var(--neon);
+    box-shadow: none;
+}
+
+
+.xf-call-status {
+    color: #ffffff;
+
+    font-family: Poppins, sans-serif;
+
+    font-size: 12px;
+
+    letter-spacing: 1px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.xf-live-dot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #ff0000;
+}
+
+
+/* =========================================================
+   CENTER
+   ========================================================= */
+
+.xf-center-profile {
+    position: absolute;
+
+    left: 50%;
+    top: 65%;
+
+    transform: translateX(-50%);
+
+    text-align: center;
+
+    min-width: 250px;
+}
+
+
+.xf-center-profile h2 {
+    margin: 0;
+
+    font-family: Aclonica, sans-serif;
+
+    color: white;
+
+    font-size: 22px;
+}
+
+
+.xf-center-profile p {
+    margin: 8px 0;
+
+    font-family: Poppins, sans-serif;
+
+    color: #ffffff;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   WAVE
+   ========================================================= */
+
+.xf-wave {
+    height: 30px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 4px;
+
+    margin-top: 10px;
+}
+
+
+.xf-wave span {
+    width: 4px;
+
+    height: 10px;
+
+    border-radius: 10px;
+
+    background: #ff0000;
+
+    animation: xfWave 1s infinite ease-in-out;
+}
+
+
+.xf-wave span:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+
+.xf-wave span:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+
+.xf-wave span:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+
+.xf-wave span:nth-child(5) {
+    animation-delay: 0.2s;
+}
+
+
+.xf-wave span:nth-child(6) {
+    animation-delay: 0.1s;
+}
+
+
+@keyframes xfWave {
+
+    0%,
+    100% {
+        height: 8px;
+    }
+
+    50% {
+        height: 28px;
+    }
+
+}
+
+
+/* =========================================================
+   CONTROLS
+   ========================================================= */
+
+.xf-control-system {
+    position: absolute;
+
+    left: 50%;
+    bottom: 80px;
+
+    transform: translateX(-50%);
+
+    width: 260px;
+    height: 260px;
+
+    pointer-events: auto;
+}
+
+
+/* =========================================================
+   ROUND CONTROL
+   ========================================================= */
+
+.xf-round-control {
+    position: absolute;
+
+    width: 65px;
+    height: 65px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: rgba(
+        20,
+        20,
+        26,
+        0.95
+    );
+
+    color: #ffffff;
+
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.08
+    );
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 4px;
+
+    cursor: pointer;
+
+    opacity: 0;
+
+    transform: scale(0.5);
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.25s,
+        transform 0.25s,
+        background 0.25s;
+}
+
+
+.xf-round-control i {
+    font-size: 17px;
+}
+
+
+.xf-round-control span {
+    font-size: 8px;
+
+    font-family: Aclonica, sans-serif;
+
+    letter-spacing: 0.5px;
+}
+
+
+/* =========================================================
+   OPEN STATE
+   ========================================================= */
+
+.xf-control-system.open
+.xf-round-control {
+    opacity: 1;
+
+    transform: scale(1);
+
+    pointer-events: auto;
+}
+
+
+.xf-control-system.open
+.xf-round-control:nth-child(1) {
+    left: 98px;
+    top: 0;
+}
+
+
+.xf-control-system.open
+.xf-round-control:nth-child(2) {
+    right: 10px;
+    top: 55px;
+}
+
+
+.xf-control-system.open
+.xf-round-control:nth-child(3) {
+    right: 10px;
+    bottom: 55px;
+}
+
+
+.xf-control-system.open
+.xf-round-control:nth-child(4) {
+    left: 98px;
+    bottom: 0;
+}
+
+
+.xf-control-system.open
+.xf-round-control:nth-child(5) {
+    left: 10px;
+    bottom: 55px;
+}
+
+
+/* =========================================================
+   CONTROL ACTIVE
+   ========================================================= */
+
+.xf-round-control.active {
+    background: #000000;
+
+    color: white;
+
+    border-color: #ff0000;
+}
+
+
+/* =========================================================
+   MAIN BUTTON
+   ========================================================= */
+
+.xf-main-call-button {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(
+        -50%,
+        -50%
+    );
+
+    width: 82px;
+    height: 82px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #ff0000;
+
+    color: white;
+
+    font-size: 25px;
+
+    cursor: pointer;
+
+    pointer-events: auto;
+
+    box-shadow:
+        0 0 30px rgba(
+            255,
+            0,
+            0,
+            0.35
+        );
+
+    z-index: 10;
+}
+
+
+.xf-main-call-button.open {
+    transform:
+        translate(-50%, -50%)
+        rotate(45deg);
+}
+
+
+.xf-main-button-glow {
+    position: absolute;
+
+    inset: -10px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(
+        255,
+        0,
+        0,
+        0.3
+    );
+
+    animation:
+        xfMainPulse 2s infinite;
+}
+
+
+@keyframes xfMainPulse {
+
+    0% {
+        transform: scale(0.9);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1.3);
+        opacity: 0;
+    }
+
+}
+
+
+/* =========================================================
+   END CALL
+   ========================================================= */
+
+.xf-end-call-button {
+    position: absolute;
+
+    left: 50%;
+    bottom: -65px;
+
+    transform: translateX(-50%);
+
+    width: 58px;
+    height: 58px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #14141A;
+
+    color: #ff0000;
+
+    border: 1px solid rgba(
+        255,
+        0,
+        0,
+        0.5
+    );
+
+    font-size: 19px;
+
+    cursor: pointer;
+
+    pointer-events: auto;
+}
+
+
+/* =========================================================
+   HINT
+   ========================================================= */
+
+.xf-control-hint {
+    position: absolute;
+
+    bottom: 25px;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    color: #ffffff;
+
+    font-family: Aclonica, sans-serif;
+
+    font-size: 9px;
+
+    letter-spacing: 1.5px;
+}
+
+
+/* =========================================================
+   HOLD
+   ========================================================= */
+
+.xf-call-room.xf-on-hold
+.xf-video-container {
+    filter: grayscale(1);
+
+    opacity: 0.5;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .xf-control-system {
+        bottom: 65px;
+    }
+
+    .xf-local-video {
+        width: 130px;
+        height: 90px;
+
+        right: 15px;
+        top: 75px;
+    }
+
+    .xf-center-profile {
+        top: 58%;
+    }
+
+}
