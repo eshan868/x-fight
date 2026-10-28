@@ -82,16 +82,24 @@ class ChatGroupMessages(models.Model):
     )
     objects = ChatMessageQuerySet.as_manager()
 
-    @property
-    def filename(self):
-        if self.file:
-            return os.path.basename(self.file.name)
-        else:
-            return None
+    IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".svg")
+
     @property
     def is_image(self):
-        return bool(self.file) and "/image/upload/" in self.file.url
+        if not self.file:
+            return False
+        if self.file.name.lower().endswith(self.IMAGE_EXTENSIONS):
+            return True
+        try:
+            return "/image/upload/" in self.file.url  
+        except Exception:
+            return False
 
+    @property
+    def filename(self):
+        return os.path.basename(self.file.name) if self.file else ""
+
+   
     @property
     def display_name(self):
         return os.path.basename(self.file.name) if self.file else ""
@@ -106,11 +114,5 @@ class ChatGroupMessages(models.Model):
 
 
 
-    @property
-
-    def is_image(self):
-        if self.filename.lower().endswith((".jpg",".jpeg",".png",".gif",".svg",".webp")):
-            return True
-        else:
-            return False 
+   
 
