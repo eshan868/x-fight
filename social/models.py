@@ -88,12 +88,20 @@ class ChatGroupMessages(models.Model):
             return os.path.basename(self.file.name)
         else:
             return None
+    @property
+    def is_image(self):
+        return bool(self.file) and "/image/upload/" in self.file.url
+
+    @property
+    def display_name(self):
+        return os.path.basename(self.file.name) if self.file else ""
 
     def __str__(self):
         if self.body:
             return f'{self.author.username} : {self.body}'
         elif self.file :
              return f'{self.author.username} : {self.file}'
+            
 
 
 
