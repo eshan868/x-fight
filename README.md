@@ -413,3 +413,5 @@ Free for personal, educational and other non-commercial use. Commercial use requ
 Copyright © 2026 Muhammed Eshan P
 
 See the [LICENSE](LICENSE) file for the complete license.
+
+The Zego SDK in `static/zego-sdk` belongs to ZEGOCLOUD and is subject to its own terms. By contributing, you agree your contributions are licensed under the same terms.
