@@ -17,6 +17,9 @@ urlpatterns=[
     path("zego/token/", views.zego_token, name="zego_token"),
     path("calling/", views.calling_room, name="calling_room"),
     path("calls/start/",views.start_call,name="start_call"),
-    path('stats/purchase',views.stats,name="stats-purchase")
+    path('stats/purchase',views.stats,name="stats-purchase"),
+    path("messages/forward-targets/", views.forward_targets, name="forward-targets"),
+    path("messages/<int:message_id>/forward/", views.forward_message, name="forward-message"),
+    path("messages/<int:message_id>/delete/", views.delete_message, name="delete-message"),
     
 ]

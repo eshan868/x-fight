@@ -1,3 +1,268 @@
+<style>
+    /* ---------- message rows ---------- */
+    .message-row {
+        display: flex;
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    .message-row.sent {
+        justify-content: flex-end;
+    }
+
+    .message-row.received {
+        justify-content: flex-start;
+    }
+
+    .message-content {
+        display: flex;
+        flex-direction: column;
+        max-width: 70%;
+        min-width: 0;
+    }
+
+    .message-row.sent .message-content {
+        align-items: flex-end;
+    }
+
+    .message-row.received .message-content {
+        align-items: flex-start;
+    }
+
+    /* ---------- bubble ---------- */
+    .message-main {
+        position: relative;
+        width: fit-content;
+        max-width: 100%;
+        height: auto;
+        min-height: 0;
+    }
+
+    .chat-message {
+        width: fit-content;
+        max-width: 100%;
+        height: auto;
+        min-height: 0;
+        padding: 8px 14px;
+        border: 1px solid #ff1a1a;
+        border-radius: 16px;
+        background: rgba(255, 26, 26, 0.08);
+        color: #fff;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        text-align: left;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+
+    .message-row.sent .chat-message {
+        background: rgba(255, 26, 26, 0.18);
+        border-bottom-right-radius: 4px;
+    }
+
+    .message-row.received .chat-message {
+        border-bottom-left-radius: 4px;
+    }
+
+    .message-author {
+        font-size: 0.75rem;
+        color: #ff6b6b;
+        margin: 0 6px 2px;
+    }
+
+    /* ---------- time ---------- */
+    .message-time {
+        font-size: 0.7rem;
+        color: #8a8a8a;
+        margin: 3px 6px 0;
+    }
+
+    /* ---------- action buttons (show on hover) ---------- */
+    .message-actions {
+        display: flex;
+        gap: 4px;
+        margin-top: 4px;
+        opacity: 0;
+        transition: opacity 0.15s;
+    }
+
+    .message-row:hover .message-actions {
+        opacity: 1;
+    }
+
+    .message-row.sent .message-actions {
+        justify-content: flex-end;
+    }
+
+    .message-action-btn {
+        all: unset;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border: 1px solid rgba(255, 26, 26, 0.5);
+        border-radius: 8px;
+        color: #ff4d4d;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+    }
+
+    .message-action-btn:hover {
+        background: #ff1a1a;
+        color: #fff;
+    }
+
+    /* ---------- file dropdown ---------- */
+    .message-menu-wrapper {
+        position: relative;
+    }
+
+    .message-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        z-index: 20;
+        min-width: 150px;
+        padding: 4px;
+        background: #0b0b0b;
+        border: 1px solid #ff1a1a;
+        border-radius: 10px;
+    }
+
+    .message-dropdown.show {
+        display: block;
+    }
+
+    .message-dropdown-item {
+        all: unset;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 7px 10px;
+        border-radius: 6px;
+        color: #fff;
+        font-size: 0.85rem;
+        cursor: pointer;
+    }
+
+    .message-dropdown-item:hover {
+        background: rgba(255, 26, 26, 0.2);
+    }
+
+    .message-dropdown-item.danger {
+        color: #ff5555;
+    }
+
+    /* ---------- images ---------- */
+    .chat-uploaded-image {
+        max-width: 260px;
+        max-height: 260px;
+        border-radius: 12px;
+        display: block;
+    }
+
+    .chat-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        background: rgba(0, 0, 0, .7);
+        align-items: center;
+        justify-content: center
+    }
+
+    .chat-modal.show {
+        display: flex
+    }
+
+    .chat-modal-box {
+        width: min(92vw, 380px);
+        padding: 20px;
+        background: #0b0b0b;
+        border: 1px solid #ff1a1a;
+        border-radius: 16px;
+        color: #fff;
+        box-shadow: 0 0 25px rgba(255, 26, 26, .35)
+    }
+
+    .chat-modal-box h3 {
+        margin: 0 0 14px;
+        font-size: 1.1rem
+    }
+
+    .chat-modal-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 14px
+    }
+
+    .chat-modal-btn {
+        padding: 10px;
+        border: 1px solid rgba(255, 26, 26, .6);
+        border-radius: 10px;
+        background: transparent;
+        color: #fff;
+        cursor: pointer
+    }
+
+    .chat-modal-btn:hover {
+        background: rgba(255, 26, 26, .2)
+    }
+
+    .chat-modal-btn.danger {
+        background: #ff1a1a;
+        border-color: #ff1a1a
+    }
+
+    .chat-modal-btn.ghost {
+        border-color: #444;
+        color: #aaa
+    }
+
+    .chat-modal-btn:disabled {
+        opacity: .5;
+        cursor: default
+    }
+
+    .forward-list {
+        max-height: 260px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 6px
+    }
+
+    .forward-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border: 1px solid #2a2a2a;
+        border-radius: 10px;
+        cursor: pointer
+    }
+
+    .forward-item:hover {
+        border-color: #ff1a1a
+    }
+
+    .forward-item small {
+        margin-left: auto;
+        color: #888
+    }
+
+    .forwarded-label {
+        font-size: .72rem;
+        color: #8a8a8a;
+        margin: 0 6px 2px
+    }
+</style>
 {% if chat_message.message_type == "group_invite" %}
 
 <div class="message-row received-message">
@@ -10,21 +275,20 @@
 
         {% if chat_message.author_id != user.id %}
 
-            <p class="invite-text">
-                <strong>{{ chat_message.author.username }}</strong>
-                invited you to join a group.
-            </p>
+        <p class="invite-text">
+            <strong>{{ chat_message.author.username }}</strong>
+            invited you to join a group.
+        </p>
 
-            <a href="{% url 'chatroom' chat_message.body %}"
-               class="join-group-btn">
-                JOIN GROUP
-            </a>
+        <a href="{% url 'chatroom' chat_message.body %}" class="join-group-btn">
+            JOIN GROUP
+        </a>
 
         {% else %}
 
-            <p class="invite-text">
-                Invite sent successfully
-            </p>
+        <p class="invite-text">
+            Invite sent successfully
+        </p>
 
         {% endif %}
 
@@ -34,78 +298,73 @@
 
 {% else %}
 
-<div class="message-row
-    {% if chat_message.author_id == user.id %}sent{% else %}received{% endif %}"
-    data-message-id="{{ chat_message.id }}">
+<div class="message-row {% if chat_message.author_id == user.id %}sent{% else %}received{% endif %}"
+    id="message-{{ chat_message.id }}" data-message-id="{{ chat_message.id }}">
 
     <div class="message-content">
 
         {% if chat_message.author_id != user.id %}
-            <div class="message-author">
-                {{ chat_message.author.username }}
-            </div>
+        <div class="message-author">
+            {{ chat_message.author.username }}
+        </div>
         {% endif %}
 
 
         <!-- ==========================================
              MESSAGE BODY
         =========================================== -->
-
+        {% if chat_message.is_forwarded %}
+        <div class="forwarded-label"><i class="bi bi-arrow-right"></i> Forwarded</div>
+        {% endif %}
         <div class="message-main">
 
             <!-- FILE / IMAGE -->
             {% if chat_message.file %}
 
-                {% if chat_message.is_image %}
+            {% if chat_message.is_image %}
 
-                    <div class="chat-image-message">
+            <div class="chat-image-message">
 
-                        <a href="{{ chat_message.file.url }}"
-                           target="_blank"
-                           class="chat-image-link">
+                <a href="{{ chat_message.file.url }}" target="_blank" class="chat-image-link">
 
-                            <img
-                                src="{{ chat_message.file.url }}"
-                                alt="Uploaded image"
-                                class="chat-uploaded-image"
-                            >
+                    <img src="{{ chat_message.file.url }}" alt="Uploaded image" class="chat-uploaded-image">
 
-                        </a>
+                </a>
 
+            </div>
+
+            {% else %}
+
+            <div class="chat-file-message">
+
+                <div class="chat-file-icon">
+                    <i class="bi bi-file-earmark-fill"></i>
+                </div>
+
+                <div class="chat-file-info">
+
+                    <div class="chat-file-name">
+                        {{ chat_message.file.name|cut:"chat_files/" }}
                     </div>
 
-                {% else %}
-
-                    <div class="chat-file-message">
-
-                        <div class="chat-file-icon">
-                            <i class="bi bi-file-earmark-fill"></i>
-                        </div>
-
-                        <div class="chat-file-info">
-
-                            <div class="chat-file-name">
-                                {{ chat_message.file.name|cut:"chat_files/" }}
-                            </div>
-
-                            <div class="chat-file-type">
-                                File
-                            </div>
-
-                        </div>
-
+                    <div class="chat-file-type">
+                        File
                     </div>
 
-                {% endif %}
+                </div>
+
+            </div>
+
+            {% endif %}
 
             {% endif %}
 
 
             <!-- TEXT -->
             {% if chat_message.body %}
-                <div class="chat-message">
-                    {{ chat_message.body }}
-                </div>
+            <div class="chat-message">
+                {{ chat_message.body }}
+            </div>
             {% endif %}
 
 
@@ -116,10 +375,7 @@
             <div class="message-actions">
 
                 <!-- Forward -->
-                <button
-                    type="button"
-                    class="message-action-btn"
-                    onclick="openForwardMenu('{{ chat_message.id }}')"
+                <button type="button" class="message-action-btn" onclick="openForwardMenu('{{ chat_message.id }}')"
                     title="Forward">
 
                     <i class="bi bi-arrow-right"></i>
@@ -130,79 +386,66 @@
                 <!-- File menu -->
                 {% if chat_message.file %}
 
-                    <div class="message-menu-wrapper">
+                <div class="message-menu-wrapper">
 
-                        <button
-                            type="button"
-                            class="message-action-btn message-menu-btn"
-                            onclick="toggleMessageMenu(this)"
-                            title="More options">
+                    <button type="button" class="message-action-btn message-menu-btn" onclick="toggleMessageMenu(this)"
+                        title="More options">
 
-                            <i class="bi bi-chevron-down"></i>
+                        <i class="bi bi-chevron-down"></i>
+
+                    </button>
+
+                    <div class="message-dropdown">
+
+                        <!-- Download -->
+                        <a href="{{ chat_message.file.url }}" download class="message-dropdown-item">
+
+                            <i class="bi bi-download"></i>
+                            <span>Download</span>
+
+                        </a>
+
+
+                        <!-- Forward -->
+                        <button type="button" class="message-dropdown-item"
+                            onclick="openForwardMenu('{{ chat_message.id }}')">
+
+                            <i class="bi bi-forward"></i>
+                            <span>Forward</span>
 
                         </button>
 
-                        <div class="message-dropdown">
 
-                            <!-- Download -->
-                            <a
-                                href="{{ chat_message.file.url }}"
-                                download
-                                class="message-dropdown-item">
+                        <!-- Delete -->
+                        {% if chat_message.author_id == user.id %}
 
-                                <i class="bi bi-download"></i>
-                                <span>Download</span>
+                        <button type="button" class="message-dropdown-item danger"
+                            onclick="deleteMessage('{{ chat_message.id }}')">
 
-                            </a>
+                            <i class="bi bi-trash3"></i>
+                            <span>Delete</span>
 
+                        </button>
 
-                            <!-- Forward -->
-                            <button
-                                type="button"
-                                class="message-dropdown-item"
-                                onclick="openForwardMenu('{{ chat_message.id }}')">
-
-                                <i class="bi bi-forward"></i>
-                                <span>Forward</span>
-
-                            </button>
-
-
-                            <!-- Delete -->
-                            {% if chat_message.author_id == user.id %}
-
-                                <button
-                                    type="button"
-                                    class="message-dropdown-item danger"
-                                    onclick="deleteMessage('{{ chat_message.id }}')">
-
-                                    <i class="bi bi-trash3"></i>
-                                    <span>Delete</span>
-
-                                </button>
-
-                            {% endif %}
-
-                        </div>
+                        {% endif %}
 
                     </div>
 
+                </div>
+
                 {% else %}
 
-                    <!-- TEXT MESSAGE DELETE -->
-                    {% if chat_message.author_id == user.id %}
+                <!-- TEXT MESSAGE DELETE -->
+                {% if chat_message.author_id == user.id %}
 
-                        <button
-                            type="button"
-                            class="message-action-btn"
-                            onclick="deleteMessage('{{ chat_message.id }}')"
-                            title="Delete">
+                <button type="button" class="message-action-btn" onclick="deleteMessage('{{ chat_message.id }}')"
+                    title="Delete">
 
-                            <i class="bi bi-trash3"></i>
+                    <i class="bi bi-trash3"></i>
 
-                        </button>
+                </button>
 
-                    {% endif %}
+                {% endif %}
 
                 {% endif %}
 
@@ -215,7 +458,7 @@
              SMALL MESSAGE TIME
         =========================================== -->
 
-        <div class="message-time">
+        <div class="message-time" data-utc="{{ chat_message.created|date:'c' }}">
             {{ chat_message.created|date:"g:i a" }}
         </div>
 
@@ -223,4 +466,154 @@
 
 </div>
 
+<!-- ============ DELETE MODAL ============ -->
+<div class="chat-modal" id="deleteModal">
+    <div class="chat-modal-box">
+        <h3>Delete message?</h3>
+        <div class="chat-modal-actions">
+            <button type="button" id="delEveryoneBtn" class="chat-modal-btn danger">Delete for everyone</button>
+            <button type="button" id="delMeBtn" class="chat-modal-btn">Delete for me</button>
+            <button type="button" class="chat-modal-btn ghost" onclick="closeModal('deleteModal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============ FORWARD MODAL ============ -->
+<div class="chat-modal" id="forwardModal">
+    <div class="chat-modal-box">
+        <h3>Forward to...</h3>
+        <div id="forwardList" class="forward-list">Loading...</div>
+        <div class="chat-modal-actions">
+            <button type="button" id="forwardSendBtn" class="chat-modal-btn danger">Forward</button>
+            <button type="button" class="chat-modal-btn ghost" onclick="closeModal('forwardModal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
 {% endif %}
+
+
+<script>
+    function localizeTimes() {
+        document.querySelectorAll("[data-utc]:not([data-localized])").forEach(el => {
+            const d = new Date(el.dataset.utc);
+            if (isNaN(d)) return;
+
+            el.textContent = d.toLocaleTimeString([], {
+                hour: "numeric",
+                minute: "2-digit",
+            });
+            el.title = d.toLocaleString();   // full date on hover
+            el.dataset.localized = "1";      // don't convert twice
+        });
+    }
+
+    localizeTimes();
+
+    // Convert messages that arrive later via WebSocket/HTMX
+    new MutationObserver(localizeTimes).observe(document.body, {
+        childList: true,
+        subtree: true,
+    });
+
+    const DELETE_URL = "{% url 'delete-message' 0 %}";
+    const FORWARD_URL = "{% url 'forward-message' 0 %}";
+    const TARGETS_URL = "{% url 'forward-targets' %}";
+
+    function csrfToken() {
+        const c = document.cookie.split("; ").find(r => r.startsWith("csrftoken="));
+        return c ? decodeURIComponent(c.split("=")[1])
+            : document.querySelector("[name=csrfmiddlewaretoken]")?.value;
+    }
+    function openModal(id) { document.getElementById(id).classList.add("show"); }
+    function closeModal(id) { document.getElementById(id).classList.remove("show"); }
+
+    async function post(url, data) {
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken(),
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: data,
+        });
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Request failed");
+        return res.json();
+    }
+
+    /* ---------------- DELETE ---------------- */
+    let pendingDeleteId = null;
+
+    function deleteMessage(id) {
+        pendingDeleteId = id;
+        const row = document.getElementById("message-" + id);
+        const mine = row && row.classList.contains("sent");
+        // "Delete for everyone" only for the sender
+        document.getElementById("delEveryoneBtn").style.display = mine ? "" : "none";
+        openModal("deleteModal");
+    }
+
+    async function confirmDelete(mode) {
+        try {
+            await post(DELETE_URL.replace("/0/", "/" + pendingDeleteId + "/"), "mode=" + mode);
+            document.getElementById("message-" + pendingDeleteId)?.remove();
+            closeModal("deleteModal");
+        } catch (e) { alert(e.message); }
+    }
+    document.getElementById("delEveryoneBtn").onclick = () => confirmDelete("everyone");
+    document.getElementById("delMeBtn").onclick = () => confirmDelete("me");
+
+    /* ---------------- FORWARD ---------------- */
+    let pendingForwardId = null;
+
+    async function openForwardMenu(id) {
+        pendingForwardId = id;
+        const list = document.getElementById("forwardList");
+        list.textContent = "Loading...";
+        openModal("forwardModal");
+
+        try {
+            const res = await fetch(TARGETS_URL);
+            const data = await res.json();
+            list.innerHTML = "";
+            if (!data.targets.length) { list.textContent = "No chats or groups yet."; return; }
+
+            data.targets.forEach(t => {
+                const label = document.createElement("label");
+                label.className = "forward-item";
+                const cb = document.createElement("input");
+                cb.type = "checkbox"; cb.value = t.room;
+                const name = document.createElement("span");
+                name.textContent = t.label;
+                const kind = document.createElement("small");
+                kind.textContent = t.type === "group" ? "Group" : "Chat";
+                label.append(cb, name, kind);
+                list.appendChild(label);
+            });
+        } catch (e) { list.textContent = "Couldn't load chats."; }
+    }
+
+    document.getElementById("forwardSendBtn").onclick = async () => {
+        const rooms = [...document.querySelectorAll("#forwardList input:checked")].map(i => i.value);
+        if (!rooms.length) return alert("Select at least one chat.");
+
+        const btn = document.getElementById("forwardSendBtn");
+        btn.disabled = true;
+        try {
+            const body = new URLSearchParams();
+            rooms.forEach(r => body.append("rooms", r));
+            await post(FORWARD_URL.replace("/0/", "/" + pendingForwardId + "/"), body.toString());
+            closeModal("forwardModal");
+        } catch (e) { alert(e.message); }
+        btn.disabled = false;
+    };
+
+    // close on backdrop click
+    document.querySelectorAll(".chat-modal").forEach(m =>
+        m.addEventListener("click", e => { if (e.target === m) m.classList.remove("show"); })
+    );
+</script>

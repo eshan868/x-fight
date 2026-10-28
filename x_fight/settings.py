@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 ZEGO_APP_ID = int(os.getenv("ZEGO_APP_ID", "0"))
 ZEGO_SERVER_SECRET = os.getenv("ZEGO_SERVER_SECRET", "")
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG")
 
 ALLOWED_HOSTS = [
     host.strip()
@@ -101,9 +101,21 @@ ASGI_APPLICATION = "x_fight.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                {
+                    "address": os.environ["REDIS_URL"],
+                    "socket_connect_timeout": 60,
+                    "socket_timeout": 60,
+                }
+            ],
+            "expiry": 60,
+            "group_expiry": 86400,
+        },
     },
 }
+
 
 
 # Database
@@ -112,7 +124,8 @@ CHANNEL_LAYERS = {
 DATABASES = {
     "default": dj_database_url.parse(
         os.environ["DATABASE_URL"],
-        conn_max_age=0,
+        conn_max_age=60,
+        conn_health_checks=True,
         ssl_require=True,
     )
 }

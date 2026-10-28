@@ -89,9 +89,9 @@
                         aria-expanded="false"
                     >
 
-                        {% if user.user_profile.profile_image %}
+                        {% if user.profile.profile_image %}
                             <img
-                                src="{{ user.user_profile.profile_image.url }}"
+                                src="{{ user.profile.profile_image.url }}"
                                 class="nav-avatar"
                                 alt="{{ user.username }}"
                             >

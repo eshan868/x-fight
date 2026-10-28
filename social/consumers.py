@@ -3,112 +3,148 @@ from django.shortcuts  import get_object_or_404
 from .models import *
 import json
 from asgiref.sync import async_to_sync
+from channels.db import database_sync_to_async
+from channels.generic.websocket import (AsyncJsonWebsocketConsumer,AsyncWebsocketConsumer)
 from django.template.loader import render_to_string
-from channels.generic.websocket import AsyncJsonWebsocketConsumer
-class ChatConsumer(WebsocketConsumer):
 
-    def connect(self):
-        self.user=self.scope['user']
-        self.chatroom_name=self.scope['url_route']['kwargs']['chatroom_name']
-        self.chatroom=get_object_or_404(ChatGroup,group_name=self.chatroom_name)
 
-        async_to_sync (self.channel_layer.group_add) (
-            self.chatroom_name,self.channel_name
+class ChatConsumer(AsyncWebsocketConsumer):
+
+    async def connect(self):
+        self.chatroom = None
+        self.user = self.scope["user"]
+        self.chatroom_name = self.scope["url_route"]["kwargs"]["chatroom_name"]
+    
+        await self.accept()
+    
+        if not self.user.is_authenticated:
+            print("CHAT: rejected, not authenticated")
+            await self.close(code=4001)
+            return
+    
+        self.chatroom = await self.get_chatroom()
+        if self.chatroom is None:
+            print("CHAT: rejected, room not found:", self.chatroom_name)
+            await self.close(code=4004)
+            return
+    
+        await self.channel_layer.group_add(self.chatroom_name, self.channel_name)
+        print("CHAT: connected", self.user.username, self.chatroom_name)
+    
+        if await self.add_user_online():
+            await self.update_online_count()
+    
+    async def disconnect(self, close_code):
+        # connect() may have exited early, so chatroom might not be set
+        if getattr(self, "chatroom", None) is None:
+            return
+
+        await self.channel_layer.group_discard(self.chatroom_name, self.channel_name)
+
+        if await self.remove_user_online():
+            await self.update_online_count()
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        body = (data.get("body") or "").strip()
+        if not body:
+            return
+
+        message_id = await self.save_message(body)
+
+        await self.channel_layer.group_send(
+            self.chatroom_name,
+            {
+                "type": "message_handler",
+                "message_id": message_id,
+            },
         )
 
-        if self.user not in self.chatroom.users_online.all():
-            self.chatroom.users_online.add(self.user)
-            self.update_online_count()
+    # ---------- group event handlers ----------
 
-        self.accept()
-    def disconnect(self, close_code):
-        async_to_sync(self.channel_layer.group_discard)(
-            self.chatroom_name,self.channel_name
+    async def message_handler(self, event):
+        html = await self.render_message(event["message_id"])
+        await self.send(text_data=html)
+
+    async def online_count_handler(self, event):
+        html = render_to_string(
+            "social/partials/online_count_p.html",
+            {"online_count": event["online_count"]},
         )
-        if self.user in self.chatroom.users_online.all():
-                    self.chatroom.users_online.remove(self.user)
-                    self.update_online_count()
-        
-    def receive(self,text_data):
-        text_data_json=json.loads(text_data)
-        body=text_data_json['body']
+        await self.send(text_data=html)
 
-        message=ChatGroupMessages.objects.create(
+    async def update_online_count(self):
+        online_count = await self.get_online_count()
+        await self.channel_layer.group_send(
+            self.chatroom_name,
+            {
+                "type": "online_count_handler",
+                "online_count": online_count,
+            },
+        )
+    async def message_deleted(self, event):
+        await self.send(
+            text_data=f'<div id="message-{event["message_id"]}" hx-swap-oob="delete"></div>'
+        )
+    # ---------- database helpers (sync code wrapped for async) ----------
+
+    @database_sync_to_async
+    def get_chatroom(self):
+        return ChatGroup.objects.filter(group_name=self.chatroom_name).first()
+
+    @database_sync_to_async
+    def add_user_online(self):
+        if self.chatroom.users_online.filter(pk=self.user.pk).exists():
+            return False
+        self.chatroom.users_online.add(self.user)
+        return True
+
+    @database_sync_to_async
+    def remove_user_online(self):
+        if not self.chatroom.users_online.filter(pk=self.user.pk).exists():
+            return False
+        self.chatroom.users_online.remove(self.user)
+        return True
+
+    @database_sync_to_async
+    def get_online_count(self):
+        return self.chatroom.users_online.count() - 1
+
+    @database_sync_to_async
+    def save_message(self, body):
+        message = ChatGroupMessages.objects.create(
             body=body,
-            author=self.scope['user'],
-            group=self.chatroom
+            author=self.user,
+            group=self.chatroom,
         )
+
         if self.chatroom.is_private:
-
-            for member in self.chatroom.members.all():
-
-                if member != self.user:
-    
-                    Notification.objects.create(
-                        user=member,
-                        text=f"{self.user.username} sent you a message",
-                        notification_type="chat_message",
-                        related_id=message.id
-                    )
-    
-                    # print("Private chat notification created")
-
-
+            text = f"{self.user.username} sent you a message"
+            notification_type = "chat_message"
         elif self.chatroom.groupchat_name:
+            text = f"{self.user.username} sent a message in {self.chatroom.groupchat_name}"
+            notification_type = "group_message"
+        else:
+            return message.id
 
-            group_name = self.chatroom.groupchat_name
+        for member in self.chatroom.members.exclude(pk=self.user.pk):
+            Notification.objects.create(
+                user=member,
+                text=text,
+                notification_type=notification_type,
+                related_id=message.id,
+            )
 
-            for member in self.chatroom.members.all():
+        return message.id
 
-                if member != self.user:
-
-                    Notification.objects.create(
-                        user=member,
-                        text=f"{self.user.username} sent a message in {group_name}",
-                        notification_type="group_message",
-                        related_id=message.id
-                    )
+    @database_sync_to_async
+    def render_message(self, message_id):
+        message = ChatGroupMessages.objects.select_related("author").get(id=message_id)
+        return render_to_string(
+            "social/partials/group_chat_messages_p.html",
+            {"chat_message": message, "user": self.user},
+        )
     
-                # print("Group chat notification created")
-
-        event={
-            'type':'message_handler',
-            'message_id':message.id
-        }
-
-        async_to_sync(self.channel_layer.group_send)(
-            self.chatroom_name,event
-        ) 
-
-    def message_handler(self , event):
-        message_id=event['message_id']
-        message=get_object_or_404(ChatGroupMessages,id=message_id)
-        context={
-                'chat_message':message,
-                'user':self.user,
-        }
-        html=render_to_string("social/partials/group_chat_messages_p.html",context=context)
-        self.send(text_data=html)
-
-    def update_online_count(self):
-        online_count=self.chatroom.users_online.count() -1
-        event={
-             'type':'online_count_handler',
-             'online_count':online_count
-
-        }
-        async_to_sync(self.channel_layer.group_send)(
-                    self.chatroom_name,event
-                ) 
-    def online_count_handler(self,event):
-        online_count=event['online_count']
-
-        html=render_to_string("social/partials/online_count_p.html",{'online_count':online_count})
-        self.send(text_data=html)
-
-
-
-
 class CallConsumer(AsyncJsonWebsocketConsumer):
     """
     Handles WebRTC signaling for voice and video calls.

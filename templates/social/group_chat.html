@@ -605,573 +605,572 @@
    CHAT MESSAGE ROW
 ========================================================= */
 
-.message-row {
-    width: 100%;
-    display: flex;
-    margin-bottom: 12px;
-    padding: 0 14px;
-    box-sizing: border-box;
-}
+    .message-row {
+        width: 100%;
+        display: flex;
+        margin-bottom: 12px;
+        padding: 0 14px;
+        box-sizing: border-box;
+    }
 
-.message-row.sent {
-    justify-content: flex-end;
-}
+    .message-row.sent {
+        justify-content: flex-end;
+    }
 
-.message-row.received {
-    justify-content: flex-start;
-}
+    .message-row.received {
+        justify-content: flex-start;
+    }
 
 
-/* =========================================================
+    /* =========================================================
    MESSAGE CONTENT
 ========================================================= */
 
-.message-content {
-    max-width: 72%;
-    min-width: 70px;
+    .message-content {
+        max-width: 72%;
+        min-width: 70px;
 
-    display: flex;
-    flex-direction: column;
-}
+        display: flex;
+        flex-direction: column;
+    }
 
 
-/* =========================================================
+    /* =========================================================
    SENT / RECEIVED ALIGNMENT
 ========================================================= */
 
-.message-row.sent .message-content {
-    align-items: flex-end;
-}
+    .message-row.sent .message-content {
+        align-items: flex-end;
+    }
 
-.message-row.received .message-content {
-    align-items: flex-start;
-}
+    .message-row.received .message-content {
+        align-items: flex-start;
+    }
 
 
-/* =========================================================
+    /* =========================================================
    MESSAGE AUTHOR
 ========================================================= */
 
-.message-author {
-    color: #ff0000;
+    .message-author {
+        color: #ff0000;
 
-    font-family: "Aclonica", sans-serif;
+        font-family: "Aclonica", sans-serif;
 
-    font-size: 11px;
-    font-weight: 500;
+        font-size: 11px;
+        font-weight: 500;
 
-    margin-bottom: 5px;
-    padding-left: 5px;
-}
+        margin-bottom: 5px;
+        padding-left: 5px;
+    }
 
 
-/* =========================================================
+    /* =========================================================
    TEXT MESSAGE
 ========================================================= */
 
-.chat-message {
-    max-width: 100%;
+    .chat-message {
+        max-width: 100%;
 
-    padding: 10px 14px;
+        padding: 10px 14px;
 
-    border-radius: 16px;
+        border-radius: 16px;
 
-    font-family: "Poppins", sans-serif;
+        font-family: "Poppins", sans-serif;
 
-    font-size: 14px;
-    line-height: 1.5;
+        font-size: 14px;
+        line-height: 1.5;
 
-    word-break: break-word;
-    overflow-wrap: anywhere;
+        word-break: break-word;
+        overflow-wrap: anywhere;
 
-    white-space: pre-wrap;
-}
+        white-space: pre-wrap;
+    }
 
 
-/* =========================================================
+    /* =========================================================
    SENT MESSAGE
 ========================================================= */
 
-.message-row.sent .chat-message {
-    background: #000000;
+    .message-row.sent .chat-message {
+        background: #000000;
 
-    color: #ffffff;
+        color: #ffffff;
 
-    border: 1px solid rgba(255, 0, 0, 0.55);
+        border: 1px solid rgba(255, 0, 0, 0.55);
 
-    border-bottom-right-radius: 5px;
-}
+        border-bottom-right-radius: 5px;
+    }
 
 
-/* =========================================================
+    /* =========================================================
    RECEIVED MESSAGE
 ========================================================= */
 
-.message-row.received .chat-message {
-    background: #14141A;
+    .message-row.received .chat-message {
+        background: #14141A;
 
-    color: #eeeeee;
+        color: #eeeeee;
 
-    border: 1px solid #24242d;
+        border: 1px solid #24242d;
 
-    border-bottom-left-radius: 5px;
-}
+        border-bottom-left-radius: 5px;
+    }
 
 
-/* =========================================================
+    /* =========================================================
    IMAGE MESSAGE
 ========================================================= */
 
-.chat-image-message {
-    width: min(420px, 65vw);
+    .chat-image-message {
+        width: min(420px, 65vw);
 
-    border-radius: 16px;
+        border-radius: 16px;
 
-    overflow: hidden;
+        overflow: hidden;
 
-    background: #14141A;
+        background: #14141A;
 
-    border: 1px solid rgba(255, 0, 0, 0.25);
-}
+        border: 1px solid rgba(255, 0, 0, 0.25);
+    }
 
-.chat-image-message img {
-    display: block;
+    .chat-image-message img {
+        display: block;
 
-    width: 100%;
-    height: auto;
+        width: 100%;
+        height: auto;
 
-    max-height: 420px;
+        max-height: 420px;
 
-    object-fit: cover;
-}
+        object-fit: cover;
+    }
 
 
-/* =========================================================
+    /* =========================================================
    FILE MESSAGE
 ========================================================= */
 
-.chat-file-message {
-    display: flex;
+    .chat-file-message {
+        display: flex;
 
-    align-items: center;
+        align-items: center;
 
-    gap: 12px;
+        gap: 12px;
 
-    width: min(360px, 65vw);
+        width: min(360px, 65vw);
 
-    padding: 12px 14px;
+        padding: 12px 14px;
 
-    background: #14141A;
+        background: #14141A;
 
-    border: 1px solid rgba(255, 0, 0, 0.25);
+        border: 1px solid rgba(255, 0, 0, 0.25);
 
-    border-radius: 14px;
+        border-radius: 14px;
 
-    color: #ffffff;
+        color: #ffffff;
 
-    text-decoration: none;
+        text-decoration: none;
 
-    transition:
-        background .2s ease,
-        border-color .2s ease,
-        transform .2s ease;
-}
+        transition:
+            background .2s ease,
+            border-color .2s ease,
+            transform .2s ease;
+    }
 
-.chat-file-message:hover {
-    background: #1b1b23;
+    .chat-file-message:hover {
+        background: #1b1b23;
 
-    border-color: #ff0000;
+        border-color: #ff0000;
 
-    transform: translateY(-1px);
-}
+        transform: translateY(-1px);
+    }
 
-.chat-file-message i {
-    flex-shrink: 0;
+    .chat-file-message i {
+        flex-shrink: 0;
 
-    color: #ff0000;
+        color: #ff0000;
 
-    font-size: 22px;
-}
+        font-size: 22px;
+    }
 
-.chat-file-info {
-    min-width: 0;
+    .chat-file-info {
+        min-width: 0;
 
-    display: flex;
+        display: flex;
 
-    flex-direction: column;
+        flex-direction: column;
 
-    gap: 3px;
-}
+        gap: 3px;
+    }
 
-.chat-file-name {
-    overflow: hidden;
+    .chat-file-name {
+        overflow: hidden;
 
-    color: #ffffff;
+        color: #ffffff;
 
-    font-size: 13px;
-    font-weight: 600;
+        font-size: 13px;
+        font-weight: 600;
 
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 
-.chat-file-size {
-    color: #777783;
+    .chat-file-size {
+        color: #777783;
 
-    font-size: 10px;
-}
+        font-size: 10px;
+    }
 
 
-/* =========================================================
+    /* =========================================================
    CHAT FOOTER
 ========================================================= */
 
-.chat-footer {
-    padding: 12px 16px 16px;
+    .chat-footer {
+        padding: 12px 16px 16px;
 
-    background: #09090B;
+        background: #09090B;
 
-    border-top: 1px solid rgba(255, 0, 0, 0.12);
+        border-top: 1px solid rgba(255, 0, 0, 0.12);
 
-    flex-shrink: 0;
-}
+        flex-shrink: 0;
+    }
 
 
-/* =========================================================
+    /* =========================================================
    CHAT FORM
 ========================================================= */
 
-.chat-form {
-    width: 100%;
+    .chat-form {
+        width: 100%;
 
-    margin: 0;
-}
+        margin: 0;
+    }
 
 
-/* =========================================================
+    /* =========================================================
    MAIN COMPOSER
 ========================================================= */
 
-.chat-composer {
-    width: 100%;
+    .chat-composer {
+        width: 100%;
 
-    display: flex;
+        display: flex;
 
-    align-items: flex-end;
+        align-items: flex-end;
 
-    gap: 8px;
+        gap: 8px;
 
-    padding: 8px;
+        padding: 8px;
 
-    box-sizing: border-box;
+        box-sizing: border-box;
 
-    background: #09090B;
+        background: #09090B;
 
-    border: 1px solid #ff0000;
+        border: 1px solid #ff0000;
 
-    border-radius: 15px;
+        border-radius: 15px;
 
-    box-shadow:
-        0 0 8px rgba(255, 0, 0, 0.12),
-        inset 0 0 12px rgba(255, 0, 0, 0.025);
+        box-shadow:
+            0 0 8px rgba(255, 0, 0, 0.12),
+            inset 0 0 12px rgba(255, 0, 0, 0.025);
 
-    transition: .25s ease;
-}
+        transition: .25s ease;
+    }
 
 
-/* =========================================================
+    /* =========================================================
    COMPOSER FOCUS
 ========================================================= */
 
-.chat-composer:focus-within {
-    border-color: #ff0000;
+    .chat-composer:focus-within {
+        border-color: #ff0000;
 
-    box-shadow:
-        0 0 12px rgba(255, 0, 0, 0.22),
-        0 0 25px rgba(255, 0, 0, 0.06),
-        inset 0 0 15px rgba(255, 0, 0, 0.03);
-}
+        box-shadow:
+            0 0 12px rgba(255, 0, 0, 0.22),
+            0 0 25px rgba(255, 0, 0, 0.06),
+            inset 0 0 15px rgba(255, 0, 0, 0.03);
+    }
 
 
-/* =========================================================
+    /* =========================================================
    TEXTAREA WRAPPER
 ========================================================= */
 
-.chat-textarea-wrapper {
-    flex: 1;
+    .chat-textarea-wrapper {
+        flex: 1;
 
-    min-width: 0;
+        min-width: 0;
 
-    display: flex;
+        display: flex;
 
-    align-items: center;
-}
+        align-items: center;
+    }
 
 
-/* =========================================================
+    /* =========================================================
    MESSAGE TEXTAREA
 ========================================================= */
 
-.chat-message-input {
-    display: block;
+    .chat-message-input {
+        display: block;
 
-    width: 100%;
+        width: 100%;
 
-    min-height: 42px;
-    max-height: 160px;
+        min-height: 42px;
+        max-height: 160px;
 
-    padding: 11px 5px;
+        padding: 11px 5px;
 
-    box-sizing: border-box;
+        box-sizing: border-box;
 
-    background: transparent;
+        background: transparent;
 
-    border: none;
-    outline: none;
+        border: none;
+        outline: none;
 
-    resize: none;
+        resize: none;
 
-    overflow-y: auto;
+        overflow-y: auto;
 
-    color: #ffffff;
+        color: #ffffff;
 
-    font-family: "Poppins", sans-serif;
+        font-family: "Poppins", sans-serif;
 
-    font-size: 14px;
+        font-size: 14px;
 
-    line-height: 20px;
+        line-height: 20px;
 
-    white-space: pre-wrap;
+        white-space: pre-wrap;
 
-    overflow-wrap: anywhere;
+        overflow-wrap: anywhere;
 
-    word-break: break-word;
-}
+        word-break: break-word;
+    }
 
 
-/* =========================================================
+    /* =========================================================
    PLACEHOLDER
 ========================================================= */
 
-.chat-message-input::placeholder {
-    color: #666672;
+    .chat-message-input::placeholder {
+        color: #666672;
 
-    opacity: 1;
-}
+        opacity: 1;
+    }
 
 
-/* =========================================================
+    /* =========================================================
    TEXTAREA SCROLLBAR
 ========================================================= */
 
-.chat-message-input::-webkit-scrollbar {
-    width: 4px;
-}
-
-.chat-message-input::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.chat-message-input::-webkit-scrollbar-thumb {
-    background: #3a1111;
-
-    border-radius: 10px;
-}
-
-.chat-message-input::-webkit-scrollbar-thumb:hover {
-    background: #ff0000;
-}
-
-
-/* =========================================================
-   UPLOAD BUTTON
-========================================================= */
-
-.chat-upload-btn {
-    width: 42px;
-    height: 42px;
-
-    flex-shrink: 0;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    box-sizing: border-box;
-
-    border: 1px solid #ff0000;
-
-    border-radius: 11px;
-
-    background: #09090B;
-
-    color: #ff0000;
-
-    font-size: 19px;
-
-    cursor: pointer;
-
-    transition: .2s ease;
-
-    position: relative;
-
-    z-index: 5;
-}
-
-.chat-upload-btn:hover {
-    background: #ff0000;
-
-    color: #ffffff;
-
-    box-shadow:
-        0 0 10px rgba(255, 0, 0, 0.4);
-
-    transform: translateY(-1px);
-}
-
-.chat-upload-btn:active {
-    transform: scale(.94);
-}
-
-
-/* =========================================================
-   SEND BUTTON
-========================================================= */
-
-.chat-send-btn {
-    width: 42px;
-    height: 42px;
-
-    flex-shrink: 0;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    box-sizing: border-box;
-
-    border: 1px solid #ff0000;
-
-    border-radius: 11px;
-
-    background: #ff0000;
-
-    color: #ffffff;
-
-    cursor: pointer;
-
-    font-size: 15px;
-
-    transition: .2s ease;
-}
-
-.chat-send-btn:hover {
-    background: #d90000;
-
-    box-shadow:
-        0 0 12px rgba(255, 0, 0, 0.45);
-
-    transform: translateY(-1px);
-}
-
-.chat-send-btn:active {
-    transform: scale(.94);
-}
-
-
-/* =========================================================
-   FILE SELECTED
-========================================================= */
-
-.chat-upload-btn.file-selected {
-    background: #ff0000;
-
-    color: #ffffff;
-
-    box-shadow:
-        0 0 12px rgba(255, 0, 0, 0.5);
-
-    animation: filePulse 1.2s infinite;
-}
-
-
-@keyframes filePulse {
-
-    0% {
-        box-shadow:
-            0 0 5px rgba(255, 0, 0, 0.25);
+    .chat-message-input::-webkit-scrollbar {
+        width: 4px;
     }
 
-    50% {
-        box-shadow:
-            0 0 16px rgba(255, 0, 0, 0.65);
+    .chat-message-input::-webkit-scrollbar-track {
+        background: transparent;
     }
 
-    100% {
-        box-shadow:
-            0 0 5px rgba(255, 0, 0, 0.25);
-    }
-
-}
-
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media (max-width: 600px) {
-
-    .chat-footer {
-        padding: 8px 8px 10px;
-    }
-
-    .chat-composer {
-        padding: 6px;
-
-        border-radius: 13px;
-    }
-
-    .chat-upload-btn,
-    .chat-send-btn {
-        width: 39px;
-        height: 39px;
+    .chat-message-input::-webkit-scrollbar-thumb {
+        background: #3a1111;
 
         border-radius: 10px;
     }
 
-    .chat-message-input {
-        font-size: 13px;
-
-        min-height: 39px;
-
-        padding: 9px 4px;
+    .chat-message-input::-webkit-scrollbar-thumb:hover {
+        background: #ff0000;
     }
 
-    .message-row {
-        padding: 0 8px;
+
+    /* =========================================================
+   UPLOAD BUTTON
+========================================================= */
+
+    .chat-upload-btn {
+        width: 42px;
+        height: 42px;
+
+        flex-shrink: 0;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        box-sizing: border-box;
+
+        border: 1px solid #ff0000;
+
+        border-radius: 11px;
+
+        background: #09090B;
+
+        color: #ff0000;
+
+        font-size: 19px;
+
+        cursor: pointer;
+
+        transition: .2s ease;
+
+        position: relative;
+
+        z-index: 5;
     }
 
-    .message-content {
-        max-width: 82%;
+    .chat-upload-btn:hover {
+        background: #ff0000;
+
+        color: #ffffff;
+
+        box-shadow:
+            0 0 10px rgba(255, 0, 0, 0.4);
+
+        transform: translateY(-1px);
     }
 
-    .chat-message {
-        font-size: 13px;
-
-        padding: 9px 12px;
+    .chat-upload-btn:active {
+        transform: scale(.94);
     }
 
-    .chat-image-message {
-        width: min(320px, 78vw);
+
+    /* =========================================================
+   SEND BUTTON
+========================================================= */
+
+    .chat-send-btn {
+        width: 42px;
+        height: 42px;
+
+        flex-shrink: 0;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        box-sizing: border-box;
+
+        border: 1px solid #ff0000;
+
+        border-radius: 11px;
+
+        background: #ff0000;
+
+        color: #ffffff;
+
+        cursor: pointer;
+
+        font-size: 15px;
+
+        transition: .2s ease;
     }
 
-    .chat-file-message {
-        width: min(300px, 78vw);
-    }
-}
+    .chat-send-btn:hover {
+        background: #d90000;
 
+        box-shadow:
+            0 0 12px rgba(255, 0, 0, 0.45);
+
+        transform: translateY(-1px);
+    }
+
+    .chat-send-btn:active {
+        transform: scale(.94);
+    }
+
+
+    /* =========================================================
+   FILE SELECTED
+========================================================= */
+
+    .chat-upload-btn.file-selected {
+        background: #ff0000;
+
+        color: #ffffff;
+
+        box-shadow:
+            0 0 12px rgba(255, 0, 0, 0.5);
+
+        animation: filePulse 1.2s infinite;
+    }
+
+
+    @keyframes filePulse {
+
+        0% {
+            box-shadow:
+                0 0 5px rgba(255, 0, 0, 0.25);
+        }
+
+        50% {
+            box-shadow:
+                0 0 16px rgba(255, 0, 0, 0.65);
+        }
+
+        100% {
+            box-shadow:
+                0 0 5px rgba(255, 0, 0, 0.25);
+        }
+
+    }
+
+
+    /* =========================================================
+   MOBILE
+========================================================= */
+
+    @media (max-width: 600px) {
+
+        .chat-footer {
+            padding: 8px 8px 10px;
+        }
+
+        .chat-composer {
+            padding: 6px;
+
+            border-radius: 13px;
+        }
+
+        .chat-upload-btn,
+        .chat-send-btn {
+            width: 39px;
+            height: 39px;
+
+            border-radius: 10px;
+        }
+
+        .chat-message-input {
+            font-size: 13px;
+
+            min-height: 39px;
+
+            padding: 9px 4px;
+        }
+
+        .message-row {
+            padding: 0 8px;
+        }
+
+        .message-content {
+            max-width: 82%;
+        }
+
+        .chat-message {
+            font-size: 13px;
+
+            padding: 9px 12px;
+        }
+
+        .chat-image-message {
+            width: min(320px, 78vw);
+        }
+
+        .chat-file-message {    
+            width: min(300px, 78vw);
+        }
+    }
 </style>
 
 <section class="chat-layout container-fluid px-md-3">
@@ -1361,14 +1360,13 @@
                             <label for="chat-file-input" class="chat-upload-btn" title="Attach file">
                                 <i class="bi bi-paperclip"></i>
                             </label>
-                                <div class="chat-textarea-wrapper">
-                                    <textarea name="body" id="chat-message-input" class="chat-message-input"
-                                        placeholder="Type a message..." rows="1" autocomplete="off"></textarea>
-                                </div>
-                                <button type="submit" class="chat-send-btn" aria-label="Send message"
-                                    title="Send message">
-                                    <i class="bi bi-send-fill"></i>
-                                </button>
+                            <div class="chat-textarea-wrapper">
+                                <textarea name="body" id="chat-message-input" class="chat-message-input"
+                                    placeholder="Type a message..." rows="1" autocomplete="off"></textarea>
+                            </div>
+                            <button type="submit" class="chat-send-btn" aria-label="Send message" title="Send message">
+                                <i class="bi bi-send-fill"></i>
+                            </button>
                         </div>
                     </form>
 
@@ -1539,6 +1537,20 @@
     const chatFileInput = document.getElementById('chat-file-input');
     const chatFileUploadInput = document.getElementById('chat-file-upload-input');
     const chatFormFile = document.getElementById('chat_form-file');
+    const form = document.querySelector("#chat-form");     // your form id
+    const input = document.querySelector("#chat-input");    // your textarea/input id
+
+    if (!input.dataset.enterBound) {          // prevents double binding
+        input.dataset.enterBound = "1";
+
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();           // stops the default submit/newline
+                if (input.value.trim() === "") return;
+                form.requestSubmit();         // single send via the form
+            }
+        });
+    }
 
     function scrollToBottom() {
         const messagesDiv = document.getElementById('messages');
@@ -1641,5 +1653,6 @@
             });
         });
     }
+    
 </script>
 {% endblock %}

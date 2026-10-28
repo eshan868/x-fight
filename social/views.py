@@ -351,16 +351,7 @@ def zego_token(request):
 
 
 
-
-
-# =========================================================
-# SIMPLE GAME MATE CALL SYSTEM
-# =========================================================
-@login_required
 def send_user_call_event(user_id, event):
-    """
-    Send a call invitation to a specific user.
-    """
 
     channel_layer = get_channel_layer()
 
@@ -659,3 +650,95 @@ def stats(request):
         }, status=400)
 
     return render(request, "social/stats.html")
+
+
+@login_required
+def forward_targets(request):
+    rooms = ChatGroup.objects.filter(members=request.user).prefetch_related("members")
+    targets = []
+    for room in rooms:
+        if room.is_private:
+            other = next((m for m in room.members.all() if m.id != request.user.id), None)
+            label, kind = (other.username if other else "Private chat"), "chat"
+        else:
+            label, kind = (room.groupchat_name or room.group_name), "group"
+        targets.append({"room": room.group_name, "label": label, "type": kind})
+    return JsonResponse({"targets": targets})
+
+
+@login_required
+@require_POST
+def forward_message(request, message_id):
+    original = get_object_or_404(
+        ChatGroupMessages.objects.visible_to(request.user), id=message_id
+    )
+
+    if not original.group.members.filter(pk=request.user.pk).exists():
+        return JsonResponse({"error": "Not allowed"}, status=403)
+    if getattr(original, "message_type", "") == "group_invite":
+        return JsonResponse({"error": "Invites can't be forwarded"}, status=400)
+
+    room_names = request.POST.getlist("rooms")
+    # only rooms the user is actually a member of
+    targets = ChatGroup.objects.filter(group_name__in=room_names, members=request.user)
+
+    layer = get_channel_layer()
+    for room in targets:
+        new_msg = ChatGroupMessages.objects.create(
+            group=room,
+            author=request.user,
+            body=original.body,
+            file=original.file,
+            is_forwarded=True,
+        )
+
+        for member in room.members.exclude(pk=request.user.pk):
+            Notification.objects.create(
+                user=member,
+                text=(
+                    f"{request.user.username} sent you a message"
+                    if room.is_private
+                    else f"{request.user.username} sent a message in {room.groupchat_name}"
+                ),
+                notification_type="chat_message" if room.is_private else "group_message",
+                related_id=new_msg.id,
+            )
+
+        # shows up live for everyone currently in that room
+        async_to_sync(layer.group_send)(
+            room.group_name,
+            {"type": "message_handler", "message_id": new_msg.id},
+        )
+
+    return JsonResponse({"ok": True, "count": targets.count()})
+
+
+@login_required
+@require_POST
+def delete_message(request, message_id):
+    msg = get_object_or_404(ChatGroupMessages, id=message_id)
+
+    if not msg.group.members.filter(pk=request.user.pk).exists():
+        return JsonResponse({"error": "Not allowed"}, status=403)
+
+    mode = request.POST.get("mode")
+
+    if mode == "everyone":
+        if msg.author_id != request.user.id:
+            return JsonResponse({"error": "Only the sender can do this"}, status=403)
+
+        msg.deleted_for_everyone = True
+        msg.save(update_fields=["deleted_for_everyone"])
+
+        async_to_sync(get_channel_layer().group_send)(
+            msg.group.group_name,
+            {"type": "message_deleted", "message_id": msg.id},
+        )
+
+    elif mode == "me":
+        msg.deleted_for.add(request.user)
+
+    else:
+        return JsonResponse({"error": "Invalid mode"}, status=400)
+
+    return JsonResponse({"ok": True})

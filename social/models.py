@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 import shortuuid
 import os
+from django.conf import settings
 # Create your models here.
 class GameMate(models.Model):
     STATUS = (
@@ -62,7 +63,9 @@ class ChatGroup(models.Model):
 
     def __str__(self):
         return self.group_name
-
+class ChatMessageQuerySet(models.QuerySet):
+    def visible_to(self, user):
+        return self.filter(deleted_for_everyone=False).exclude(deleted_for=user)
 class ChatGroupMessages(models.Model):
     group=models.ForeignKey(ChatGroup,related_name="chat_messages", on_delete=models.CASCADE)
     author=models.ForeignKey(User,on_delete=models.CASCADE)
@@ -70,6 +73,14 @@ class ChatGroupMessages(models.Model):
     file=models.FileField(upload_to="chat_files/",blank=True,null=True)
     created=models.DateTimeField(auto_now_add=True)
     message_type = models.CharField(max_length=30,default="normal")
+    is_forwarded = models.BooleanField(default=False)
+    deleted_for_everyone = models.BooleanField(default=False)
+    deleted_for = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name="hidden_chat_messages",
+        blank=True,
+    )
+    objects = ChatMessageQuerySet.as_manager()
 
     @property
     def filename(self):
