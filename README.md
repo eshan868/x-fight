@@ -407,8 +407,9 @@ Please avoid committing secrets, credentials, environment files, or private conf
 
 ## License
 
-This project is distributed under the license specified in the repository's `LICENSE` file.
+This project is licensed under the [PolyForm Noncommercial License 1.0.0](https://github.com/eshan868/x-fight/blob/master/LICENSE).
+Free for personal, educational and other non-commercial use. Commercial use requires my permission.
 
-Copyright © 2026 **Muhammed Eshan P**
+Copyright © 2026 Muhammed Eshan P
 
 See the [LICENSE](LICENSE) file for the complete license.
