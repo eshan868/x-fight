@@ -18,7 +18,7 @@ def match_data(match_id):
     else:
         tournament_name=match.tournament.name
         tournament_id=match.tournament.id
-        winner_team=match.winner_team,
+        winner_team=match.winner_team
 
 
     return {
@@ -30,7 +30,7 @@ def match_data(match_id):
         "winner_team":winner_team,
         "game": match.game,
         "image": result.screenshot.path,
-        "players": match.match_players.name,
+        "players": match.match_players.name
     }
     
 
@@ -49,11 +49,7 @@ def analyze_match(match_info, response_text):
     match_id=match_info["id"]
     match = Match.objects.select_related("tournament").get(id=match_id)
     if response_text.startswith("```"):
-        response_text = response_text.replace(
-            "```json", ""
-        ).replace(
-            "```", ""
-        ).strip()
+        response_text = response_text.replace("```json", "").replace( "```", "").strip()
     #print(response_text)
     try:   
         data = json.loads(response_text)
@@ -64,14 +60,12 @@ def analyze_match(match_info, response_text):
         data["tournament_name"] = match_info["tournament_name"]
         data["game"] = match_info["game"]
         data["image"] = match_info["image"]
-
-        print(type(matches))
-        print(matches)
-
+        #print(type(matches))
+        #print(matches)
         matches.append(data)
-        print("data uploaded",data)
+        #print("data uploaded",data)
         winner_name=data["winner"]
-        print("winner is :",winner_name)
+        #print("winner is :",winner_name)
 
         if match.tournament is None:
             winner = get_object_or_404(User, username=data["winner"])
@@ -94,7 +88,7 @@ def analyze_match(match_info, response_text):
                     winner_profile = winner.profile
                     winner_profile.xp += total_loot
                     winner_profile.save(update_fields=["xp"])
-                    print("loot given")
+                    #print("loot given")
 
         elif match.tournament.category == "team":   
             winner_team=Team.objects.filter(name=winner_name).first()

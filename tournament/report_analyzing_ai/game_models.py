@@ -3,9 +3,7 @@ import time
 from PIL import Image
 import os
 GCP_API_KEY = os.environ.get("GCP_API_KEY")
-client=genai.Client(
-    api_key=GCP_API_KEY
-    )
+client=genai.Client(api_key=GCP_API_KEY)
 
 def e_footbll(image):
     print("request reached ")
@@ -47,8 +45,8 @@ Return ONLY valid JSON.
      
         """
     
-    print("===== Gemini Request Started =====")
-    print("Time:", time.strftime("%H:%M:%S"))
+    #print("===== Gemini Request Started =====")
+    #print("Time:", time.strftime("%H:%M:%S"))
   
     if image:
         print(image)
@@ -57,14 +55,13 @@ Return ONLY valid JSON.
 
     request_image=Image.open(image)
 
-    print("Request reached")
+    #print("Request reached")
 
     response = client.models.generate_content(
         model="gemini-3.5-flash-lite",
-        contents=[request_image, prompt]
-    )
+        contents=[request_image, prompt])
 
-    print(response.text)
+    #print(response.text)
 
     return response.text
 
@@ -178,8 +175,8 @@ Do not include explanations.
      
      
     
-    print("===== Gemini Request Started =====")
-    print("Time:", time.strftime("%H:%M:%S"))
+    #print("===== Gemini Request Started =====")
+    #print("Time:", time.strftime("%H:%M:%S"))
   
     if image:
         print(image)
@@ -188,14 +185,13 @@ Do not include explanations.
 
     request_image=Image.open(image)
 
-    print("Request reached")
+    #print("Request reached")
 
     response = client.models.generate_content(
         model="gemini-3.5-flash-lite",
-        contents=[request_image, prompt]
-    )
+        contents=[request_image, prompt])
 
-    print(response.text)
+    #print(response.text)
 
     return response.text
 
@@ -436,8 +432,8 @@ Use null when information is unavailable.
 }
     """
     
-    print("===== Gemini Request Started =====")
-    print("Time:", time.strftime("%H:%M:%S"))
+    #print("===== Gemini Request Started =====")
+    #print("Time:", time.strftime("%H:%M:%S"))
   
     if image:
         print(image)
@@ -446,13 +442,13 @@ Use null when information is unavailable.
 
     request_image=Image.open(image)
 
-    print("Request reached")
+    #print("Request reached")
 
     response = client.models.generate_content(
         model="gemini-3.5-flash-lite",
         contents=[request_image, prompt]
     )
 
-    print(response.text)
+    #print(response.text)
 
     return response.text

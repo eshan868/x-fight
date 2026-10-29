@@ -1,1010 +1,288 @@
 import asyncio
 import json
-
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-
 from django.template.loader import render_to_string
 from django.utils import timezone
-
 from .models import Match, match_player
 
-
-# ============================================================
-# FIXED COUNTDOWN
-# ============================================================
-
 COUNTDOWN_SECONDS = 12
-
-
-# ============================================================
-# COUNTDOWN START TIMES
-# ============================================================
-#
-# Stored only in memory.
-#
-# Example:
-#
-# {
-#     35: datetime(...),
-#     36: datetime(...)
-# }
-#
-# ============================================================
-
 countdown_times = {}
-
-
 class MatchRoomConsumer(AsyncWebsocketConsumer):
 
-    # ========================================================
-    # CONNECT
-    # ========================================================
 
     async def connect(self):
 
-        # ----------------------------------------------------
-        # GET MATCH ID
-        # ----------------------------------------------------
-
-        self.match_id = self.scope[
-            "url_route"
-        ]["kwargs"]["match_id"]
-
-        self.room_group_name = (
-            f"match_{self.match_id}"
-        )
-
+        self.match_id = self.scope["url_route"]["kwargs"]["match_id"]
+        self.room_group_name = (f"match_{self.match_id}")
         self.user = self.scope["user"]
-
-        # ----------------------------------------------------
-        # CHECK LOGIN
-        # ----------------------------------------------------
-
         if self.user.is_anonymous:
-
-            print(
-                "❌ Anonymous user tried to connect"
-            )
-
+            #print(" unknown user tried to connect")
             await self.close()
             return
-
-        # ----------------------------------------------------
-        # GET MATCH
-        # ----------------------------------------------------
 
         match = await self.get_match()
-
         if not match:
 
-            print(
-                f"❌ Match {self.match_id} "
-                f"does not exist"
-            )
+            #print(f" Match {self.match_id} does not exist")
 
             await self.close()
             return
-
-        # ----------------------------------------------------
-        # CHECK WHETHER USER IS A PLAYER
-        # ----------------------------------------------------
 
         is_player = await self.is_match_player()
 
         if not is_player:
-
-            print(
-                f"❌ {self.user.username} "
-                f"is not a player in "
-                f"Match {self.match_id}"
-            )
-
+            #print(f"{self.user.username} is not a player in Match {self.match_id}")
             await self.close()
             return
-
-        # ----------------------------------------------------
-        # UPDATE MATCH STATE
-        # ----------------------------------------------------
-
         state = await self.update_match_state()
-
-        # Match has not started yet
         if state == "closed":
-
-            print(
-                f"🔒 Match {self.match_id} "
-                f"is not open yet"
-            )
-
+            #print(f" Match {self.match_id} is not open yet")
             await self.close()
             return
-
-        # ----------------------------------------------------
-        # JOIN CHANNEL GROUP
-        # ----------------------------------------------------
-
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
-
+        await self.channel_layer.group_add(self.room_group_name,self.channel_name)
         await self.accept()
 
-        print(
-            f"🟢 {self.user.username} "
-            f"connected to Match "
-            f"{self.match_id}"
-        )
+        #print(f" {self.user.username} connected to Match {self.match_id}")
 
-        # ----------------------------------------------------
-        # START TIMER
-        # ----------------------------------------------------
-
-        self.timer_task = asyncio.create_task(
-            self.match_timer()
-        )
-
-        # ----------------------------------------------------
-        # SEND CURRENT MATCH STATE
-        # ----------------------------------------------------
+        self.timer_task = asyncio.create_task(self.match_timer())
 
         await self.broadcast_match()
-
-        # ----------------------------------------------------
-        # SEND ONLY THIS USER'S READY BUTTON
-        # ----------------------------------------------------
-
         await self.send_own_ready_button()
 
-    # ========================================================
-    # DISCONNECT
-    # ========================================================
+
 
     async def disconnect(self, close_code):
-
-        # ----------------------------------------------------
-        # CANCEL TIMER
-        # ----------------------------------------------------
-
-        task = getattr(
-            self,
-            "timer_task",
-            None
-        )
-
+        task = getattr(self,"timer_task",None)
         if task:
-
             task.cancel()
 
-        # ----------------------------------------------------
-        # LEAVE CHANNEL GROUP
-        # ----------------------------------------------------
 
-        if hasattr(
-            self,
-            "room_group_name"
-        ):
-
+        if hasattr(self,"room_group_name"):
             await self.channel_layer.group_discard(
                 self.room_group_name,
                 self.channel_name
             )
 
-        print(
-            f"🔴 {self.user.username} "
-            f"disconnected from Match "
-            f"{self.match_id}"
-        )
+        #print(f" {self.user.username} disconnected from Match {self.match_id}")
 
-    # ========================================================
-    # RECEIVE WEBSOCKET MESSAGE
-    # ========================================================
+ 
 
-    async def receive(
-        self,
-        text_data
-    ):
+    async def receive(self,text_data):
 
-        print(
-            "\n=============================="
-        )
-
-        print(
-            "🔵 WEBSOCKET RECEIVE"
-        )
-
-        print(
-            "=============================="
-        )
-
-        print(
-            "Raw data:",
-            text_data
-        )
-
-        # ----------------------------------------------------
-        # PARSE JSON
-        # ----------------------------------------------------
+        #print(" WEBSOCKET RECEIVE")
+        #print("Raw data:",text_data)
 
         try:
-
-            data = json.loads(
-                text_data
-            )
-
+            data = json.loads(text_data)
         except json.JSONDecodeError:
 
-            print(
-                "❌ Invalid JSON"
-            )
-
+            #print(" Invalid JSON")
             return
 
-        print(
-            "Parsed data:",
-            data
-        )
+        #print("Parsed data:", data)
 
-        # ----------------------------------------------------
-        # GET ACTION
-        # ----------------------------------------------------
+        action = data.get("action")
+        #print("Action:",action)
+        #print("User:",self.user.username)
+        #print("Match ID:",self.match_id)
 
-        action = data.get(
-            "action"
-        )
-
-        print(
-            "Action:",
-            action
-        )
-
-        print(
-            "User:",
-            self.user.username
-        )
-
-        print(
-            "Match ID:",
-            self.match_id
-        )
-
-        # ----------------------------------------------------
-        # VALIDATE ACTION
-        # ----------------------------------------------------
-
-        if action not in [
-            "ready",
-            "not-ready"
-        ]:
-
-            print(
-                "❌ Invalid action"
-            )
-
+        if action not in ["ready","not-ready"]:
+            #print(" Invalid action")
             return
+        #print("Valid action")
 
-        print(
-            "✅ Valid action"
-        )
+        result = await self.update_ready(action)
 
-        # ----------------------------------------------------
-        # UPDATE READY STATE
-        # ----------------------------------------------------
-
-        result = await self.update_ready(
-            action
-        )
-
-        print(
-            "update_ready result:",
-            result
-        )
-
+       #print("update_ready result:",result)
         if not result:
-
-            print(
-                "❌ Ready state "
-                "was not updated"
-            )
-
+            #print("Ready state ""was not updated")
             return
-
-        print(
-            "✅ Ready state updated"
-        )
-
-        # ----------------------------------------------------
-        # CHECK EVERYONE READY
-        # ----------------------------------------------------
+        #print("Ready state updated")
 
         await self.check_everyone_ready()
-
-        print(
-            "✅ Everyone-ready check completed"
-        )
-
-        # ----------------------------------------------------
-        # UPDATE THIS USER'S BUTTON
-        # ----------------------------------------------------
-
+        #print(" Everyone-ready check completed")
         await self.send_own_ready_button()
-
-        # ----------------------------------------------------
-        # UPDATE EVERYONE'S MATCH UI
-        # ----------------------------------------------------
-
         await self.broadcast_match()
 
-        print(
-            "✅ Broadcast completed"
-        )
-
-        print(
-            "==============================\n"
-        )
-
-    # ========================================================
-    # MATCH TIMER
-    # ========================================================
+        #print("Broadcast completed")
 
     async def match_timer(self):
-
         try:
-
             while True:
 
-                # ------------------------------------------------
-                # CHECK EVERY SECOND
-                # ------------------------------------------------
-
                 await asyncio.sleep(1)
-
-                state = (
-                    await self.update_match_state()
-                )
-
-                # ================================================
-                # MATCH FINISHED
-                # ================================================
-
+                state = (await self.update_match_state())
                 if state == "finished":
 
-                    # Update match information
                     await self.broadcast_match()
-
-                    # Remove Ready button
                     await self.send_own_ready_button()
-
-                    # Stop this timer
                     break
-
-                # ================================================
-                # OPEN
-                # COUNTDOWN
-                # LIVE
-                # ================================================
-
-                if state in [
-                    "open",
-                    "countdown",
-                    "live"
-                ]:
-
-                    # Update common match UI
+                if state in ["open","countdown","live"]:
                     await self.broadcast_match()
-
-                    # Update this user's Ready button
                     await self.send_own_ready_button()
 
         except asyncio.CancelledError:
-
-            print(
-                f"⏹ Timer cancelled "
-                f"for Match {self.match_id}"
-            )
-
-    # ========================================================
-    # UPDATE MATCH STATE
-    # ========================================================
+            print(f"Timer cancelled for Match {self.match_id}")
 
     @database_sync_to_async
     def update_match_state(self):
-
-        match = Match.objects.get(
-            id=self.match_id
-        )
-
+        match = Match.objects.get(id=self.match_id)
         now = timezone.now()
-       
-        # ====================================================
-        # SCHEDULED → OPEN
-        # ====================================================
-
         if match.status == "scheduled":
 
-            # ------------------------------------------------
-            # MATCH START TIME REACHED
-            # ------------------------------------------------
-
-            if (
-                match.match_start_time
-                and now >= match.match_start_time
-            ):
-
+            if (match.match_start_time and now >= match.match_start_time):
                 match.status = "open"
+                match.save(update_fields=["status"])
 
-                match.save(
-                    update_fields=[
-                        "status"
-                    ]
-                )
-
-                print(
-                    f"🟢 Match {match.id} "
-                    f"is now OPEN"
-                )
-
-            # ------------------------------------------------
-            # NOT STARTED YET
-            # ------------------------------------------------
+               # print(f" Match {match.id} is now OPEN")
 
             else:
-
                 return "scheduled"
 
-        # ====================================================
-        # COUNTDOWN
-        # ====================================================
 
         if match.status == "countdown":
-
-            # ------------------------------------------------
-            # GET COUNTDOWN START
-            # ------------------------------------------------
-
-            countdown_start = (
-                countdown_times.get(
-                    match.id
-                )
-            )
-
-            # ------------------------------------------------
-            # SAFETY
-            # ------------------------------------------------
+            countdown_start = (countdown_times.get(match.id))
 
             if countdown_start is None:
-
-                countdown_times[
-                    match.id
-                ] = now
-
+                countdown_times[match.id] = now
                 countdown_start = now
+                #print(f"⏳ Countdown initialized "f"for Match {match.id}")
+            players = (match.match_player.all())
+            total_players = (players.count())
+            ready_players = (players.filter(ready=True).count())
 
-                print(
-                    f"⏳ Countdown initialized "
-                    f"for Match {match.id}"
-                )
 
-            # ------------------------------------------------
-            # CHECK WHETHER EVERYONE IS STILL READY
-            # ------------------------------------------------
-
-            players = (
-                match.match_player.all()
-            )
-
-            total_players = (
-                players.count()
-            )
-
-            ready_players = (
-                players.filter(
-                    ready=True
-                ).count()
-            )
-
-            # ------------------------------------------------
-            # SOMEONE BECAME NOT READY
-            # ------------------------------------------------
-
-            if (
-                total_players == 0
-                or ready_players != total_players
-            ):
-
+            if (total_players == 0 or ready_players != total_players):
                 match.status = "open"
-
-                match.save(
-                    update_fields=[
-                        "status"
-                    ]
-                )
-
-                countdown_times.pop(
-                    match.id,
-                    None
-                )
-
-                print(
-                    f"🛑 Countdown cancelled "
-                    f"for Match {match.id}"
-                )
-
+                match.save(update_fields=["status"])
+                countdown_times.pop(match.id,None)
+                #print(f" Countdown cancelled for Match {match.id}")
                 return "open"
 
-            # ------------------------------------------------
-            # CALCULATE ELAPSED TIME
-            # ------------------------------------------------
-
-            elapsed = (
-                now - countdown_start
-            ).total_seconds()
-
-            # ------------------------------------------------
-            # COUNTDOWN FINISHED
-            # ------------------------------------------------
-
+            elapsed = (now - countdown_start).total_seconds()
             if elapsed >= COUNTDOWN_SECONDS:
-
                 match.status = "live"
-
                 match.started_at = now
-
-                # --------------------------------------------
-                # MATCH END TIME
-                # --------------------------------------------
-
-                match.match_end_time = (
-                    now + match.duration
-                )
-
-                match.save(
-                    update_fields=[
+                match.match_end_time = (now + match.duration)
+                match.save(update_fields=[
                         "status",
                         "started_at",
-                        "match_end_time"
-                    ]
-                )
+                        "match_end_time"])
+                countdown_times.pop(match.id,None)
 
-                countdown_times.pop(
-                    match.id,
-                    None
-                )
-
-                print(
-                    f"🔥 Match {match.id} "
-                    f"is now LIVE"
-                )
-
+                print(f"Match {match.id} is now LIVE")
                 return "live"
-
             return "countdown"
-
-        # ====================================================
-        # LIVE
-        # ====================================================
 
         if match.status == "live":
 
-            # ------------------------------------------------
-            # CHECK MATCH END TIME
-            # ------------------------------------------------
-
-            if (
-                match.match_end_time
-                and now >= match.match_end_time
-            ):
-
+            if (match.match_end_time and now >= match.match_end_time):
                 match.status = "finished"
-
                 match.ended_at = now
-
-                match.save(
-                    update_fields=[
+                match.save(update_fields=[
                         "status",
-                        "ended_at"
-                    ]
-                )
-
-                # --------------------------------------------
-                # DELETE TEMPORARY MATCH PLAYERS
-                # --------------------------------------------
-
+                        "ended_at"])
                 match.match_player.all().delete()
-
-                # --------------------------------------------
-                # REMOVE COUNTDOWN IF ANY
-                # --------------------------------------------
-
-                countdown_times.pop(
-                    match.id,
-                    None
-                )
-
-                print(
-                    f"🏁 Match {match.id} "
-                    f"FINISHED"
-                )
-
+                countdown_times.pop(match.id,None)
+                print(f" Match {match.id} FINISHED")
                 return "finished"
-
             return "live"
 
-        # ====================================================
-        # OPEN
-        # ====================================================
-
         if match.status == "open":
-
             return "open"
-
-        # ====================================================
-        # FINISHED
-        # ====================================================
-
         if match.status == "finished":
-
             return "finished"
-
-        # ====================================================
-        # DEFAULT
-        # ====================================================
-
         return match.status
-
-    # ========================================================
-    # UPDATE READY STATE
-    # ========================================================
-
+    
     @database_sync_to_async
-    def update_ready(
-        self,
-        action
-    ):
+    def update_ready(self,action):
 
-        match = Match.objects.get(
-            id=self.match_id
-        )
-
-        # ====================================================
-        # ONLY OPEN / COUNTDOWN
-        # ====================================================
-
-        if match.status not in [
-            "open",
-            "countdown"
-        ]:
-
-            print(
-                "❌ Cannot change ready status."
-            )
-
-            print(
-                "Current status:",
-                match.status
-            )
-
+        match = Match.objects.get(id=self.match_id)
+        if match.status not in ["open","countdown"]:
             return False
 
-        # ====================================================
-        # FIND PLAYER
-        # ====================================================
 
-        player = (
-            match.match_player
-            .filter(
-                user=self.user
-            )
-            .first()
-        )
-
+        player = (match.match_player.filter(user=self.user).first() )
         if not player:
-
-            print(
-                "❌ match_player does not exist "
-                f"for {self.user.username}"
-            )
-
             return False
-
-        # ====================================================
-        # READY
-        # ====================================================
 
         if action == "ready":
-
             player.ready = True
 
-        # ====================================================
-        # NOT READY
-        # ====================================================
-
         elif action == "not-ready":
-
             player.ready = False
+        player.save(update_fields=["ready"])
 
-        # ====================================================
-        # SAVE
-        # ====================================================
-
-        player.save(
-            update_fields=[
-                "ready"
-            ]
-        )
-
-        print(
-            f"✅ {self.user.username} "
-            f"ready = {player.ready}"
-        )
-
-        # ====================================================
-        # IMPORTANT
-        # ====================================================
-        #
-        # If someone clicks NOT READY during countdown,
-        # immediately cancel countdown.
-        #
-        # ====================================================
-
-        if (
-            action == "not-ready"
-            and match.status == "countdown"
-        ):
-
+ 
+        if (action == "not-ready"and match.status == "countdown"):
             match.status = "open"
-
-            match.save(
-                update_fields=[
-                    "status"
-                ]
-            )
-
-            countdown_times.pop(
-                match.id,
-                None
-            )
-
-            print(
-                "🛑 COUNTDOWN CANCELLED"
-            )
-
-            print(
-                "↩️ Match returned to OPEN"
-            )
+            match.save(update_fields=["status"])
+            countdown_times.pop(match.id,None)
 
         return True
-
-    # ========================================================
-    # CHECK EVERYONE READY
-    # ========================================================
 
     @database_sync_to_async
     def check_everyone_ready(self):
 
-        match = Match.objects.get(
-            id=self.match_id
-        )
-
-        # ====================================================
-        # ONLY OPEN / COUNTDOWN
-        # ====================================================
-
-        if match.status not in [
-            "open",
-            "countdown"
-        ]:
-
+        match = Match.objects.get(id=self.match_id)
+        if match.status not in ["open","countdown"]:
             return False
-
-        # ====================================================
-        # GET PLAYERS
-        # ====================================================
-
-        players = (
-            match.match_player.all()
-        )
-
+        players = ( match.match_player.all())
         if not players.exists():
-
-            print(
-                "⚠️ No match players found"
-            )
-
             return False
 
-        # ====================================================
-        # CHECK ALL READY
-        # ====================================================
-
-        player_list = list(
-            players.values(
-                "user__username",
-                "ready"
-            )
-        )
-        
-        print("👥 MATCH PLAYERS:", player_list)
-        
-        all_ready = not players.filter(
-            ready=False
-        ).exists()
-        
-        print("👥 ALL READY:", all_ready)
-        # ====================================================
-        # EVERYONE READY
-        # ====================================================
-
+        #player_list = list(players.values("user__username","ready"))
+        all_ready = not players.filter(ready=False).exists()
         if all_ready:
-
-            # ------------------------------------------------
-            # START COUNTDOWN
-            # ------------------------------------------------
-
             if match.status == "open":
-
                 match.status = "countdown"
-
-                countdown_times[
-                    match.id
-                ] = timezone.now()
-
-                match.save(
-                    update_fields=[
-                        "status"
-                    ]
-                )
-
-                print(
-                    "================================"
-                )
-
-                print(
-                    "⏳ ALL PLAYERS READY"
-                )
-
-                print(
-                    "⏳ 12 SECOND COUNTDOWN STARTED"
-                )
-
-                print(
-                    "================================"
-                )
-
+                countdown_times[match.id] = timezone.now()
+                match.save(update_fields=["status"])
             return True
 
-        # ====================================================
-        # SOMEONE NOT READY
-        # ====================================================
-
         if match.status == "countdown":
-
             match.status = "open"
-
-            countdown_times.pop(
-                match.id,
-                None
-            )
-
-            match.save(
-                update_fields=[
-                    "status"
-                ]
-            )
-
-            print(
-                "↩️ COUNTDOWN CANCELLED"
-            )
-
+            countdown_times.pop(match.id,None)
+            match.save(update_fields=["status"])
         return False
-
-    # ========================================================
-    # CHECK WHETHER USER IS A MATCH PLAYER
-    # ========================================================
 
     @database_sync_to_async
     def is_match_player(self):
-        match = (
-            Match.objects
-            .select_related("tournament")
-            .filter(id=self.match_id)
-            .first()
-        )
-    
+        match = (Match.objects.select_related("tournament").filter(id=self.match_id).first())
         if not match:
             return False
-    
-        # Friendly match: participants are match_player records.
+        
         if match.friendly_match_room:
-            return match.match_player.filter(
-                user=self.user
-            ).exists()
-    
-        # Tournament match must have a tournament.
+            return match.match_player.filter(user=self.user).exists()
+
         if not match.tournament:
             return False
-    
-        # Team tournament.
+   
         if match.tournament.category == "team":
-            return match.teams.filter(
-                user=self.user
-            ).exists()
-    
-        # Solo tournament.
+            return match.teams.filter(user=self.user).exists()
+
         if match.tournament.category == "solo":
-            return match.match_players.filter(
-                id=self.user.id
-            ).exists()
+            return match.match_players.filter(id=self.user.id).exists()
     
         return False
-
-    # ========================================================
-    # GET CURRENT USER'S MATCH PLAYER
-    # ========================================================
 
     @database_sync_to_async
     def get_player(self):
 
-        return (
-            match_player.objects
-            .filter(
-                match_id=self.match_id,
-                user=self.user
-            )
-            .first()
-        )
-
-    # ========================================================
-    # GET MATCH
-    # ========================================================
-
+        return ( match_player.objects.filter(match_id=self.match_id,user=self.user).first())
     @database_sync_to_async
     def get_match(self):
-
-        return (
-            Match.objects
-            .select_related(
-                "tournament"
-            )
-            .filter(
-                id=self.match_id
-            )
-            .first()
-        )
-
-    # ========================================================
-    # SEND ONLY THIS USER'S READY BUTTON
-    # ========================================================
+        return (Match.objects.select_related("tournament").filter(id=self.match_id).first())
 
     async def send_own_ready_button(self):
-
         player = await self.get_player()
-
         match = await self.get_match()
-
         if not match:
-
             return
 
-        # ====================================================
-        # UNIQUE CONTAINER FOR THIS USER
-        # ====================================================
-
-        container_id = (
-            f"ready-container-{self.user.id}"
-        )
-
-        # ====================================================
-        # LIVE / FINISHED
-        # REMOVE BUTTON
-        # ====================================================
-
-        if match.status in [
-            "live",
-            "finished"
-        ]:
-
+        container_id = (f"ready-container-{self.user.id}")
+        if match.status in ["live","finished"]:
             html = f"""
             <div
                 id="{container_id}"
@@ -1013,49 +291,19 @@ class MatchRoomConsumer(AsyncWebsocketConsumer):
             </div>
             """
 
-        # ====================================================
-        # OPEN / COUNTDOWN
-        # ====================================================
-
         elif (
-            match.status in [
-                "open",
-                "countdown"
-            ]
-            and player
-        ):
-
-            # ------------------------------------------------
-            # USER IS READY
-            # ------------------------------------------------
+            match.status in ["open","countdown"]and player):
 
             if player.ready:
-
                 action = "not-ready"
-
                 button_text = "Not Ready"
+                button_class = ("btn btn-danger")
 
-                button_class = (
-                    "btn btn-danger"
-                )
-
-            # ------------------------------------------------
-            # USER IS NOT READY
-            # ------------------------------------------------
 
             else:
-
                 action = "ready"
-
                 button_text = "Ready"
-
-                button_class = (
-                    "btn btn-success"
-                )
-
-            # ------------------------------------------------
-            # BUILD BUTTON HTML
-            # ------------------------------------------------
+                button_class = ("btn btn-success")
 
             html = f"""
             <div
@@ -1087,74 +335,25 @@ class MatchRoomConsumer(AsyncWebsocketConsumer):
 
             return
 
-        # ====================================================
-        # SEND RAW HTML
-        # ====================================================
-        #
-        # IMPORTANT:
-        #
-        # DO NOT json.dumps() this.
-        #
-        # HTMX websocket extension expects the HTML directly.
-        #
-        # ====================================================
-
-        await self.send(
-            text_data=html
-        )
-
-    # ========================================================
-    # BROADCAST MATCH
-    # ========================================================
+     
+        await self.send( text_data=html)
 
     async def broadcast_match(self):
-
-        html = (
-            await self.render_match_html()
-        )
-
+        html = (await self.render_match_html())
         await self.channel_layer.group_send(
-
-            self.room_group_name,
-
-            {
+            self.room_group_name,{
                 "type": "match_update",
-
                 "html": html,
-            }
-
-        )
-
-    # ========================================================
-    # RECEIVE BROADCAST
-    # ========================================================
-
-    async def match_update(
-        self,
-        event
-    ):
-
-        await self.send(
-            text_data=event["html"]
-        )
-
-    # ========================================================
-    # RENDER MATCH HTML
-    # ========================================================
+            })
+    async def match_update(self,event):
+        await self.send(text_data=event["html"])
 
     @database_sync_to_async
     def render_match_html(self):
-        match = (
-            Match.objects
-            .select_related("tournament")
-            .prefetch_related(
+        match = (Match.objects.select_related("tournament").prefetch_related(
                 "teams__user",
                 "match_players",
-                "match_player__user",
-            )
-            .filter(id=self.match_id)
-            .first()
-        )
+                "match_player__user").filter(id=self.match_id).first())
     
         if not match:
             return ""
@@ -1162,74 +361,31 @@ class MatchRoomConsumer(AsyncWebsocketConsumer):
         team_data = []
         solo_players = []
     
-        # --------------------------------------------------------
-        # FRIENDLY MATCH
-        # --------------------------------------------------------
-        # Friendly matches use match_player records and may not
-        # have a tournament attached.
-        # --------------------------------------------------------
-    
         if match.friendly_match_room:
-            for player_record in match.match_player.select_related(
-                "user"
-            ).all():
-                solo_players.append({
-                    "user": player_record.user,
-                    "match_player": player_record,
-                })
-    
-        # --------------------------------------------------------
-        # TOURNAMENT MATCH
-        # --------------------------------------------------------
+            for player_record in match.match_player.select_related("user").all():
+                solo_players.append({"user": player_record.user,"match_player": player_record})
     
         elif match.tournament:
-    
-            # ----------------------------------------------------
-            # TEAM TOURNAMENT
-            # ----------------------------------------------------
-    
             if match.tournament.category == "team":
                 for team in match.teams.prefetch_related("user").all():
                     team_players = []
-    
                     for user in team.user.all():
-                        player_record = (
-                            match.match_player
-                            .filter(user=user)
-                            .first()
-                        )
-    
+                        player_record = (match.match_player.filter(user=user).first())
                         team_players.append({
                             "user": user,
-                            "match_player": player_record,
-                        })
-    
+                            "match_player": player_record})
                     team_data.append({
                         "team": team,
-                        "players": team_players,
+                        "players": team_players
                     })
     
-            # ----------------------------------------------------
-            # SOLO TOURNAMENT
-            # ----------------------------------------------------
-    
             elif match.tournament.category == "solo":
-                player_records = {
-                    record.user_id: record
-                    for record in match.match_player.select_related(
-                        "user"
-                    ).all()
-                }
-    
+                player_records = {record.user_id: record for record in match.match_player.select_related("user").all()}
                 for user in match.match_players.all():
                     solo_players.append({
                         "user": user,
-                        "match_player": player_records.get(user.id),
+                        "match_player": player_records.get(user.id)
                     })
-    
-        # --------------------------------------------------------
-        # RENDER PLAYER PARTIAL
-        # --------------------------------------------------------
     
         teams_html = render_to_string(
             "tournament/partials/match_players.html",
@@ -1237,36 +393,19 @@ class MatchRoomConsumer(AsyncWebsocketConsumer):
                 "team_data": team_data,
                 "solo_players": solo_players,
                 "match": match,
-                "is_friendly": match.friendly_match_room,
-            },
-        )
-    
-        # --------------------------------------------------------
-        # STATUS
-        # --------------------------------------------------------
-    
+                "is_friendly": match.friendly_match_room
+            })
         status_html = f"""
         <div id="match-status" hx-swap-oob="innerHTML">
             {match.status.upper()}
         </div>
         """
     
-        # --------------------------------------------------------
-        # TIMER
-        # --------------------------------------------------------
-    
         if match.status == "countdown":
             countdown_start = countdown_times.get(match.id)
-    
             if countdown_start:
-                elapsed = (
-                    timezone.now() - countdown_start
-                ).total_seconds()
-    
-                remaining = max(
-                    0,
-                    COUNTDOWN_SECONDS - int(elapsed)
-                )
+                elapsed = ( timezone.now() - countdown_start).total_seconds()
+                remaining = max(0,COUNTDOWN_SECONDS - int(elapsed))
             else:
                 remaining = COUNTDOWN_SECONDS
     

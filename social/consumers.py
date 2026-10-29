@@ -7,40 +7,35 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import (AsyncJsonWebsocketConsumer,AsyncWebsocketConsumer)
 from django.template.loader import render_to_string
 
-
 class ChatConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         self.chatroom = None
         self.user = self.scope["user"]
         self.chatroom_name = self.scope["url_route"]["kwargs"]["chatroom_name"]
-    
         await self.accept()
-    
+
         if not self.user.is_authenticated:
-            print("CHAT: rejected, not authenticated")
+            print("chat: rejected, not authenticated")
             await self.close(code=4001)
             return
-    
+        
         self.chatroom = await self.get_chatroom()
         if self.chatroom is None:
-            print("CHAT: rejected, room not found:", self.chatroom_name)
+            print("chat: rejected, room not found:", self.chatroom_name)
             await self.close(code=4004)
             return
     
         await self.channel_layer.group_add(self.chatroom_name, self.channel_name)
-        print("CHAT: connected", self.user.username, self.chatroom_name)
+        print("chat: connected", self.user.username, self.chatroom_name)
     
         if await self.add_user_online():
             await self.update_online_count()
     
     async def disconnect(self, close_code):
-        # connect() may have exited early, so chatroom might not be set
         if getattr(self, "chatroom", None) is None:
             return
-
         await self.channel_layer.group_discard(self.chatroom_name, self.channel_name)
-
         if await self.remove_user_online():
             await self.update_online_count()
 
@@ -49,18 +44,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         body = (data.get("body") or "").strip()
         if not body:
             return
-
         message_id = await self.save_message(body)
-
-        await self.channel_layer.group_send(
-            self.chatroom_name,
-            {
+        await self.channel_layer.group_send(self.chatroom_name,{
                 "type": "message_handler",
-                "message_id": message_id,
-            },
-        )
-
-    # ---------- group event handlers ----------
+                "message_id": message_id })
 
     async def message_handler(self, event):
         html = await self.render_message(event["message_id"])
@@ -69,8 +56,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def online_count_handler(self, event):
         html = render_to_string(
             "social/partials/online_count_p.html",
-            {"online_count": event["online_count"]},
-        )
+            {"online_count": event["online_count"]})
         await self.send(text_data=html)
 
     async def update_online_count(self):
@@ -79,14 +65,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.chatroom_name,
             {
                 "type": "online_count_handler",
-                "online_count": online_count,
-            },
-        )
+                "online_count": online_count})
     async def message_deleted(self, event):
-        await self.send(
-            text_data=f'<div id="message-{event["message_id"]}" hx-swap-oob="delete"></div>'
-        )
-    # ---------- database helpers (sync code wrapped for async) ----------
+        await self.send(text_data=f'<div id="message-{event["message_id"]}" hx-swap-oob="delete"></div>')
 
     @database_sync_to_async
     def get_chatroom(self):
@@ -112,11 +93,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def save_message(self, body):
-        message = ChatGroupMessages.objects.create(
-            body=body,
-            author=self.user,
-            group=self.chatroom,
-        )
+        message = ChatGroupMessages.objects.create(body=body,author=self.user,group=self.chatroom,)
 
         if self.chatroom.is_private:
             text = f"{self.user.username} sent you a message"
@@ -132,171 +109,118 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 user=member,
                 text=text,
                 notification_type=notification_type,
-                related_id=message.id,
-            )
-
+                related_id=message.id)
+            
         return message.id
 
     @database_sync_to_async
     def render_message(self, message_id):
         message = ChatGroupMessages.objects.select_related("author").get(id=message_id)
-        return render_to_string(
-            "social/partials/group_chat_messages_p.html",
-            {"chat_message": message, "user": self.user},
-        )
+        return render_to_string("social/partials/group_chat_messages_p.html",{"chat_message": message, "user": self.user})
     
 class CallConsumer(AsyncJsonWebsocketConsumer):
-    """
-    Handles WebRTC signaling for voice and video calls.
-
-    Django Channels transfers signaling messages.
-    The actual audio and video are handled by the
-    frontend calling SDK.
-    """
 
     async def connect(self):
         self.room_id = self.scope["url_route"]["kwargs"]["room_id"]
         self.room_group_name = f"call_{self.room_id}"
         self.user = self.scope["user"]
 
-        # Only authenticated users can connect.
         if not self.user.is_authenticated:
             await self.close()
             return
 
-        # Add this connection to the call room.
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name,
         )
-
         await self.accept()
 
-        # Confirm connection to the current user.
         await self.send_json({
             "type": "call_connected",
             "user_id": self.user.id,
             "username": self.user.username,
-            "room_id": self.room_id,
-        })
-
-        # Notify other users in the room.
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
+            "room_id": self.room_id})
+        await self.channel_layer.group_send(self.room_group_name,{
                 "type": "user_joined",
                 "user_id": self.user.id,
-                "username": self.user.username,
-            },
-        )
-
+                "username": self.user.username})
+        
     async def disconnect(self, close_code):
         if not hasattr(self, "room_group_name"):
             return
 
-        # Remove the connection from the call room.
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name,
         )
 
-        # Notify other users.
         if self.user.is_authenticated:
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
                     "type": "user_left",
                     "user_id": self.user.id,
-                    "username": self.user.username,
-                },
-            )
+                    "username": self.user.username})
 
     async def receive_json(self, content, **kwargs):
         message_type = content.get("type")
 
         if not message_type:
             return
-
         if message_type == "offer":
             await self.send_offer(content)
-
         elif message_type == "answer":
             await self.send_answer(content)
-
         elif message_type == "ice_candidate":
             await self.send_ice_candidate(content)
-
         elif message_type in ["mute", "camera", "hold", "ready"]:
-            await self.send_call_status(
-                content,
-                message_type,
-            )
-
+            await self.send_call_status(content,message_type,)
         elif message_type == "leave":
             await self.leave_call()
 
     async def send_offer(self, content):
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
+        await self.channel_layer.group_send(self.room_group_name,{
                 "type": "webrtc_offer",
                 "sender_id": self.user.id,
                 "sender_name": self.user.username,
                 "offer": content.get("offer"),
-                "target_id": content.get("target_id"),
-            },
-        )
+                "target_id": content.get("target_id")
+                })
 
     async def send_answer(self, content):
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
+        await self.channel_layer.group_send(self.room_group_name,{
                 "type": "webrtc_answer",
                 "sender_id": self.user.id,
                 "sender_name": self.user.username,
                 "answer": content.get("answer"),
-                "target_id": content.get("target_id"),
-            },
-        )
+                "target_id": content.get("target_id")
+            })
 
     async def send_ice_candidate(self, content):
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
+        await self.channel_layer.group_send(self.room_group_name,{
                 "type": "webrtc_ice_candidate",
                 "sender_id": self.user.id,
                 "candidate": content.get("candidate"),
-                "target_id": content.get("target_id"),
-            },
-        )
+                "target_id": content.get("target_id")
+            })
 
     async def send_call_status(self, content, status_type):
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
+        await self.channel_layer.group_send(self.room_group_name,{
                 "type": "call_status",
                 "status_type": status_type,
                 "sender_id": self.user.id,
                 "sender_name": self.user.username,
-                "value": content.get("value"),
-            },
-        )
+                "value": content.get("value")
+            })
 
     async def leave_call(self):
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
+        await self.channel_layer.group_send(self.room_group_name,{
                 "type": "call_user_left",
                 "user_id": self.user.id,
-                "username": self.user.username,
-            },
-        )
+                "username": self.user.username
+            })
 
         await self.close()
-
-    # =====================================================
-    # GROUP EVENT HANDLERS
-    # =====================================================
 
     async def user_joined(self, event):
         if event["user_id"] == self.user.id:
@@ -305,7 +229,7 @@ class CallConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json({
             "type": "user_joined",
             "user_id": event["user_id"],
-            "username": event["username"],
+            "username": event["username"]
         })
 
     async def user_left(self, event):
@@ -315,57 +239,47 @@ class CallConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json({
             "type": "user_left",
             "user_id": event["user_id"],
-            "username": event["username"],
+            "username": event["username"]
         })
 
     async def webrtc_offer(self, event):
         if event["sender_id"] == self.user.id:
             return
 
-        if (
-            event.get("target_id")
-            and str(event["target_id"]) != str(self.user.id)
-        ):
+        if (event.get("target_id") and str(event["target_id"]) != str(self.user.id)):
             return
-
         await self.send_json({
             "type": "offer",
             "sender_id": event["sender_id"],
             "sender_name": event["sender_name"],
-            "offer": event["offer"],
+            "offer": event["offer"]
         })
 
     async def webrtc_answer(self, event):
         if event["sender_id"] == self.user.id:
             return
 
-        if (
-            event.get("target_id")
-            and str(event["target_id"]) != str(self.user.id)
-        ):
+        if (event.get("target_id")and str(event["target_id"]) != str(self.user.id)):
             return
-
+        
         await self.send_json({
             "type": "answer",
             "sender_id": event["sender_id"],
             "sender_name": event["sender_name"],
-            "answer": event["answer"],
+            "answer": event["answer"]
         })
 
     async def webrtc_ice_candidate(self, event):
         if event["sender_id"] == self.user.id:
             return
 
-        if (
-            event.get("target_id")
-            and str(event["target_id"]) != str(self.user.id)
-        ):
+        if (event.get("target_id") and str(event["target_id"]) != str(self.user.id)):
             return
 
         await self.send_json({
             "type": "ice_candidate",
             "sender_id": event["sender_id"],
-            "candidate": event["candidate"],
+            "candidate": event["candidate"]
         })
 
     async def call_status(self, event):
@@ -377,7 +291,7 @@ class CallConsumer(AsyncJsonWebsocketConsumer):
             "status_type": event["status_type"],
             "sender_id": event["sender_id"],
             "sender_name": event["sender_name"],
-            "value": event["value"],
+            "value": event["value"]
         })
 
     async def call_user_left(self, event):
@@ -387,9 +301,8 @@ class CallConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json({
             "type": "user_left",
             "user_id": event["user_id"],
-            "username": event["username"],
+            "username": event["username"]
         })
-
 
 
 class GlobalCallConsumer(AsyncJsonWebsocketConsumer):
@@ -403,29 +316,20 @@ class GlobalCallConsumer(AsyncJsonWebsocketConsumer):
 
         self.user_group_name = f"user_{self.user.id}"
 
-        await self.channel_layer.group_add(
-            self.user_group_name,
-            self.channel_name
-        )
-
+        await self.channel_layer.group_add(self.user_group_name,self.channel_name)
         await self.accept()
 
     async def disconnect(self, close_code):
         if hasattr(self, "user_group_name"):
-            await self.channel_layer.group_discard(
-                self.user_group_name,
-                self.channel_name
-            )
+            await self.channel_layer.group_discard(self.user_group_name,self.channel_name)
 
     async def receive_json(self, content):
         message_type = content.get("type")
 
         if message_type == "accept_call":
             await self.handle_accept_call(content)
-
         elif message_type == "decline_call":
             await self.handle_decline_call(content)
-
         elif message_type == "cancel_call":
             await self.handle_cancel_call(content)
 
@@ -438,17 +342,14 @@ class GlobalCallConsumer(AsyncJsonWebsocketConsumer):
         if not caller_id or not room_id:
             return
 
-        await self.channel_layer.group_send(
-            f"user_{caller_id}",
-            {
+        await self.channel_layer.group_send(f"user_{caller_id}",{
                 "type": "call_accepted",
                 "receiver_id": self.user.id,
                 "receiver_name": self.user.username,
                 "room_id": room_id,
                 "call_type": call_type,
-                "chatroom_name": chatroom_name,
-            }
-        )
+                "chatroom_name": chatroom_name
+            })
 
     async def handle_decline_call(self, content):
         caller_id = content.get("caller_id")
@@ -463,9 +364,8 @@ class GlobalCallConsumer(AsyncJsonWebsocketConsumer):
                 "type": "call_declined",
                 "receiver_id": self.user.id,
                 "receiver_name": self.user.username,
-                "room_id": room_id,
-            }
-        )
+                "room_id": room_id
+            })
 
     async def handle_cancel_call(self, content):
         receiver_id = content.get("receiver_id")
@@ -480,9 +380,8 @@ class GlobalCallConsumer(AsyncJsonWebsocketConsumer):
                 "type": "call_cancelled",
                 "caller_id": self.user.id,
                 "caller_name": self.user.username,
-                "room_id": room_id,
-            }
-        )
+                "room_id": room_id
+            })
 
     async def incoming_call(self, event):
         await self.send_json({
@@ -491,7 +390,7 @@ class GlobalCallConsumer(AsyncJsonWebsocketConsumer):
             "caller_name": event["caller_name"],
             "room_id": event["room_id"],
             "call_type": event["call_type"],
-            "chatroom_name": event.get("chatroom_name"),
+            "chatroom_name": event.get("chatroom_name")
         })
 
     async def call_accepted(self, event):
@@ -501,7 +400,7 @@ class GlobalCallConsumer(AsyncJsonWebsocketConsumer):
             "receiver_name": event["receiver_name"],
             "room_id": event["room_id"],
             "call_type": event["call_type"],
-            "chatroom_name": event.get("chatroom_name"),
+            "chatroom_name": event.get("chatroom_name")
         })
 
     async def call_declined(self, event):
@@ -509,7 +408,7 @@ class GlobalCallConsumer(AsyncJsonWebsocketConsumer):
             "type": "call_declined",
             "receiver_id": event["receiver_id"],
             "receiver_name": event["receiver_name"],
-            "room_id": event["room_id"],
+            "room_id": event["room_id"]
         })
 
     async def call_cancelled(self, event):
@@ -517,5 +416,5 @@ class GlobalCallConsumer(AsyncJsonWebsocketConsumer):
             "type": "call_cancelled",
             "caller_id": event["caller_id"],
             "caller_name": event["caller_name"],
-            "room_id": event["room_id"],
+            "room_id": event["room_id"]
         })

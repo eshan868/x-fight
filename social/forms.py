@@ -13,8 +13,7 @@ class ChatMessageCreatorForm(ModelForm):
                 'placeholder': 'Type a message...',
                 'autocomplete': 'off',
             })
-            }
-
+        }
 
 class NewGroupForm(ModelForm):
     class Meta:

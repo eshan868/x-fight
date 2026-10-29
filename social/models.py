@@ -11,45 +11,21 @@ class GameMate(models.Model):
         ("accepted","Accepted"),
         ("rejected","Rejected"),
     )
-
-    user=models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="gamemates"
-    )
-
-    mate=models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
-    )
+    user=models.ForeignKey(User, on_delete=models.CASCADE,related_name="gamemates")
+    mate=models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     status = models.CharField(
         max_length=20,
         choices=STATUS,
         default="non_gamemate"
     )
     created_at=models.DateTimeField(auto_now_add=True)
-
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     sender = models.ForeignKey(User, null=True, blank=True,on_delete=models.CASCADE ,related_name="notification_sender")
     text = models.TextField()
-
-    notification_type = models.CharField(
-        max_length=50,
-        null=True,
-        blank=True
-    )
-
-    related_id = models.IntegerField(
-        null=True,
-        blank=True
-    )
-    is_read = models.BooleanField(
-        default=False
-    )
-
+    notification_type = models.CharField(max_length=50,null=True,blank=True)
+    related_id = models.IntegerField(null=True,blank=True)
+    is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
 class ChatGroup(models.Model):
@@ -63,9 +39,11 @@ class ChatGroup(models.Model):
 
     def __str__(self):
         return self.group_name
+    
 class ChatMessageQuerySet(models.QuerySet):
     def visible_to(self, user):
         return self.filter(deleted_for_everyone=False).exclude(deleted_for=user)
+    
 class ChatGroupMessages(models.Model):
     group=models.ForeignKey(ChatGroup,related_name="chat_messages", on_delete=models.CASCADE)
     author=models.ForeignKey(User,on_delete=models.CASCADE)
@@ -75,11 +53,7 @@ class ChatGroupMessages(models.Model):
     message_type = models.CharField(max_length=30,default="normal")
     is_forwarded = models.BooleanField(default=False)
     deleted_for_everyone = models.BooleanField(default=False)
-    deleted_for = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        related_name="hidden_chat_messages",
-        blank=True,
-    )
+    deleted_for = models.ManyToManyField(settings.AUTH_USER_MODEL,related_name="hidden_chat_messages",blank=True,)
     objects = ChatMessageQuerySet.as_manager()
 
     IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".svg")
