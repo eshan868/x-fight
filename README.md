@@ -1,135 +1,130 @@
-# X-Fight — GameArena
+# X-Fight - The GameArena
 
 ## You can explore this website on : https://x-fight-two.vercel.app/
 
 <img width="1338" height="608" alt="image" src="https://github.com/user-attachments/assets/d0662248-2506-4884-bb9a-3a5f7162d21f" />
 
-**X-Fight** is a gaming community and tournament management platform built using Python and Django. It is designed for gamers who want to connect with other players, participate in tournaments, organize friendly matches, communicate with teammates, and compete in a gaming community.
+This is a gaming community and tournament managing website built using Python and Django. It is developed for gamers who want everything in one platform.
+like other website this website can host tournaments, host friendly matches, chat with other gamers, and call them and dominate by having high stats
 
-Unlike a traditional gaming website, X-Fight brings multiple gaming community features together in one platform. It supports different types of matches, player connections, tournament management, in-platform communication, and an experience system.
-
-This is one of my projects developed while learning and working with Python, Django, and modern web technologies. The goal is to create a platform where gamers can connect, compete, and manage their gaming activities in one place.
+## why I created this?
+I know that there are websites like slack, discord and in almost all the games has tournament system and leaderboard but that is for that game, but I want the gamers that dominate whole the gamming community that's where this X-fight comes and that's why I created it 
 
 ## Working of X-Fight
+in this x-fight there some features in that the main features are.
 
-The features available on the website depend on the user's account, permissions, and participation in tournaments, matches, and teams.
+### The Main Features
 
-### Main Features
-
-- User registration and authentication.
-- Player profiles with gamer tags, profile pictures, biographies, and social links.
-- Gaming community and player discovery.
 - GameMate system for connecting with other players.
 - Tournament creation and management.
 - Friendly match creation and participation.
-- Match rooms with player readiness and match status management.
-- Real-time communication using Django Channels and WebSockets.
 - One-to-one and group chat functionality.
 - Team management and team meetings.
 - In-platform coin and Stats.
 - Match report uploads and AI-assisted match result processing.
-- Responsive gaming dashboard and player interface.
 
-## If You Are a Player
 
-After logging in, players can access their gaming dashboard and the features available to their account.
+
+## After Entering The Arena
 
 ### Dashboard
 
 <img width="1334" height="646" alt="image" src="https://github.com/user-attachments/assets/cc7796d1-3aa9-4e13-869d-350c82d7cb36" />
 
-The dashboard acts as the main entry point to the gaming platform. It provides access to player-related activities, gaming features, and community interactions.
+Here the dashboard acts as the main entry point to the Site. It provides access to player-related activities and community interactions.
 
 Players can navigate between the available sections to manage their profiles, connect with other gamers, and participate in gaming activities.
 
 ### Player Profile
 
-Each player can maintain a gaming profile containing details such as:
+In order to create an account the user must enter these much information
 
 - Full name.
+- username
+- password
 - Unique gamer tag.
 - Profile picture.
 - Age.
 - Biography.
-- Social media links.
-- Coins
-- Stats
+- Social medias links.
+- email
 
-The profile helps other players identify and connect with them within the gaming community.
+The profile helps other players identify and connect with them within the gaming community. And when it comes to the profile there will be two more things that is stats and coins initial when registering the stats and the coins and the stats will be zero
 
 ### GameMates
 
-The GameMate feature allows players to connect with other gamers.
-
-Players can discover potential gaming partners, send or manage connection requests, and connect with accepted GameMates.
-
-Depending on the available features and permissions, accepted GameMates can interact through the platform's communication and friendly-match systems.
+The GameMate feature allows players to connect with other gamers. In this the Players can discover gaming partners GameMates 
+When a user sends a GameMate Request to another user in notification Pannel of the receiver user an option will be seen accept or reject as their name their functionality is same to accept and reject the game mate requests  
 
 ### Discover Players
-
-Players can explore the gaming community and discover other users.
-
-This feature helps gamers find potential teammates and expand their gaming network.
+This a popup screen where all the users of the x-fight are listed from here they can send gameMate request 
 
 ## Tournaments
+This is the place all the active tournaments is listed <img width="1358" height="636" alt="image" src="https://github.com/user-attachments/assets/6a4e6a00-9963-46ba-b251-bef7e1627c63" />
 
-X-Fight includes tournament management functionality that allows tournament organizers to manage competitive gaming events.
+in this when they click the view details  there the details of the tournament will be displayed<img width="1358" height="636" alt="image" src="https://github.com/user-attachments/assets/2c4784e2-dc0e-4c83-a61c-03bcc75d94aa" />
+here they can join the tournament with two possibilities 
+- Team if it is Team tournament then they can select the team and register
+- solo if is solo tournament then they can just join
+
+if there is fee for the tournament then they need to pay is and then only join the fee will be coins 
 
 ### Tournament Creation
 
-Tournament organizers can configure tournament details, including:
+in every players dashboard there will be option to organize a tournament and in that they can select in that select there may not have a checkbox then just click gamemates names of the admins  they can create the tournament with these details 
 
-- Tournament name and information.
-- Game category.
+- Tournament name
 - Solo or team-based participation.
-- Entry fee, where applicable.
-- Team registration limits.
-- Match duration.
-- Match report submission settings.
+- Entry fee if it is free then it will be zero.
+- tourtnament description
+- tournament dates and details
+- tournament admins
 - reward coins
 
-The available configuration depends on the tournament creation form and its validation rules.
 
-### Tournament Participation
+### tournament dashboard 
 
-Players can participate in tournaments according to the configured rules.
+in here all the users can see 
+- leaderboard
+- scheduled matches they can enter in which their team or name is registered
+- all the participating tournaments and players
+<img width="1358" height="636" alt="image" src="https://github.com/user-attachments/assets/6837bca6-994e-4c49-8716-683796991a3c" />
 
-The tournament system supports features such as:
 
-- Tournament registration.
-- Team and player participation.
-- Match assignment.
-- Player readiness.
-- Match scheduling and status tracking.
-- Match report submission.
+## tournament settings dashboard 
 
-### Match Management
+this page can access only by the tournament admins they can do the following things 
+-  leaderboard
+- schedule matches
+- all the participating tournaments and players
+- add admins
 
-Tournament matches can move through different states as they progress.
-Typical match states include:
+<img width="1358" height="636" alt="image" src="https://github.com/user-attachments/assets/4c5da994-d7b3-4ff1-a9bb-84eee59e8faf" />
 
-- Scheduled.
-- Open.
-- Countdown.
-- Live.
-- Finished.
+## Team dashboard
+every players can create team with his gammemates then they can acesses this page in this page they can use the following features 
+- overview
+- upcomming matches for that team
+- initially the team captain will be who created the team later all the team members can decide the team captain by voting in which members got majority vote    will be the team captain
+- team meeting - the team meeting can be scheduled by the team memebers can join in time
+- team chat - when a team ius create the team chat is automatically created and they can chat there
 
-The system uses match status and timing information to manage the match lifecycle.
+  <img width="1358" height="636" alt="image" src="https://github.com/user-attachments/assets/30ca2e03-3cf9-44b1-a74f-a6e91df7a597" />
 
-### Ready System and Countdown
+## match room
 
-Players can mark themselves as ready before a match begins.
+when the players enter a Matchroom in left they will be seeing all the participants of that tournament and in right side thay will have the button for ready or not
 
-A countdown can be used before the match starts, helping participants prepare for the game. Match readiness and participation restrictions are handled according to the match rules.
+if everybody in the match presses the ready and the 12 sec countdown will starts before the match duration starts and if anyone press not ready on the countdown period the countdown will rest and starts again and after countdown the button will disappear 
 
 ### Match Reports and AI-Assisted Results
 
-X-Fight includes functionality for uploading match reports and processing match results.
+This x-fight has a functionality for uploadin2g match reports and processing match results.
 
-if it is a friendly match or solo a random player will be selected to upload the screen shot of the game scoreboard 
+if it is a friendly match or solo a random player will be randomly selected to upload the screen shot of the game scoreboard 
 > [!IMPORTANT]
 > Set username of the x-fight and the username of game should be equal otherwise it won't publish result and reward will not given 
-Depending on the configured game and report-processing workflow, the system can use AI-assisted image or result processing to extract match information.
+Depending on the configured game , the system can use AI-assisted image or result processing to extract match information.
 
 Processed results can include:
 
@@ -138,13 +133,11 @@ Processed results can include:
 - Match winner.
 - Draw or penalty-related outcomes, where supported.
 
-Match result processing and Coin rewards depend on the configured implementation.
 
 ## Friendly Matches
 
-In addition to tournament matches, X-Fight supports the creation of friendly matches.
-Friendly matches allow players to organize games without creating a full tournament.
-it can create between the game mates only 
+In addition to tournament matches, it supports the creation of friendly matches.Friendly matches allow players to organize games without creating a full tournament.
+it can create between the gamemates only 
 
 ### Friendly Match Features
 
@@ -152,41 +145,45 @@ it can create between the game mates only
 - Select the supported game.
 - Configure the match duration.
 - Invite or select GameMates.
-- Manage player participation.
-- Allow players to mark themselves as ready.
 - Access the match room.
+- loot
 
-Supported game choices depend on the current implementation and may include eFootball, EA SPORTS FC, and other games.
-
-Available durations depend on the configured match creation form.
-
-Friendly matches use a separate workflow from tournament matches, allowing the platform to handle casual games independently.
+in this loot means the total amount of the coins that the winner should recive
+this loot amount will be taken from every player participating in here 
+the way of calculating the loot to collect is 
+                        total amount /total palyers
+this amount will be taken from all the participalnts 
 
 ## Chat and Real-Time Communication
-
-X-Fight uses Django Channels and WebSockets to support real-time features.
-it also includes option for forwarding deleting the message 
-deleting message has two options delete for me or delete for everyone 
-
-### One-to-One Chat
-<img width="1349" height="630" alt="image" src="https://github.com/user-attachments/assets/41d7c17e-e9e9-45d2-85fd-79f0cc7ca617" />
-
-Players can communicate with eligible GameMates through individual chat rooms.
+in this website the players can communicate with each other with calling or chat way the tech i used here for this is Django channels and WebSocket's for real time communication
 
 ### Group Chat
 
-The platform includes support for group communication, allowing multiple participants to interact within a shared chat room.
+The platform  support for group communication, allowing multiple players to interact within a shared chat room.
 
 In these there are two options
 -group detail: in which the details of the group will be mentioned, and the admins can change that Eg- change admin removing user ect ..
 -Invite they can send invitation to the game mates through their single chat if they click join they will be joined 
+-Group voice call 
+-group video call
+<img width="1358" height="636" alt="image" src="https://github.com/user-attachments/assets/c52119b7-a867-49ca-ab17-a8501bd974ad" />
 
-### Real-Time Updates
+## group detail
+here all the details of the group are displayed they are 
+-group name
+-group admins 
+-group members 
+- for group admins they can remove or make a member as admin
+  <img width="1358" height="636" alt="image" src="https://github.com/user-attachments/assets/2ab7c7e0-6798-4842-8061-061e31a19505" />
 
-WebSocket connections can be used to exchange messages and updates without repeatedly refreshing the page.
-The exact availability of each communication feature depends on the user's permissions and the current room configuration.
 
-In this chat room there have button for video call and voice call 
+### one to one chat 
+
+this is nothing othere that chating with the gamemates it has two options 
+-voice call
+-video call
+<img width="1358" height="636" alt="image" src="https://github.com/user-attachments/assets/09ca32a9-c1c0-437c-ad1d-086889e12074" />
+
 
 ## Teams and Meetings
 
@@ -198,49 +195,33 @@ Team features can help players organize their gaming activities and coordinate w
 
 The captain of the Team will be able manage the team 
 
-### Team Meetings
 
-The team meeting functionality provides a place for  team members to access scheduled meetings.
-
-Depending on the configured permissions, team captains  can schedule meetings, while other members can access their meeting information and join in the time 
-
-### Team chat 
-
-whenever a team is created a team chat is also created in the name of that team 
-
-This is the place where the team members can chat 
-
-### Voice and Video Communication
+### Voice and Video Calls Tech Stack used
 <img width="1347" height="619" alt="image" src="https://github.com/user-attachments/assets/67941132-d463-4a0b-a7ba-ce071a76ed59" />
 
 The project includes integration work for ZEGOCLOUD-based real-time communication.
-
 The communication flow is designed to use backend-generated authentication tokens instead of exposing server-side secrets to the browser.
-
 For the Voice and Vedio calls We have used ZEECLOUD SDK over UI KIT to give our own UI
 
-## Coins and Experience Points
-
-X-Fight includes a system for managing player Stats and platform-related coin balances.
+## Coins 
+ These coins can be earned by winning matches and can share is to game mates by through the page call share credits 
+ and it has another page for keeping all the records for sharing the credits 
+ <img width="1358" height="636" alt="image" src="https://github.com/user-attachments/assets/e8fd29fa-242f-4f46-81e4-c0934dbb7307" />
+ <img width="1358" height="636" alt="image" src="https://github.com/user-attachments/assets/f97e0185-5c7e-4f00-86f5-ee964521562f" />
 
 ### Stats
 
-Players have a Stats in their Profile 
+All The Players can have a Stats in their Profile 
+In the leaderboard who has more Stats will on top of the  position
 
-In the leaderboard who has more Stats will on to postion
-
-Here winning the match the user will get coins. using that coins they can buy stats 
-
-stats comes with three option 
+stats buying option comes with three option 
 -Starter pack
 -Pro pack
 -Elite pack
 
-### Coin Transfers
+<img width="1358" height="636" alt="image" src="https://github.com/user-attachments/assets/dfc8a91b-afd7-45d9-aa5b-80a62d940133" />
 
-The platform includes functionality for transferring supported coin balances between GameMates.
-Transaction records can be used to track transfers and display transaction history.
-All balance changes should be validated on the backend to prevent unauthorized modifications.
+
 
 ## Technology Stack
 
@@ -256,11 +237,8 @@ X-Fight is built using the following technologies:
 - **Daphne** — ASGI server.
 - **SQLite or PostgreSQL** — Database, depending on the configured environment.
 - **ZEGOCLOUD** — Real-time communication integration.
-- **Google authentication** — External authentication integration, where configured.
-- **AI and OCR services** — Match report processing, depending on the configured provider.
-- **Git and GitHub** — Version control and source-code hosting.
-- **Vercel** — Deployment, subject to ASGI, WebSocket, database, and background-processing requirements.
-
+- **AI** — Match report processing, depending on the configured provider(via google gemini)
+  
 The exact dependencies and services are defined by the project's current configuration and `requirements.txt`.
 
 ## Instructions to Build and Run Locally
@@ -268,8 +246,6 @@ The exact dependencies and services are defined by the project's current configu
 Follow these steps to run X-Fight on your local machine.
 
 ### 1. Clone the repository
-
-Replace the repository URL with your X-Fight GitHub repository URL.
 
 ```bash
 git clone https://github.com/eshan868/x-fight.git
@@ -313,16 +289,9 @@ pip install -r requirements.txt
 
 Create a `.env` file 
 
-Add the necessary environment variables for the database, authentication providers, communication services, AI integrations, cloudinary and Django settings.
+Add the necessary environment variables for the database, authentication providers, communication services, AI API, cloudinary and Django settings.
 
-For example:
-
-```env
-SECRET_KEY=your_django_secret_key
-DEBUG=True
-```
-
-Add other variables only as required by the project's settings.
+Add other variables only as required by the project's settings (which you can see in the settings.py which are the env varaiables is neede)
 
 
 ### 7. Run database migrations
@@ -331,21 +300,11 @@ Add other variables only as required by the project's settings.
 python manage.py migrate
 ```
 
-### 8. Create an administrator account (optional)
-
-```bash
-python manage.py createsuperuser
-```
-
-Follow the prompts to create the account.
-
 ### 9. Start the development server
 
 ```bash
 python manage.py runserver
 ```
-
-For development involving Django Channels and WebSocket functionality, use the ASGI server and configuration appropriate to the project when required.
 
 ### 10. Open the website
 
@@ -354,14 +313,14 @@ Visit the following address in your browser:
 http://127.0.0.1:8000/
 
 The website should now be available locally, provided the required settings, dependencies, and database configuration are in place.
+> [!NOTE]
+> THEN TEST THE FEATURE MENTIONED BELOW
+
 
 ## Project Structure
 
 The project is organized into Django applications, with each application responsible for a specific part of the platform.
-
-The exact structure may vary depending on the current repository version.
-
-Typical application responsibilities include:
+They are:
 
 - **accounts** — User accounts, authentication, and player profiles.
 - **discovery** — Player discovery and related community functionality.
@@ -369,15 +328,7 @@ Typical application responsibilities include:
 - **tournament** — Tournament management, match creation, participation, and match results.
 - **Project configuration** — Django settings, URL routing, ASGI configuration, and application initialization.
 
-## Security Notes
-
-- Set `DEBUG=False` in production and configure `ALLOWED_HOSTS` appropriately.
-- Configure secure cookies, CSRF protection, and authentication settings for the production environment.
-
-
 ## Future Improvements
-
-Potential areas for further development include:
 
 - Expanded competitive tournament formats.
 - More supported games and match types.
@@ -388,8 +339,6 @@ Potential areas for further development include:
 - More detailed tournament analytics.
 - Further optimization for mobile devices.
 - Expanded deployment support for persistent WebSocket connections and background tasks.
-
-These improvements depend on future development and should not be considered available features unless implemented.
 
 ## Contributing
 
@@ -402,8 +351,6 @@ To contribute:
 3. Implement and test your changes.
 4. Commit your changes with a descriptive message.
 5. Submit a pull request.
-
-Please avoid committing secrets, credentials, environment files, or private configuration data.
 
 ## License
 
