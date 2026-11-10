@@ -262,10 +262,26 @@
         color: #8a8a8a;
         margin: 0 6px 2px
     }
+
+    .author-only {
+        display: none;
+    }
+
+    .author-only-flex {
+        display: none;
+    }
+
+    .invite-sender-view {
+        display: none;
+    }
+
+    .invite-recipient-view {
+        display: block;
+    }
 </style>
 {% if chat_message.message_type == "group_invite" %}
 
-<div class="message-row received-message">
+<div class="message-row received-message" data-author-id="{{ chat_message.author_id }}">
     <div class="group-invite-message">
 
         <div class="group-invite-header">
@@ -273,24 +289,22 @@
             <h3>Group Invitation</h3>
         </div>
 
-        {% if chat_message.author_id != user.id %}
+        <div class="invite-recipient-view">
+            <p class="invite-text">
+                <strong>{{ chat_message.author.username }}</strong>
+                invited you to join a group.
+            </p>
 
-        <p class="invite-text">
-            <strong>{{ chat_message.author.username }}</strong>
-            invited you to join a group.
-        </p>
+            <a href="{% url 'chatroom' chat_message.body %}" class="join-group-btn">
+                JOIN GROUP
+            </a>
+        </div>
 
-        <a href="{% url 'chatroom' chat_message.body %}" class="join-group-btn">
-            JOIN GROUP
-        </a>
-
-        {% else %}
-
-        <p class="invite-text">
-            Invite sent successfully
-        </p>
-
-        {% endif %}
+        <div class="invite-sender-view">
+            <p class="invite-text">
+                Invite sent successfully
+            </p>
+        </div>
 
     </div>
 </div>
@@ -298,16 +312,14 @@
 
 {% else %}
 
-<div class="message-row {% if chat_message.author_id == user.id %}sent{% else %}received{% endif %}"
-    id="message-{{ chat_message.id }}" data-message-id="{{ chat_message.id }}">
+<div class="message-row"
+    id="message-{{ chat_message.id }}" data-message-id="{{ chat_message.id }}" data-author-id="{{ chat_message.author_id }}">
 
     <div class="message-content">
 
-        {% if chat_message.author_id != user.id %}
         <div class="message-author">
             {{ chat_message.author.username }}
         </div>
-        {% endif %}
 
 
         <!-- ==========================================
@@ -417,17 +429,13 @@
 
 
                         <!-- Delete -->
-                        {% if chat_message.author_id == user.id %}
-
-                        <button type="button" class="message-dropdown-item danger"
+                        <button type="button" class="message-dropdown-item danger author-only-flex"
                             onclick="deleteMessage('{{ chat_message.id }}')">
 
                             <i class="bi bi-trash3"></i>
                             <span>Delete</span>
 
                         </button>
-
-                        {% endif %}
 
                     </div>
 
@@ -436,16 +444,12 @@
                 {% else %}
 
                 <!-- TEXT MESSAGE DELETE -->
-                {% if chat_message.author_id == user.id %}
-
-                <button type="button" class="message-action-btn" onclick="deleteMessage('{{ chat_message.id }}')"
+                <button type="button" class="message-action-btn author-only" onclick="deleteMessage('{{ chat_message.id }}')"
                     title="Delete">
 
                     <i class="bi bi-trash3"></i>
 
                 </button>
-
-                {% endif %}
 
                 {% endif %}
 
@@ -498,6 +502,19 @@
 
 
 <script>
+    function syncSentMessages() {
+        const currentUserId = document.getElementById("messages")?.dataset.currentUserId || document.body.dataset.userId;
+        if (!currentUserId) return;
+        document.querySelectorAll(`.message-row[data-author-id="${currentUserId}"]:not(.sent)`).forEach(el => {
+            el.classList.add("sent");
+            el.classList.remove("received");
+        });
+        document.querySelectorAll(`.message-row[data-author-id]:not([data-author-id="${currentUserId}"]):not(.received)`).forEach(el => {
+            el.classList.add("received");
+            el.classList.remove("sent");
+        });
+    }
+
     function localizeTimes() {
         document.querySelectorAll("[data-utc]:not([data-localized])").forEach(el => {
             const d = new Date(el.dataset.utc);
@@ -513,9 +530,13 @@
     }
 
     localizeTimes();
+    syncSentMessages();
 
     // Convert messages that arrive later via WebSocket/HTMX
-    new MutationObserver(localizeTimes).observe(document.body, {
+    new MutationObserver(function() {
+        localizeTimes();
+        syncSentMessages();
+    }).observe(document.body, {
         childList: true,
         subtree: true,
     });
@@ -551,7 +572,8 @@
     function deleteMessage(id) {
         pendingDeleteId = id;
         const row = document.getElementById("message-" + id);
-        const mine = row && row.classList.contains("sent");
+        const currentUserId = document.getElementById("messages")?.dataset.currentUserId || document.body.dataset.userId;
+        const mine = row && (row.classList.contains("sent") || (currentUserId && row.dataset.authorId === currentUserId));
         // "Delete for everyone" only for the sender
         document.getElementById("delEveryoneBtn").style.display = mine ? "" : "none";
         openModal("deleteModal");

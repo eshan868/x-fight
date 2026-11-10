@@ -1,81 +1,21 @@
 {% extends "layouts/base_layout.html" %}
-
 {% block title %}Event Settings{% endblock %}
-
 {% block content %}
-
-
 <section>
-
     <section class="event-settings-page">
-
         <div class="event-settings-layout">
 
-
-            <!-- =====================================================
-                 SIDEBAR
-            ====================================================== -->
-
             <aside class="event-settings-sidebar">
-
                 <div class="event-sidebar-header">
-
-                    <h3>
-                        {{ event.name }}
-                    </h3>
-
-                    <span>
-                        Event Management
-                    </span>
-
+                    <h3>{{ event.name }}</h3>
+                    <span>Event Management</span>
                 </div>
-
-
                 <nav class="event-sidebar-nav">
 
 
-                    <!-- OVERVIEW -->
-
-                    <button type="button" class="event-nav-item active" onclick="showEventSection('overview', this)">
-
-                        <span>⌂</span>
-
-                        Overview
-
-                    </button>
-
-
-                    <!-- PARTICIPANTS -->
-
-                    <button type="button" class="event-nav-item" onclick="showEventSection('participants', this)">
-
-                        <span>♟</span>
-
-                        Participants
-
-                    </button>
-
-
-                    <!-- MATCHES -->
-
-                    <button type="button" class="event-nav-item" onclick="showEventSection('matches', this)">
-
-                        <span>⚔</span>
-
-                        Matches
-
-                    </button>
-
-
-                    <!-- ADMINS -->
-
-                    <button type="button" class="event-nav-item" onclick="showEventSection('admins', this)">
-
-                        <span>♙</span>
-
-                        Admins
-
-                    </button>
+                    <button type="button" class="event-nav-item active" onclick="showEventSection('overview', this)">Overview</button>
+                    <button type="button" class="event-nav-item" onclick="showEventSection('participants', this)">Participants</button>
+                    <button type="button" class="event-nav-item" onclick="showEventSection('matches', this)">Matches</button>Admins</button>
 
 
                     <!-- SCOREBOARD -->

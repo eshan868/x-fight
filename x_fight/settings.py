@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 ZEGO_APP_ID = int(os.getenv("ZEGO_APP_ID", "0"))
 ZEGO_SERVER_SECRET = os.getenv("ZEGO_SERVER_SECRET", "")
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DJANGO_DEBUG")
+DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
     host.strip()

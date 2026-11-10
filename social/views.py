@@ -228,8 +228,9 @@ def chat_file_upload(request, chatroom_name):
         )
 
         channel_layer = get_channel_layer()
+        html = render_to_string("social/partials/group_chat_messages_p.html", {"chat_message": message})
         async_to_sync(channel_layer.group_send)(
-            chatroom_name,{"type": "message_handler","message_id": message.id,})
+            chatroom_name, {"type": "message_handler", "message_id": message.id, "html": html})
         
         return HttpResponse("")
     return HttpResponse("Invalid request", status=400)
@@ -432,9 +433,10 @@ def forward_message(request, message_id):
                 related_id=new_msg.id,
             )
 
+        html = render_to_string("social/partials/group_chat_messages_p.html", {"chat_message": new_msg})
         async_to_sync(layer.group_send)(
             room.group_name,
-            {"type": "message_handler", "message_id": new_msg.id}
+            {"type": "message_handler", "message_id": new_msg.id, "html": html}
         )
 
     return JsonResponse({"ok": True, "count": targets.count()})

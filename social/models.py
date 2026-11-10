@@ -47,7 +47,7 @@ class ChatMessageQuerySet(models.QuerySet):
 class ChatGroupMessages(models.Model):
     group=models.ForeignKey(ChatGroup,related_name="chat_messages", on_delete=models.CASCADE)
     author=models.ForeignKey(User,on_delete=models.CASCADE)
-    body=models.CharField(max_length=500,null=True,blank=True)
+    body=models.TextField(null=True,blank=True)
     file=models.FileField(upload_to="chat_files/",blank=True,null=True)
     created=models.DateTimeField(auto_now_add=True)
     message_type = models.CharField(max_length=30,default="normal")

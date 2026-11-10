@@ -613,7 +613,8 @@
         box-sizing: border-box;
     }
 
-    .message-row.sent {
+    .message-row.sent,
+    .message-row[data-author-id="{{ request.user.id }}"] {
         justify-content: flex-end;
     }
 
@@ -639,7 +640,8 @@
    SENT / RECEIVED ALIGNMENT
 ========================================================= */
 
-    .message-row.sent .message-content {
+    .message-row.sent .message-content,
+    .message-row[data-author-id="{{ request.user.id }}"] .message-content {
         align-items: flex-end;
     }
 
@@ -692,7 +694,8 @@
    SENT MESSAGE
 ========================================================= */
 
-    .message-row.sent .chat-message {
+    .message-row.sent .chat-message,
+    .message-row[data-author-id="{{ request.user.id }}"] .chat-message {
         background: #000000;
 
         color: #ffffff;
@@ -700,6 +703,30 @@
         border: 1px solid rgba(255, 0, 0, 0.55);
 
         border-bottom-right-radius: 5px;
+    }
+
+    .message-row[data-author-id="{{ request.user.id }}"] .message-author {
+        display: none;
+    }
+
+    .message-row[data-author-id="{{ request.user.id }}"] .message-actions {
+        justify-content: flex-end;
+    }
+
+    .message-row[data-author-id="{{ request.user.id }}"] .author-only {
+        display: inline-flex;
+    }
+
+    .message-row[data-author-id="{{ request.user.id }}"] .author-only-flex {
+        display: flex;
+    }
+
+    .message-row[data-author-id="{{ request.user.id }}"] .invite-sender-view {
+        display: block;
+    }
+
+    .message-row[data-author-id="{{ request.user.id }}"] .invite-recipient-view {
+        display: none;
     }
 
 
@@ -1339,7 +1366,7 @@
                 </div>
 
                 <!-- MESSAGES -->
-                <div class="messages flex-grow-1 d-flex flex-column" id="messages">
+                <div class="messages flex-grow-1 d-flex flex-column" id="messages" data-current-user-id="{{ request.user.id }}">
                     {% for chat_message in chat_messages %}
                     {% include 'social/group_chat_messages.html' %}
                     {% empty %}
@@ -1355,7 +1382,6 @@
                         hx-ext="ws" ws-connect="/ws/chatroom/{{ chatroom_name }}/" ws-send>
                         {% csrf_token %}
                         <div class="chat-composer">
-                            <input type="file" name="file" id="chat-file-input" hidden>
                             <input type="file" name="file" id="chat-file-input" hidden>
                             <label for="chat-file-input" class="chat-upload-btn" title="Attach file">
                                 <i class="bi bi-paperclip"></i>

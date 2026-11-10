@@ -2,10 +2,13 @@ from channels.generic.websocket import WebsocketConsumer
 from django.shortcuts  import get_object_or_404
 from .models import *
 import json
-from asgiref.sync import async_to_sync
+import logging
+from asgiref.sync import async_to_sync, sync_to_async
 from channels.db import database_sync_to_async
 from channels.generic.websocket import (AsyncJsonWebsocketConsumer,AsyncWebsocketConsumer)
 from django.template.loader import render_to_string
+
+logger = logging.getLogger(__name__)
 
 class ChatConsumer(AsyncWebsocketConsumer):
 
@@ -40,23 +43,43 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.update_online_count()
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
+        try:
+            data = json.loads(text_data)
+        except Exception as e:
+            logger.error("Failed to parse JSON in ChatConsumer.receive: %s", e)
+            return
+
         body = (data.get("body") or "").strip()
         if not body:
             return
-        message_id = await self.save_message(body)
-        await self.channel_layer.group_send(self.chatroom_name,{
+
+        try:
+            message = await self.save_message(body)
+        except Exception as e:
+            logger.exception("Failed to save message in ChatConsumer.save_message: %s", e)
+            return
+
+        html = await self.render_message(message)
+        await self.channel_layer.group_send(
+            self.chatroom_name,
+            {
                 "type": "message_handler",
-                "message_id": message_id })
+                "message_id": message.id,
+                "html": html,
+            },
+        )
 
     async def message_handler(self, event):
-        html = await self.render_message(event["message_id"])
+        html = event.get("html")
+        if not html:
+            html = await self.render_message(event["message_id"])
         await self.send(text_data=html)
 
     async def online_count_handler(self, event):
-        html = render_to_string(
+        html = await sync_to_async(render_to_string)(
             "social/partials/online_count_p.html",
-            {"online_count": event["online_count"]})
+            {"online_count": event["online_count"]}
+        )
         await self.send(text_data=html)
 
     async def update_online_count(self):
@@ -102,7 +125,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             text = f"{self.user.username} sent a message in {self.chatroom.groupchat_name}"
             notification_type = "group_message"
         else:
-            return message.id
+            return message
 
         for member in self.chatroom.members.exclude(pk=self.user.pk):
             Notification.objects.create(
@@ -111,12 +134,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 notification_type=notification_type,
                 related_id=message.id)
             
-        return message.id
+        return message
 
     @database_sync_to_async
-    def render_message(self, message_id):
-        message = ChatGroupMessages.objects.select_related("author").get(id=message_id)
-        return render_to_string("social/partials/group_chat_messages_p.html",{"chat_message": message, "user": self.user})
+    def render_message(self, message_or_id):
+        if isinstance(message_or_id, ChatGroupMessages):
+            message = message_or_id
+        else:
+            message = ChatGroupMessages.objects.select_related("author").get(id=message_or_id)
+        return render_to_string("social/partials/group_chat_messages_p.html", {"chat_message": message})
     
 class CallConsumer(AsyncJsonWebsocketConsumer):
 
